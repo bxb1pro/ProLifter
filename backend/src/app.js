@@ -2,13 +2,13 @@ require('dotenv').config();
 
 const express = require('express');
 const userRoutes = require('./routes/userRoutes');
+const exerciseRoutes = require('./routes/exerciseRoutes');
 
 const app = express();
 
-// Middleware to parse JSON
 app.use(express.json());
 
-// Mount the user routes
 app.use('/api/users', userRoutes);
+app.use('/api/exercises', exerciseRoutes);
 
 module.exports = app;

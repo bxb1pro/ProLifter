@@ -25,8 +25,15 @@ const getUserById = async (req, res) => {
 
 const createUser = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
-        const newUser = await User.create({ name, email, password });
+        const { userName, userEmail, userPassword, userAge, userExperienceLevel, userWeightliftingGoal } = req.body;
+        const newUser = await User.create({ 
+            userName, 
+            userEmail, 
+            userPassword, 
+            userAge, 
+            userExperienceLevel, 
+            userWeightliftingGoal 
+        });
         res.status(201).json(newUser);
     } catch (error) {
         console.error(error);
