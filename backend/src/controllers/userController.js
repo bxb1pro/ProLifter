@@ -25,11 +25,11 @@ const getUserById = async (req, res) => {
 
 const createUser = async (req, res) => {
     try {
-        const { userName, userEmail, userPassword, userAge, userExperienceLevel, userWeightliftingGoal } = req.body;
+        const { userName, userEmail, userPasswordHash, userAge, userExperienceLevel, userWeightliftingGoal } = req.body;
         const newUser = await User.create({ 
             userName, 
             userEmail, 
-            userPassword, 
+            userPasswordHash, 
             userAge, 
             userExperienceLevel, 
             userWeightliftingGoal 
