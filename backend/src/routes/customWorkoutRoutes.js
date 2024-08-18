@@ -1,5 +1,5 @@
 const express = require('express');
-const {editWorkout,deleteWorkout} = require('../controllers/customWorkoutController');
+const {createWorkout, viewWorkout, editWorkout, deleteWorkout} = require('../controllers/customWorkoutController');
 const verifyRole = require('../middleware/roleMiddleware');
 
 const router = express.Router();
