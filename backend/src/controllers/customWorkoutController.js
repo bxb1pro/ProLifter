@@ -1,35 +1,38 @@
 const CustomWorkout = require('../models/customWorkout');
 
-// const addExercise = async (req, res) => {
-//     try {
-//         const { exerciseID } = req.body;
-//         const workout = await CustomWorkout.findByPk(req.params.id);
-//         if (!workout) {
-//             return res.status(404).json({ error: 'Custom workout not found' });
-//         }
-//         // Logic to add the exercise to the custom workout goes here
-//         // This might involve updating a join table (e.g., CustomWorkoutExercise)
-//         res.status(200).json({ message: 'Exercise added successfully' });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: 'Server error' });
-//     }
-// };
+// Create a new custom workout
+const createWorkout = async (req, res) => {
+    try {
+        const { customWorkoutName, customWorkoutDays } = req.body;
 
-// const removeExercise = async (req, res) => {
-//     try {
-//         const { exerciseID } = req.body;
-//         const workout = await CustomWorkout.findByPk(req.params.id);
-//         if (!workout) {
-//             return res.status(404).json({ error: 'Custom workout not found' });
-//         }
-//         // Logic to remove the exercise from the custom workout goes here
-//         res.status(200).json({ message: 'Exercise removed successfully' });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: 'Server error' });
-//     }
-// };
+        // Extract the userID from the authenticated user's request
+        const userID = req.user.userID;
+
+        const newWorkout = await CustomWorkout.create({
+            customWorkoutName,
+            customWorkoutDays,
+            userID, // Use the userID extracted from the JWT
+        });
+
+        res.status(201).json({ message: 'Custom workout created successfully', customWorkoutID: newWorkout.customWorkoutID });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+const viewWorkout = async (req, res) => {
+    try {
+        const workout = await CustomWorkout.findByPk(req.params.id);
+        if (!workout) {
+            return res.status(404).json({ error: 'Custom workout not found' });
+        }
+        res.status(200).json(workout);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
 
 const editWorkout = async (req, res) => {
     try {
@@ -63,8 +66,8 @@ const deleteWorkout = async (req, res) => {
 };
 
 module.exports = {
-    //addExercise,
-    //removeExercise,
+    createWorkout,
+    viewWorkout,
     editWorkout,
     deleteWorkout,
 };

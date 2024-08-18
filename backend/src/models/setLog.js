@@ -1,25 +1,32 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
-const UserPresetWorkout = sequelize.define('UserPresetWorkout', {
-    userPresetWorkoutID: {
+const SetLog = sequelize.define('SetLog', {
+    setLogID: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
     },
-    userID: {
+    setLogWeight: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    presetWorkoutID: {
+    setLogReps: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    dateSelected: {
-        type: DataTypes.DATE,
+    setLogRPE: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+    },
+    setLog1RM: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+    },
+    exerciseLogID: {
+        type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: DataTypes.NOW,
     },
 });
 
-module.exports = UserPresetWorkout;
+module.exports = SetLog;

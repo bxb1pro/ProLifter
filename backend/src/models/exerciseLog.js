@@ -21,18 +21,6 @@ const ExerciseLog = sequelize.define('ExerciseLog', {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
-    exerciseLogReps: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-    },
-    exerciseLogRPE: {
-        type: DataTypes.FLOAT,
-        allowNull: true,
-    },
-    exerciseLog1RM: {
-        type: DataTypes.FLOAT,
-        allowNull: true,
-    },
     userID: {
         type: DataTypes.INTEGER,
         allowNull: false,

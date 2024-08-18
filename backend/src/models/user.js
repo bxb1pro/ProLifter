@@ -20,6 +20,11 @@ const User = sequelize.define('User', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    role: {
+        type: DataTypes.ENUM('user', 'admin', 'superadmin'), //ENUM to force one of these three values
+        defaultValue: 'user',
+        allowNull: false,
+    },
     userAge: {
         type: DataTypes.INTEGER,
         allowNull: true,

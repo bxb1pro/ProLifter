@@ -15,8 +15,12 @@ const linkPresetWorkout = async (req, res) => {
             return res.status(404).json({ error: 'User or preset workout not found' });
         }
 
-        // Create the link
-        await UserPresetWorkout.create({ userID, presetWorkoutID });
+        // Create the link with the current date
+        await UserPresetWorkout.create({
+            userID,
+            presetWorkoutID,
+            dateSelected: new Date(), // Set the current date and time
+        });
 
         res.status(200).json({ message: 'Preset workout linked to user successfully' });
     } catch (error) {

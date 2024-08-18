@@ -1,16 +1,12 @@
 const express = require('express');
-const {
-    addExercise,
-    removeExercise,
-    editWorkout,
-    deleteWorkout
-} = require('../controllers/customWorkoutController');
+const {createWorkout, viewWorkout, editWorkout, deleteWorkout} = require('../controllers/customWorkoutController');
+const verifyRole = require('../middleware/roleMiddleware');
 
 const router = express.Router();
 
-//router.post('/:id/add-exercise', addExercise);
-//router.post('/:id/remove-exercise', removeExercise);
-router.put('/:id/edit', editWorkout);
-router.delete('/:id/delete', deleteWorkout);
+router.post('/', verifyRole(['user']), createWorkout);
+router.get('/:id', verifyRole(['user']), viewWorkout);
+router.put('/:id/edit', verifyRole(['user']), editWorkout);
+router.delete('/:id/delete', verifyRole(['user']), deleteWorkout);
 
 module.exports = router;

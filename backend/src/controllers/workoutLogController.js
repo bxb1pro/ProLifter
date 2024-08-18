@@ -26,21 +26,6 @@ const finishWorkout = async (req, res) => {
     }
 };
 
-// const addExerciseLog = async (req, res) => {
-//     try {
-//         const { exerciseLog } = req.body;
-//         const workoutLog = await WorkoutLog.findByPk(req.params.id);
-//         if (!workoutLog) {
-//             return res.status(404).json({ error: 'Workout log not found' });
-//         }
-//         // Logic to add the exercise log to the workout log should be implemented here
-//         res.status(200).json({ message: 'Exercise log added successfully' });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: 'Server error' });
-//     }
-// };
-
 const editWorkoutLog = async (req, res) => {
     try {
         const { workoutLogDate, workoutLogCompleted } = req.body;
@@ -75,7 +60,6 @@ const deleteWorkoutLog = async (req, res) => {
 module.exports = {
     startWorkout,
     finishWorkout,
-    //addExerciseLog,
     editWorkoutLog,
     deleteWorkoutLog,
 };

@@ -10,6 +10,7 @@ const exerciseLogRoutes = require('./routes/exerciseLogRoutes');
 const presetWorkoutExerciseRoutes = require('./routes/presetWorkoutExerciseRoutes');
 const customWorkoutExerciseRoutes = require('./routes/customWorkoutExerciseRoutes');
 const userPresetWorkoutRoutes = require('./routes/userPresetWorkoutRoutes');
+const setLogRoutes = require('./routes/setLogRoutes');
 const authRoutes = require('./routes/authRoutes');
 
 const app = express();
@@ -25,6 +26,7 @@ app.use('/api/exercise-logs', exerciseLogRoutes);
 app.use('/api/preset-workout-exercises', presetWorkoutExerciseRoutes);
 app.use('/api/custom-workout-exercises', customWorkoutExerciseRoutes);
 app.use('/api/user-preset-workouts', userPresetWorkoutRoutes);
+app.use('/api/set-log-roues', setLogRoutes);
 app.use('/api/auth', authRoutes);
 
 module.exports = app;
