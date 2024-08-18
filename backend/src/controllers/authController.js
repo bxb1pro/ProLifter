@@ -1,16 +1,14 @@
+require('dotenv').config();
+
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { sendConfirmationEmail } = require('../services/emailService'); // Import the email service
 
-// Secret key for JWT
-const JWT_SECRET = 'your_secret_key';
-
-
 // Some code here inspired by https://medium.com/@akshaysen/implementing-authentication-using-jwt-in-node-js-cf9fdf210d07
 const signup = async (req, res) => {
     try {
-        const { userName, userEmail, userPassword } = req.body;
+        const { userName, userEmail, userPassword, role } = req.body;
 
         // Check if the user already exists
         const existingUser = await User.findOne({ where: { userEmail } });
@@ -27,6 +25,7 @@ const signup = async (req, res) => {
             userName,
             userEmail,
             userPasswordHash: hashedPassword,
+            role: role || 'user', // Default role is 'user' if not specified
         });
 
         // Send a confirmation email after successful signup
@@ -55,8 +54,8 @@ const login = async (req, res) => {
             return res.status(400).json({ error: 'Invalid email or password' });
         }
 
-        // Generate JWT
-        const token = jwt.sign({ userID: user.userID }, JWT_SECRET, { expiresIn: '1h' });
+        // Generate JWT using the secret from the environment variable
+        const token = jwt.sign({ userID: user.userID }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         res.status(200).json({ message: 'Logged in successfully', token });
     } catch (error) {
