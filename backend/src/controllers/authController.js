@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const { sendConfirmationEmail } = require('../utils/emailService'); // Import the email service
+const { sendConfirmationEmail } = require('../services/emailService'); // Import the email service
 
 // Secret key for JWT
 const JWT_SECRET = 'your_secret_key';
