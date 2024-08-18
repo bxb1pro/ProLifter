@@ -15,6 +15,11 @@ const UserPresetWorkout = sequelize.define('UserPresetWorkout', {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+    dateSelected: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+    },
 });
 
 module.exports = UserPresetWorkout;
