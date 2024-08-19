@@ -15,10 +15,25 @@ export const fetchExercises = createAsyncThunk(
     }
 );
 
+// Thunk to fetch an exercise by ID
+export const fetchExerciseById = createAsyncThunk(
+    'exercises/fetchById',
+    async (id, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/exercises/${id}`);
+            return response.data;
+        } catch (error) {
+            console.error('Fetch exercise by ID error:', error.response ? error.response.data : error.message);
+            return rejectWithValue(error.response.data || 'Failed to fetch exercise');
+        }
+    }
+);
+
 const exerciseSlice = createSlice({
     name: 'exercises',
     initialState: {
         exercises: [],
+        selectedExercise: null,
         isLoading: false,
         error: null,
     },
@@ -34,6 +49,18 @@ const exerciseSlice = createSlice({
                 state.isLoading = false;
             })
             .addCase(fetchExercises.rejected, (state, action) => {
+                state.error = action.payload;
+                state.isLoading = false;
+            })
+            .addCase(fetchExerciseById.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(fetchExerciseById.fulfilled, (state, action) => {
+                state.selectedExercise = action.payload;
+                state.isLoading = false;
+            })
+            .addCase(fetchExerciseById.rejected, (state, action) => {
                 state.error = action.payload;
                 state.isLoading = false;
             });

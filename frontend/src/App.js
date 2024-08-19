@@ -5,6 +5,7 @@ import Signup from './components/Auth/Signup';
 import Dashboard from './components/Dashboard';
 import Logout from './components/Auth/Logout';
 import Exercises from './components/Exercises';
+import ExerciseDetails from './components/ExerciseDetails';
 
 function App() {
     return (
@@ -14,6 +15,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/logout" element={<Logout />} /> 
             <Route path="/exercises" element={<Exercises />} />
+            <Route path="/exercises/:id" element={<ExerciseDetails />} />
         </Routes>
     );
 }

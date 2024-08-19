@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchExercises } from '../features/exercises/exerciseSlice';
+import { Link } from 'react-router-dom';
 import './Exercises.css';
 
 const Exercises = () => {
@@ -17,12 +18,14 @@ const Exercises = () => {
     return (
         <div className="exercises-grid">
             {exercises.map((exercise) => (
-                <div key={exercise.id} className="exercise-card">
-                    <img src={exercise.gifUrl} alt={exercise.name} className="exercise-image" />
-                    <h3>{exercise.name}</h3>
-                    <p>Body Part: {exercise.bodyPart}</p>
-                    <p>Equipment: {exercise.equipment}</p>
-                </div>
+                <Link to={`/exercises/${exercise.id}`} key={exercise.id} className="exercise-card-link">
+                    <div className="exercise-card">
+                        <img src={exercise.gifUrl} alt={exercise.name} className="exercise-image" />
+                        <h3>{exercise.name}</h3>
+                        <p>Body Part: {exercise.bodyPart}</p>
+                        <p>Equipment: {exercise.equipment}</p>
+                    </div>
+                </Link>
             ))}
         </div>
     );
