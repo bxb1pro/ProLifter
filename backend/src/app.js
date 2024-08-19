@@ -1,6 +1,16 @@
 require('dotenv').config();
 
 const express = require('express');
+const cors = require('cors'); // Import the CORS package
+
+// Create the Express app
+const app = express();
+
+// Enable CORS for all routes
+app.use(cors());
+
+app.use(express.json());
+
 const userRoutes = require('./routes/userRoutes');
 const exerciseRoutes = require('./routes/exerciseRoutes');
 const presetWorkoutRoutes = require('./routes/presetWorkoutRoutes');
@@ -12,10 +22,6 @@ const customWorkoutExerciseRoutes = require('./routes/customWorkoutExerciseRoute
 const userPresetWorkoutRoutes = require('./routes/userPresetWorkoutRoutes');
 const setLogRoutes = require('./routes/setLogRoutes');
 const authRoutes = require('./routes/authRoutes');
-
-const app = express();
-
-app.use(express.json());
 
 app.use('/api/users', userRoutes);
 app.use('/api/exercises', exerciseRoutes);
