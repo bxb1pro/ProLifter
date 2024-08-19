@@ -4,23 +4,32 @@ const Exercise = require('../models/exercise');
 
 const linkExercise = async (req, res) => {
     try {
-        const { exerciseID } = req.body;
+        const { exerciseID } = req.body;  // This is the external ID from the API
         const presetWorkoutID = req.params.id;
 
-        // Make sure both preset workout and exercise exist
+        // Check if the preset workout exists
         const workout = await PresetWorkout.findByPk(presetWorkoutID);
-        const exercise = await Exercise.findByPk(exerciseID);
-
-        if (!workout || !exercise) {
-            return res.status(404).json({ error: 'Preset workout or exercise not found' });
+        if (!workout) {
+            return res.status(404).json({ error: 'Preset workout not found' });
         }
 
-        // Create link
+        // Optionally verify exercise existence in the external API
+        try {
+            const exerciseData = await getExerciseById(exerciseID);
+            if (!exerciseData) {
+                return res.status(404).json({ error: 'Exercise not found in external API' });
+            }
+        } catch (error) {
+            console.error(`Failed to fetch exercise with ID ${exerciseID} from external API:`, error);
+            return res.status(500).json({ error: 'Failed to fetch exercise from external API' });
+        }
+
+        // Directly create the link in the database
         await PresetWorkoutExercise.create({ presetWorkoutID, exerciseID });
 
         res.status(200).json({ message: 'Exercise linked successfully' });
     } catch (error) {
-        console.error(error);
+        console.error('Server error:', error);
         res.status(500).json({ error: 'Server error' });
     }
 };
