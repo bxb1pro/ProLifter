@@ -57,9 +57,28 @@ const deleteWorkoutLog = async (req, res) => {
     }
 };
 
+const getUserWorkoutLogs = async (req, res) => {
+    try {
+        // Extract the userID from the authenticated user's request
+        const userID = req.user.userID;
+
+        // Find all workout logs associated with this user
+        const workoutLogs = await WorkoutLog.findAll({
+            where: { userID },
+            order: [['workoutLogDate', 'DESC']], // Optional: order by date
+        });
+
+        res.status(200).json(workoutLogs);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
 module.exports = {
     startWorkout,
     finishWorkout,
     editWorkoutLog,
     deleteWorkoutLog,
+    getUserWorkoutLogs,
 };

@@ -65,9 +65,28 @@ const deleteWorkout = async (req, res) => {
     }
 };
 
+const getUserCustomWorkouts = async (req, res) => {
+    try {
+        // Extract the userID from the authenticated user's request
+        const userID = req.user.userID;
+
+        // Find all custom workouts associated with this user
+        const customWorkouts = await CustomWorkout.findAll({
+            where: { userID },
+            order: [['customWorkoutDateCreated', 'DESC']], // Optional: order by creation date
+        });
+
+        res.status(200).json(customWorkouts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
 module.exports = {
     createWorkout,
     viewWorkout,
     editWorkout,
     deleteWorkout,
+    getUserCustomWorkouts,
 };
