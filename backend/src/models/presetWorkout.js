@@ -19,6 +19,10 @@ const PresetWorkout = sequelize.define('PresetWorkout', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    presetWorkoutGoal: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     presetWorkoutLocation: {
         type: DataTypes.STRING,
         allowNull: false,
