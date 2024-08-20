@@ -31,4 +31,9 @@ const WorkoutLog = sequelize.define('WorkoutLog', {
     },
 });
 
+WorkoutLog.associate = (models) => {
+    WorkoutLog.belongsTo(models.User, { foreignKey: 'userID' });
+    WorkoutLog.hasMany(models.ExerciseLog, { foreignKey: 'workoutLogID' });
+};
+
 module.exports = WorkoutLog;

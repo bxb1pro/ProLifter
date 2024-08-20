@@ -32,7 +32,7 @@ app.use('/api/exercise-logs', exerciseLogRoutes);
 app.use('/api/preset-workout-exercises', presetWorkoutExerciseRoutes);
 app.use('/api/custom-workout-exercises', customWorkoutExerciseRoutes);
 app.use('/api/user-preset-workouts', userPresetWorkoutRoutes);
-app.use('/api/set-log-roues', setLogRoutes);
+app.use('/api/set-log-routes', setLogRoutes);
 app.use('/api/auth', authRoutes);
 
 module.exports = app;

@@ -21,9 +21,14 @@ const CustomWorkout = sequelize.define('CustomWorkout', {
         defaultValue: DataTypes.NOW,
     },
     userID: {
-        type: DataTypes.UUID,
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
 });
+
+CustomWorkout.associate = (models) => {
+    CustomWorkout.belongsTo(models.User, { foreignKey: 'userID' });
+    CustomWorkout.hasMany(models.CustomWorkoutExercise, { foreignKey: 'customWorkoutID' });
+};
 
 module.exports = CustomWorkout;

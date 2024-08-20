@@ -29,4 +29,8 @@ const SetLog = sequelize.define('SetLog', {
     },
 });
 
+SetLog.associate = (models) => {
+    SetLog.belongsTo(models.ExerciseLog, { foreignKey: 'exerciseLogID' });
+};
+
 module.exports = SetLog;

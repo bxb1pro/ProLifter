@@ -30,4 +30,9 @@ const PresetWorkout = sequelize.define('PresetWorkout', {
     },
 });
 
+PresetWorkout.associate = (models) => {
+    PresetWorkout.hasMany(models.PresetWorkoutExercise, { foreignKey: 'presetWorkoutID' });
+    PresetWorkout.hasMany(models.UserPresetWorkout, { foreignKey: 'presetWorkoutID' });
+};
+
 module.exports = PresetWorkout;

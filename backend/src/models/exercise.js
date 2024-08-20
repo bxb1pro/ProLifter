@@ -37,4 +37,10 @@ const Exercise = sequelize.define('Exercise', {
     },
 });
 
+Exercise.associate = (models) => {
+    Exercise.hasMany(models.CustomWorkoutExercise, { foreignKey: 'exerciseID' });
+    Exercise.hasMany(models.PresetWorkoutExercise, { foreignKey: 'exerciseID' });
+    Exercise.hasMany(models.ExerciseLog, { foreignKey: 'exerciseID' });
+};
+
 module.exports = Exercise;

@@ -22,4 +22,9 @@ const UserPresetWorkout = sequelize.define('UserPresetWorkout', {
     },
 });
 
+UserPresetWorkout.associate = (models) => {
+    UserPresetWorkout.belongsTo(models.User, { foreignKey: 'userID' });
+    UserPresetWorkout.belongsTo(models.PresetWorkout, { foreignKey: 'presetWorkoutID' });
+};
+
 module.exports = UserPresetWorkout;

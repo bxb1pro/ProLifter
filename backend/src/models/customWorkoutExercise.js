@@ -17,4 +17,9 @@ const CustomWorkoutExercise = sequelize.define('CustomWorkoutExercise', {
     },
 });
 
+CustomWorkoutExercise.associate = (models) => {
+    CustomWorkoutExercise.belongsTo(models.CustomWorkout, { foreignKey: 'customWorkoutID' });
+    CustomWorkoutExercise.belongsTo(models.Exercise, { foreignKey: 'exerciseID' });
+};
+
 module.exports = CustomWorkoutExercise;
