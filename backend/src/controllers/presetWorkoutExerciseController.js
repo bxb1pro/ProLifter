@@ -3,42 +3,44 @@ const { getExerciseById } = require('../services/exerciseService');
 
 const linkExercise = async (req, res) => {
     try {
-        const { exerciseID } = req.body;  // External ID from API
+        const { exerciseID } = req.body; // This is the external ID from the API
         const presetWorkoutID = req.params.id;
 
+        console.log(`Linking exercise ID: ${exerciseID} to preset workout ID: ${presetWorkoutID}`);
+
+        // Check if the preset workout exists
         const workout = await PresetWorkout.findByPk(presetWorkoutID);
         if (!workout) {
             return res.status(404).json({ error: 'Preset workout not found' });
         }
 
-        // Check if exercise exists locally in DB, if not then fetch and create from external API
+        // Check if the exercise exists in the local database
         let exercise = await Exercise.findByPk(exerciseID);
+
+        // If not, fetch it from the external API and store it locally
         if (!exercise) {
-            try {
-                const exerciseData = await getExerciseById(exerciseID);
-                if (!exerciseData) {
-                    return res.status(404).json({ error: 'Exercise not found in external API' });
-                }
-                
-                // Create exercise locally
-                exercise = await Exercise.create({
-                    exerciseID: exerciseData.id,
-                    exerciseName: exerciseData.name,
-                    exerciseBodypart: exerciseData.bodyPart,
-                    exerciseDescription: exerciseData.instructions.join(', '),
-                    exerciseFormGuide: exerciseData.instructions.join(', '),
-                    exerciseImageUrl: exerciseData.gifUrl,
-                    exerciseEquipment: exerciseData.equipment,
-                    exerciseSecondaryBodypart: externalExercise.secondaryMuscles,
-                });
-            } catch (error) {
-                console.error(`Failed to fetch exercise with ID ${exerciseID} from external API:`, error);
-                return res.status(500).json({ error: 'Failed to fetch exercise from external API' });
+            const externalExercise = await getExerciseById(exerciseID);
+
+            if (!externalExercise) {
+                console.log(`Exercise with ID ${exerciseID} not found in external API.`);
+                return res.status(404).json({ error: 'Exercise not found in external API' });
             }
+
+            // Store the exercise in the local database
+            exercise = await Exercise.create({
+                exerciseID: externalExercise.id,
+                exerciseName: externalExercise.name,
+                exerciseBodypart: externalExercise.bodyPart,
+                exerciseDescription: externalExercise.instructions.join(', '),
+                exerciseFormGuide: externalExercise.instructions.join(', '),
+                exerciseImageUrl: externalExercise.gifUrl,
+                exerciseEquipment: externalExercise.equipment,
+                exerciseSecondaryBodypart: externalExercise.secondaryMuscles.join(', '),
+            });
         }
 
-        // Create link in the database
-        await PresetWorkoutExercise.create({ presetWorkoutID, exerciseID });
+        // Create the link in the PresetWorkoutExercise table
+        await PresetWorkoutExercise.create({ presetWorkoutID, exerciseID: exercise.exerciseID });
 
         res.status(200).json({ message: 'Exercise linked successfully' });
     } catch (error) {

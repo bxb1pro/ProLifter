@@ -73,9 +73,20 @@ const deletePresetWorkout = async (req, res) => {
     }
 };
 
+const viewAllPresetWorkouts = async (req, res) => {
+    try {
+        const workouts = await PresetWorkout.findAll();  // Retrieve all preset workouts from the database
+        res.status(200).json(workouts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
 module.exports = {
     createPresetWorkout,
     viewDetails,
     editPresetWorkout,
     deletePresetWorkout,
+    viewAllPresetWorkouts,
 };

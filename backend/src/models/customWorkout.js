@@ -27,8 +27,8 @@ const CustomWorkout = sequelize.define('CustomWorkout', {
 });
 
 CustomWorkout.associate = (models) => {
-    CustomWorkout.belongsTo(models.User, { foreignKey: 'userID' });
-    CustomWorkout.hasMany(models.CustomWorkoutExercise, { foreignKey: 'customWorkoutID' });
+    CustomWorkout.belongsTo(models.User, { foreignKey: 'userID', onDelete: 'CASCADE' });
+    CustomWorkout.hasMany(models.CustomWorkoutExercise, { foreignKey: 'customWorkoutID', onDelete: 'CASCADE' });
 };
 
 module.exports = CustomWorkout;

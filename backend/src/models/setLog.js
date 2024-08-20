@@ -30,7 +30,7 @@ const SetLog = sequelize.define('SetLog', {
 });
 
 SetLog.associate = (models) => {
-    SetLog.belongsTo(models.ExerciseLog, { foreignKey: 'exerciseLogID' });
+    SetLog.belongsTo(models.ExerciseLog, { foreignKey: 'exerciseLogID', onDelete: 'CASCADE' });
 };
 
 module.exports = SetLog;

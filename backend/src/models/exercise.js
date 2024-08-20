@@ -31,15 +31,15 @@ const Exercise = sequelize.define('Exercise', {
         allowNull: true,
     },
     exerciseSecondaryBodypart: {
-        type: DataTypes.ARRAY(DataTypes.STRING), // Array of strings
+        type: DataTypes.TEXT,
         allowNull: true,
     },
 });
 
 Exercise.associate = (models) => {
-    Exercise.hasMany(models.CustomWorkoutExercise, { foreignKey: 'exerciseID' });
-    Exercise.hasMany(models.PresetWorkoutExercise, { foreignKey: 'exerciseID' });
-    Exercise.hasMany(models.ExerciseLog, { foreignKey: 'exerciseID' });
+    Exercise.hasMany(models.CustomWorkoutExercise, { foreignKey: 'exerciseID', onDelete: 'CASCADE' });
+    Exercise.hasMany(models.PresetWorkoutExercise, { foreignKey: 'exerciseID', onDelete: 'CASCADE' });
+    Exercise.hasMany(models.ExerciseLog, { foreignKey: 'exerciseID', onDelete: 'CASCADE' });
 };
 
 module.exports = Exercise;

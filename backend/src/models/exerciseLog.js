@@ -36,9 +36,9 @@ const ExerciseLog = sequelize.define('ExerciseLog', {
 });
 
 ExerciseLog.associate = (models) => {
-    ExerciseLog.belongsTo(models.WorkoutLog, { foreignKey: 'workoutLogID' });
-    ExerciseLog.belongsTo(models.Exercise, { foreignKey: 'exerciseID' });
-    ExerciseLog.hasMany(models.SetLog, { foreignKey: 'exerciseLogID' });
+    ExerciseLog.belongsTo(models.WorkoutLog, { foreignKey: 'workoutLogID', onDelete: 'CASCADE' });
+    ExerciseLog.belongsTo(models.Exercise, { foreignKey: 'exerciseID', onDelete: 'CASCADE' });
+    ExerciseLog.hasMany(models.SetLog, { foreignKey: 'exerciseLogID', onDelete: 'CASCADE' });
 };
 
 module.exports = ExerciseLog;

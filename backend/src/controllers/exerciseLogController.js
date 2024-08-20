@@ -1,4 +1,4 @@
-const { ExerciseLog } = require('../models');
+const { ExerciseLog, WorkoutLog } = require('../models');
 
 // Start an exercise log
 const startExerciseLog = async (req, res) => {
