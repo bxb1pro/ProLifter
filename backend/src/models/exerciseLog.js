@@ -30,7 +30,7 @@ const ExerciseLog = sequelize.define('ExerciseLog', {
         allowNull: false,
     },
     exerciseID: {
-        type: DataTypes.UUID,
+        type: DataTypes.STRING,
         allowNull: false,
     },
 });

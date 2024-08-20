@@ -12,7 +12,7 @@ const CustomWorkoutExercise = sequelize.define('CustomWorkoutExercise', {
         allowNull: false,
     },
     exerciseID: {
-        type: DataTypes.UUID,
+        type: DataTypes.STRING,
         allowNull: false,
     },
 });

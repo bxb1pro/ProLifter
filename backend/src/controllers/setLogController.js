@@ -1,4 +1,4 @@
-const SetLog = require('../models/setLog');
+const { SetLog } = require('../models');
 
 // Add a new set log
 const addSetLog = async (req, res) => {

@@ -1,4 +1,4 @@
-const CustomWorkout = require('../models/customWorkout');
+const { CustomWorkout } = require('../models');
 
 // Create a new custom workout
 const createWorkout = async (req, res) => {

@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
-const config = require('../config/config.json')[env];
+const config = require('../config/config.js'); // Ensure this path is correct
 const db = {};
 
 let sequelize;
@@ -14,7 +14,7 @@ if (config.use_env_variable) {
     sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 
-// Auto-load all model files and instantiate them
+// Auto-load all model files and require them directly
 fs.readdirSync(__dirname)
     .filter(file => {
         return (
@@ -25,7 +25,7 @@ fs.readdirSync(__dirname)
         );
     })
     .forEach(file => {
-        const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
+        const model = require(path.join(__dirname, file)); // No need to invoke the model as a function
         db[model.name] = model;
     });
 

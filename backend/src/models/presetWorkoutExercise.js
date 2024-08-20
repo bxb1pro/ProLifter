@@ -12,7 +12,7 @@ const PresetWorkoutExercise = sequelize.define('PresetWorkoutExercise', {
         allowNull: false,
     },
     exerciseID: {
-        type: DataTypes.UUID,
+        type: DataTypes.STRING,
         allowNull: false,
     },
 });

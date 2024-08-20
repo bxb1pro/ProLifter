@@ -1,6 +1,4 @@
-const UserPresetWorkout = require('../models/userPresetWorkout');
-const PresetWorkout = require('../models/presetWorkout');
-const User = require('../models/user');
+const { UserPresetWorkout, PresetWorkout, User } = require('../models');
 
 const linkPresetWorkout = async (req, res) => {
     try {

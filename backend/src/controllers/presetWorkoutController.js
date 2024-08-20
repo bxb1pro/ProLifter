@@ -1,4 +1,4 @@
-const PresetWorkout = require('../models/presetWorkout');
+const { PresetWorkout } = require('../models');
 
 const createPresetWorkout = async (req, res) => {
     try {

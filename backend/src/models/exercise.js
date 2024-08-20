@@ -3,8 +3,7 @@ const sequelize = require('../config/db');
 
 const Exercise = sequelize.define('Exercise', {
     exerciseID: {
-        type: DataTypes.UUID, //different id data type so it can work with public API
-        defaultValue: DataTypes.UUIDV4,
+        type: DataTypes.STRING, //string data type to match the external API
         primaryKey: true,
     },
     exerciseName: {
@@ -16,23 +15,23 @@ const Exercise = sequelize.define('Exercise', {
         allowNull: false,
     },
     exerciseDescription: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: true,
     },
     exerciseFormGuide: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: true,
     },
     exerciseImageUrl: {
         type: DataTypes.STRING,
         allowNull: true,
     },
-    exerciseVideoUrl: {
+    exerciseEquipment: {
         type: DataTypes.STRING,
         allowNull: true,
     },
-    exerciseEquipment: {
-        type: DataTypes.STRING,
+    exerciseSecondaryBodypart: {
+        type: DataTypes.ARRAY(DataTypes.STRING), // Array of strings
         allowNull: true,
     },
 });

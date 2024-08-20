@@ -1,4 +1,4 @@
-const Exercise = require('../models/exercise');
+const { Exercise } = require('../models');
 const { getAllExercises, getExerciseById } = require('../services/exerciseService');
 
 // Fetch all exercises from the API

@@ -1,8 +1,7 @@
 require('dotenv').config();
-
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/user');
+const { User } = require('../models'); // Import from index.js
 const { sendConfirmationEmail } = require('../services/emailService'); // Import the email service
 
 // Some code here inspired by https://medium.com/@akshaysen/implementing-authentication-using-jwt-in-node-js-cf9fdf210d07
