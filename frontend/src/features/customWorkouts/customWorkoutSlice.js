@@ -24,35 +24,61 @@ export const linkExerciseToCustomWorkout = createAsyncThunk(
   }
 );
 
-const customWorkoutSlice = createSlice({
-  name: 'customWorkouts',
-  initialState: {
-    workouts: [],
-    status: 'idle', // idle, loading, succeeded, failed
-    error: null,
-  },
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchUserCustomWorkouts.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchUserCustomWorkouts.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.workouts = action.payload;
-      })
-      .addCase(fetchUserCustomWorkouts.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message;
-      })
-      .addCase(linkExerciseToCustomWorkout.fulfilled, (state, action) => {
-        state.status = 'succeeded';  // Handle successful linking if needed
-      })
-      .addCase(linkExerciseToCustomWorkout.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message;
-      });
-  },
-});
-
-export default customWorkoutSlice.reducer;
+// New Thunk to fetch exercises for a specific custom workout
+export const fetchExercisesForCustomWorkout = createAsyncThunk(
+    'customWorkouts/fetchExercisesForCustomWorkout',
+    async (customWorkoutID, { rejectWithValue }) => {
+      try {
+        const response = await api.get(`/custom-workout-exercises/${customWorkoutID}/exercises`);
+        return response.data;
+      } catch (error) {
+        console.error('Fetch exercises for custom workout error:', error.response ? error.response.data : error.message);
+        return rejectWithValue(error.response.data || 'Failed to fetch exercises');
+      }
+    }
+  );
+  
+  const customWorkoutSlice = createSlice({
+    name: 'customWorkouts',
+    initialState: {
+      workouts: [],
+      exercises: {},  // Store exercises for each custom workout
+      status: 'idle',
+      error: null,
+    },
+    reducers: {},
+    extraReducers: (builder) => {
+      builder
+        .addCase(fetchUserCustomWorkouts.pending, (state) => {
+          state.status = 'loading';
+        })
+        .addCase(fetchUserCustomWorkouts.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          state.workouts = action.payload;
+        })
+        .addCase(fetchUserCustomWorkouts.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.error.message;
+        })
+        .addCase(linkExerciseToCustomWorkout.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+        })
+        .addCase(linkExerciseToCustomWorkout.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.error.message;
+        })
+        .addCase(fetchExercisesForCustomWorkout.pending, (state) => {
+          state.status = 'loading';
+        })
+        .addCase(fetchExercisesForCustomWorkout.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          state.exercises[action.meta.arg] = action.payload; // Store exercises by workout ID
+        })
+        .addCase(fetchExercisesForCustomWorkout.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.error.message;
+        });
+    },
+  });
+  
+  export default customWorkoutSlice.reducer;

@@ -72,7 +72,30 @@ const unlinkExercise = async (req, res) => {
     }
 };
 
+const getExercisesForCustomWorkout = async (req, res) => {
+    try {
+        const customWorkoutID = req.params.id;
+
+        // Find all exercises linked to this custom workout
+        const exercises = await CustomWorkoutExercise.findAll({
+            where: { customWorkoutID },
+            include: [Exercise], // Include the Exercise details
+        });
+
+        if (!exercises || exercises.length === 0) {
+            return res.status(404).json({ error: 'No exercises found for this custom workout' });
+        }
+
+        res.status(200).json(exercises);
+    } catch (error) {
+        console.error('Server error:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+
 module.exports = {
     linkExercise,
     unlinkExercise,
+    getExercisesForCustomWorkout
 };
