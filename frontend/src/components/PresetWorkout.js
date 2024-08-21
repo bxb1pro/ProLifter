@@ -19,6 +19,11 @@ const PresetWorkout = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState(null);
 
+  // Filters
+  const [difficultyFilter, setDifficultyFilter] = useState('');
+  const [goalFilter, setGoalFilter] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
+
   useEffect(() => {
     if (status === 'idle') {
       dispatch(fetchPresetWorkouts());
@@ -46,36 +51,72 @@ const PresetWorkout = () => {
     dispatch(deletePresetWorkout(presetWorkoutID));
   };
 
+  // Filtered workouts based on the selected filters
+  const filteredWorkouts = workouts.filter((workout) => {
+    return (
+      (difficultyFilter === '' || workout.presetWorkoutDifficulty === difficultyFilter) &&
+      (goalFilter === '' || workout.presetWorkoutGoal === goalFilter) &&
+      (locationFilter === '' || workout.presetWorkoutLocation === locationFilter)
+    );
+  });
+
   let content;
 
   if (status === 'loading') {
     content = <p>Loading...</p>;
   } else if (status === 'succeeded') {
     content = (
-      <ul>
-        {workouts.map((workout) => (
-          <li key={workout.presetWorkoutID}>
-            <div>
-              {workout.presetWorkoutName} - {workout.presetWorkoutDays} days - {workout.presetWorkoutDifficulty}
-              <button onClick={() => handleViewExercises(workout.presetWorkoutID)}>View Exercises</button>
-              <button onClick={() => handleEditWorkout(workout)}>Edit</button>
-              <button onClick={() => handleDeleteWorkout(workout.presetWorkoutID)}>Delete</button>
-            </div>
-            {selectedWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
-              <ul>
-                {exercises[workout.presetWorkoutID].map((exercise) => (
-                  <li key={exercise.exerciseID}>
-                    {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
-                    <button onClick={() => handleUnlinkExercise(workout.presetWorkoutID, exercise.exerciseID)}>
-                      Remove
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-        ))}
-      </ul>
+      <>
+        <div>
+          <label>Filter by Difficulty: </label>
+          <select value={difficultyFilter} onChange={(e) => setDifficultyFilter(e.target.value)}>
+            <option value="">All</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+          </select>
+
+          <label>Filter by Goal: </label>
+          <select value={goalFilter} onChange={(e) => setGoalFilter(e.target.value)}>
+            <option value="">All</option>
+            <option value="Size">Muscle Size</option>
+            <option value="Strength">Muscle Strength</option>
+            <option value="Overall">Strength & Size</option>
+          </select>
+
+          <label>Filter by Location: </label>
+          <select value={locationFilter} onChange={(e) => setLocationFilter(e.target.value)}>
+            <option value="">All</option>
+            <option value="Home">Home</option>
+            <option value="Gym">Gym</option>
+          </select>
+        </div>
+
+        <ul>
+          {filteredWorkouts.map((workout) => (
+            <li key={workout.presetWorkoutID}>
+              <div>
+                {workout.presetWorkoutName} - {workout.presetWorkoutDifficulty}
+                <button onClick={() => handleViewExercises(workout.presetWorkoutID)}>View Exercises</button>
+                <button onClick={() => handleEditWorkout(workout)}>Edit</button>
+                <button onClick={() => handleDeleteWorkout(workout.presetWorkoutID)}>Delete</button>
+              </div>
+              {selectedWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
+                <ul>
+                  {exercises[workout.presetWorkoutID].map((exercise) => (
+                    <li key={exercise.exerciseID}>
+                      {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
+                      <button onClick={() => handleUnlinkExercise(workout.presetWorkoutID, exercise.exerciseID)}>
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      </>
     );
   } else if (status === 'failed') {
     content = <p>{error}</p>;

@@ -56,7 +56,7 @@ const CustomWorkouts = () => {
         {workouts.map((workout) => (
           <li key={workout.customWorkoutID}>
             <div>
-              {workout.customWorkoutName} - {workout.customWorkoutDays} days
+              {workout.customWorkoutName}
               <button onClick={() => handleViewExercises(workout.customWorkoutID)}>View Exercises</button>
               <button onClick={() => handleEditWorkout(workout)}>Edit</button>
               <button onClick={() => handleDeleteWorkout(workout.customWorkoutID)}>Delete</button>

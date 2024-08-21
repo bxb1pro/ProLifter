@@ -55,9 +55,9 @@ export const fetchExercisesForPresetWorkout = createAsyncThunk(
 // Thunk to create a preset workout
 export const createPresetWorkout = createAsyncThunk(
     'presetWorkouts/createPresetWorkout',
-    async ({ presetWorkoutName, presetWorkoutDays, presetWorkoutDifficulty, presetWorkoutGoal, presetWorkoutLocation }, { rejectWithValue }) => {
+    async ({ presetWorkoutName, presetWorkoutDifficulty, presetWorkoutGoal, presetWorkoutLocation }, { rejectWithValue }) => {
       try {
-        const response = await api.post('/preset-workouts', { presetWorkoutName, presetWorkoutDays, presetWorkoutDifficulty, presetWorkoutGoal, presetWorkoutLocation });
+        const response = await api.post('/preset-workouts', { presetWorkoutName, presetWorkoutDifficulty, presetWorkoutGoal, presetWorkoutLocation });
         return response.data;
       } catch (error) {
         console.error('Create preset workout error:', error.response ? error.response.data : error.message);
@@ -69,9 +69,9 @@ export const createPresetWorkout = createAsyncThunk(
 // Thunk to edit a preset workout
 export const editPresetWorkout = createAsyncThunk(
 'presetWorkouts/editPresetWorkout',
-async ({ id, presetWorkoutName, presetWorkoutDays, presetWorkoutDifficulty, presetWorkoutGoal, presetWorkoutLocation }, { rejectWithValue }) => {
+async ({ id, presetWorkoutName, presetWorkoutDifficulty, presetWorkoutGoal, presetWorkoutLocation }, { rejectWithValue }) => {
     try {
-    const response = await api.put(`/preset-workouts/${id}`, { presetWorkoutName, presetWorkoutDays, presetWorkoutDifficulty, presetWorkoutGoal, presetWorkoutLocation });
+    const response = await api.put(`/preset-workouts/${id}`, { presetWorkoutName, presetWorkoutDifficulty, presetWorkoutGoal, presetWorkoutLocation });
     return response.data;
     } catch (error) {
     console.error('Edit preset workout error:', error.response ? error.response.data : error.message);

@@ -9,7 +9,7 @@ const SetLog = sequelize.define('SetLog', {
     },
     setLogWeight: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
     },
     setLogReps: {
         type: DataTypes.INTEGER,

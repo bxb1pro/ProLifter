@@ -4,7 +4,6 @@ import { createPresetWorkout } from '../../features/presetWorkouts/presetWorkout
 
 const AddPresetWorkoutForm = ({ onClose }) => {
   const [presetWorkoutName, setPresetWorkoutName] = useState('');
-  const [presetWorkoutDays, setPresetWorkoutDays] = useState('');
   const [presetWorkoutDifficulty, setPresetWorkoutDifficulty] = useState('');
   const [presetWorkoutGoal, setPresetWorkoutGoal] = useState('');
   const [presetWorkoutLocation, setPresetWorkoutLocation] = useState('');
@@ -14,7 +13,6 @@ const AddPresetWorkoutForm = ({ onClose }) => {
     e.preventDefault();
     if (
       presetWorkoutName &&
-      presetWorkoutDays &&
       presetWorkoutDifficulty &&
       presetWorkoutGoal &&
       presetWorkoutLocation
@@ -22,7 +20,6 @@ const AddPresetWorkoutForm = ({ onClose }) => {
       dispatch(
         createPresetWorkout({
           presetWorkoutName,
-          presetWorkoutDays,
           presetWorkoutDifficulty,
           presetWorkoutGoal,
           presetWorkoutLocation,
@@ -40,15 +37,6 @@ const AddPresetWorkoutForm = ({ onClose }) => {
           type="text"
           value={presetWorkoutName}
           onChange={(e) => setPresetWorkoutName(e.target.value)}
-          required
-        />
-      </label>
-      <label>
-        Number of Days:
-        <input
-          type="number"
-          value={presetWorkoutDays}
-          onChange={(e) => setPresetWorkoutDays(e.target.value)}
           required
         />
       </label>

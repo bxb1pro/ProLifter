@@ -4,13 +4,12 @@ import { createCustomWorkout } from '../../features/customWorkouts/customWorkout
 
 const AddCustomWorkoutForm = ({ onClose }) => {
   const [customWorkoutName, setCustomWorkoutName] = useState('');
-  const [customWorkoutDays, setCustomWorkoutDays] = useState('');
   const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (customWorkoutName && customWorkoutDays) {
-      dispatch(createCustomWorkout({ customWorkoutName, customWorkoutDays }));
+    if (customWorkoutName) {
+      dispatch(createCustomWorkout({ customWorkoutName }));
       onClose();
     }
   };
@@ -23,15 +22,6 @@ const AddCustomWorkoutForm = ({ onClose }) => {
           type="text"
           value={customWorkoutName}
           onChange={(e) => setCustomWorkoutName(e.target.value)}
-          required
-        />
-      </label>
-      <label>
-        Number of Days:
-        <input
-          type="number"
-          value={customWorkoutDays}
-          onChange={(e) => setCustomWorkoutDays(e.target.value)}
           required
         />
       </label>

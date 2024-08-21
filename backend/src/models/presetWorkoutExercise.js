@@ -15,6 +15,19 @@ const PresetWorkoutExercise = sequelize.define('PresetWorkoutExercise', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    // Attributes for preset workout exercises to be set by admins/other
+    defaultSets: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    defaultReps: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    defaultRPE: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+    },
 });
 
 PresetWorkoutExercise.associate = (models) => {

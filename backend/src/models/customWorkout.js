@@ -11,10 +11,6 @@ const CustomWorkout = sequelize.define('CustomWorkout', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    customWorkoutDays: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-    },
     customWorkoutDateCreated: {
         type: DataTypes.DATE,
         allowNull: false,

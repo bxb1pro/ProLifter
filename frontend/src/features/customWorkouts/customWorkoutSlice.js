@@ -55,9 +55,9 @@ export const fetchExercisesForCustomWorkout = createAsyncThunk(
   // Thunk to create a custom workout
 export const createCustomWorkout = createAsyncThunk(
     'customWorkouts/createCustomWorkout',
-    async ({ customWorkoutName, customWorkoutDays }, { rejectWithValue }) => {
+    async ({ customWorkoutName }, { rejectWithValue }) => {
       try {
-        const response = await api.post('/custom-workouts', { customWorkoutName, customWorkoutDays });
+        const response = await api.post('/custom-workouts', { customWorkoutName });
         return response.data;
       } catch (error) {
         console.error('Create custom workout error:', error.response ? error.response.data : error.message);
@@ -69,9 +69,9 @@ export const createCustomWorkout = createAsyncThunk(
   // Thunk to edit a custom workout
   export const editCustomWorkout = createAsyncThunk(
     'customWorkouts/editCustomWorkout',
-    async ({ id, customWorkoutName, customWorkoutDays }, { rejectWithValue }) => {
+    async ({ id, customWorkoutName }, { rejectWithValue }) => {
       try {
-        const response = await api.put(`/custom-workouts/${id}/edit`, { customWorkoutName, customWorkoutDays });
+        const response = await api.put(`/custom-workouts/${id}/edit`, { customWorkoutName });
         return response.data;
       } catch (error) {
         console.error('Edit custom workout error:', error.response ? error.response.data : error.message);

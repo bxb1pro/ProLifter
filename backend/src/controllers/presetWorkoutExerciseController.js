@@ -3,10 +3,10 @@ const { getExerciseById } = require('../services/exerciseService');
 
 const linkExercise = async (req, res) => {
     try {
-        const { exerciseID } = req.body; // This is the external ID from the API
+        const { exerciseID, defaultSets, defaultReps, defaultRPE } = req.body; // Now includes default values
         const presetWorkoutID = req.params.id;
 
-        console.log(`Linking exercise ID: ${exerciseID} to preset workout ID: ${presetWorkoutID}`);
+        console.log(`Linking exercise ID: ${exerciseID} to preset workout ID: ${presetWorkoutID} with default sets: ${defaultSets}, reps: ${defaultReps}, RPE: ${defaultRPE}`);
 
         // Check if the preset workout exists
         const workout = await PresetWorkout.findByPk(presetWorkoutID);
@@ -39,8 +39,14 @@ const linkExercise = async (req, res) => {
             });
         }
 
-        // Create the link in the PresetWorkoutExercise table
-        await PresetWorkoutExercise.create({ presetWorkoutID, exerciseID: exercise.exerciseID });
+        // Create the link in the PresetWorkoutExercise table with dynamic default values
+        await PresetWorkoutExercise.create({
+            presetWorkoutID,
+            exerciseID: exercise.exerciseID,
+            defaultSets,
+            defaultReps,
+            defaultRPE
+        });
 
         res.status(200).json({ message: 'Exercise linked successfully' });
     } catch (error) {
@@ -90,9 +96,10 @@ const getExercisesForPresetWorkout = async (req, res) => {
         const exercises = await PresetWorkoutExercise.findAll({
             where: { presetWorkoutID },
             include: [Exercise], // Include the Exercise details
+            attributes: ['exerciseID', 'defaultSets', 'defaultReps', 'defaultRPE'] // Include the defaults
         });
 
-        if (!exercises) {
+        if (!exercises.length) {
             return res.status(404).json({ error: 'No exercises found for this preset workout' });
         }
 

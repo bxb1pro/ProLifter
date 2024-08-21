@@ -11,10 +11,6 @@ const PresetWorkout = sequelize.define('PresetWorkout', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    presetWorkoutDays: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-    },
     presetWorkoutDifficulty: {
         type: DataTypes.STRING,
         allowNull: false,

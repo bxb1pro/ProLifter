@@ -4,7 +4,6 @@ import { editPresetWorkout } from '../../features/presetWorkouts/presetWorkoutSl
 
 const EditPresetWorkoutForm = ({ workout, onClose }) => {
   const [presetWorkoutName, setPresetWorkoutName] = useState(workout.presetWorkoutName);
-  const [presetWorkoutDays, setPresetWorkoutDays] = useState(workout.presetWorkoutDays);
   const [presetWorkoutDifficulty, setPresetWorkoutDifficulty] = useState(workout.presetWorkoutDifficulty);
   const [presetWorkoutGoal, setPresetWorkoutGoal] = useState(workout.presetWorkoutGoal);
   const [presetWorkoutLocation, setPresetWorkoutLocation] = useState(workout.presetWorkoutLocation);
@@ -14,7 +13,6 @@ const EditPresetWorkoutForm = ({ workout, onClose }) => {
     e.preventDefault();
     if (
       presetWorkoutName &&
-      presetWorkoutDays &&
       presetWorkoutDifficulty &&
       presetWorkoutGoal &&
       presetWorkoutLocation
@@ -23,7 +21,6 @@ const EditPresetWorkoutForm = ({ workout, onClose }) => {
         editPresetWorkout({
           id: workout.presetWorkoutID,
           presetWorkoutName,
-          presetWorkoutDays,
           presetWorkoutDifficulty,
           presetWorkoutGoal,
           presetWorkoutLocation,
@@ -41,15 +38,6 @@ const EditPresetWorkoutForm = ({ workout, onClose }) => {
           type="text"
           value={presetWorkoutName}
           onChange={(e) => setPresetWorkoutName(e.target.value)}
-          required
-        />
-      </label>
-      <label>
-        Number of Days:
-        <input
-          type="number"
-          value={presetWorkoutDays}
-          onChange={(e) => setPresetWorkoutDays(e.target.value)}
           required
         />
       </label>
