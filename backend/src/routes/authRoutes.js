@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/logout', logout);
-router.delete('/delete', verifyRole(['user', 'admin']), deleteAccount);
-router.get('/account', verifyRole(['user', 'admin']), getAccountDetails);
+router.delete('/delete', verifyRole(['user', 'superadmin', 'admin']), deleteAccount);
+router.get('/account', verifyRole(['user', 'superadmin', 'admin']), getAccountDetails);
 
 module.exports = router;

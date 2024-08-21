@@ -101,7 +101,7 @@ const getAccountDetails = async (req, res) => {
 
         // Find the user in the database
         const user = await User.findByPk(userID, {
-            attributes: ['userID', 'userName', 'userEmail', 'role', 'userDateCreated']
+            attributes: ['userID', 'userName', 'userEmail', 'role']
         });
 
         if (!user) {
