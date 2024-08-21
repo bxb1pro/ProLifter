@@ -7,6 +7,8 @@ import Logout from './components/Auth/Logout';
 import Exercises from './components/Exercises';
 import ExerciseDetails from './components/ExerciseDetails';
 import PresetWorkout from './components/PresetWorkout';
+import WorkoutLogs from './components/WorkoutLogs';
+import ExerciseLogs from './components/ExerciseLogs'; 
 
 function App() {
     return (
@@ -18,6 +20,8 @@ function App() {
             <Route path="/exercises" element={<Exercises />} />
             <Route path="/exercises/:id" element={<ExerciseDetails />} />
             <Route path="/preset-workouts" element={<PresetWorkout />} />
+            <Route path="/workout-logs" element={<WorkoutLogs />} />
+            <Route path="/workout-logs/:workoutLogID/exercise-logs" element={<ExerciseLogs />} /> 
         </Routes>
     );
 }

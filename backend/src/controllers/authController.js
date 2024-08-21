@@ -68,8 +68,58 @@ const logout = (req, res) => {
     res.status(200).json({ message: 'Logged out successfully' });
 };
 
+const deleteAccount = async (req, res) => {
+    try {
+        const { userPassword } = req.body;
+        const userID = req.user.userID; // Extract userID from the authenticated user's JWT
+
+        // Find the user in the database
+        const user = await User.findByPk(userID);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Verify the provided password
+        const validPassword = await bcrypt.compare(userPassword, user.userPasswordHash);
+        if (!validPassword) {
+            return res.status(400).json({ error: 'Invalid password' });
+        }
+
+        // Delete the user account
+        await user.destroy();
+
+        res.status(200).json({ message: 'Account deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+const getAccountDetails = async (req, res) => {
+    try {
+        const userID = req.user.userID; // Extract userID from the authenticated user's JWT
+
+        // Find the user in the database
+        const user = await User.findByPk(userID, {
+            attributes: ['userID', 'userName', 'userEmail', 'role', 'userDateCreated']
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
 module.exports = {
     signup,
     login,
     logout,
+    deleteAccount,
+    getAccountDetails,
+
 };
