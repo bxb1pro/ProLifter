@@ -1,15 +1,27 @@
+// src/features/presetWorkouts/presetWorkoutSlice.js
+
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
 
-// Async thunk to fetch all preset workouts
+// Thunk to fetch all preset workouts
 export const fetchPresetWorkouts = createAsyncThunk(
   'presetWorkouts/fetchPresetWorkouts',
-  async (_, { rejectWithValue }) => {
+  async () => {
+    const response = await api.get('/preset-workouts');
+    return response.data;
+  }
+);
+
+// Thunk to link an exercise to a preset workout
+export const linkExerciseToPresetWorkout = createAsyncThunk(
+  'presetWorkouts/linkExerciseToPresetWorkout',
+  async ({ presetWorkoutID, exerciseID }, { rejectWithValue }) => {
     try {
-      const response = await api.get('/preset-workouts');
+      const response = await api.post(`/preset-workout-exercises/${presetWorkoutID}/link-exercise`, { exerciseID });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data || 'Failed to fetch preset workouts');
+      console.error('Link exercise to preset workout error:', error.response ? error.response.data : error.message);
+      return rejectWithValue(error.response.data || 'Failed to link exercise');
     }
   }
 );
@@ -33,7 +45,14 @@ const presetWorkoutSlice = createSlice({
       })
       .addCase(fetchPresetWorkouts.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload;
+        state.error = action.error.message;
+      })
+      .addCase(linkExerciseToPresetWorkout.fulfilled, (state, action) => {
+        state.status = 'succeeded';  // Handle successful linking if needed
+      })
+      .addCase(linkExerciseToPresetWorkout.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
       });
   },
 });
