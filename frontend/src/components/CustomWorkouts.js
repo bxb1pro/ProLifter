@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import {fetchUserCustomWorkouts, fetchExercisesForCustomWorkout, unlinkExerciseFromCustomWorkout,} from '../features/customWorkouts/customWorkoutSlice';
+import {
+  fetchUserCustomWorkouts,
+  fetchExercisesForCustomWorkout,
+  unlinkExerciseFromCustomWorkout,
+  deleteCustomWorkout, // Import the delete thunk
+} from '../features/customWorkouts/customWorkoutSlice';
+import AddCustomWorkoutForm from './forms/AddCustomWorkoutForm';
+import EditCustomWorkoutForm from './forms/EditCustomWorkoutForm';
 
 const CustomWorkouts = () => {
   const dispatch = useDispatch();
@@ -9,6 +16,8 @@ const CustomWorkouts = () => {
   const status = useSelector((state) => state.customWorkouts.status);
   const error = useSelector((state) => state.customWorkouts.error);
   const [selectedWorkoutID, setSelectedWorkoutID] = useState(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingWorkout, setEditingWorkout] = useState(null);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -25,6 +34,18 @@ const CustomWorkouts = () => {
     dispatch(unlinkExerciseFromCustomWorkout({ customWorkoutID, exerciseID }));
   };
 
+  const handleDeleteWorkout = (customWorkoutID) => {
+    dispatch(deleteCustomWorkout(customWorkoutID));
+  };
+
+  const handleAddWorkout = () => {
+    setShowAddForm(true);
+  };
+
+  const handleEditWorkout = (workout) => {
+    setEditingWorkout(workout);
+  };
+
   let content;
 
   if (status === 'loading') {
@@ -37,6 +58,8 @@ const CustomWorkouts = () => {
             <div>
               {workout.customWorkoutName} - {workout.customWorkoutDays} days
               <button onClick={() => handleViewExercises(workout.customWorkoutID)}>View Exercises</button>
+              <button onClick={() => handleEditWorkout(workout)}>Edit</button>
+              <button onClick={() => handleDeleteWorkout(workout.customWorkoutID)}>Delete</button>
             </div>
             {selectedWorkoutID === workout.customWorkoutID && exercises[workout.customWorkoutID] && (
               <ul>
@@ -61,7 +84,12 @@ const CustomWorkouts = () => {
   return (
     <section>
       <h2>Your Custom Workouts</h2>
+      <button onClick={handleAddWorkout}>Add Custom Workout</button>
       {content}
+      {showAddForm && <AddCustomWorkoutForm onClose={() => setShowAddForm(false)} />}
+      {editingWorkout && (
+        <EditCustomWorkoutForm workout={editingWorkout} onClose={() => setEditingWorkout(null)} />
+      )}
     </section>
   );
 };

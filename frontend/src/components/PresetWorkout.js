@@ -4,7 +4,10 @@ import {
   fetchPresetWorkouts,
   fetchExercisesForPresetWorkout,
   unlinkExerciseFromPresetWorkout,
+  deletePresetWorkout,
 } from '../features/presetWorkouts/presetWorkoutSlice';
+import AddPresetWorkoutForm from './forms/AddPresetWorkoutForm';
+import EditPresetWorkoutForm from './forms/EditPresetWorkoutForm';
 
 const PresetWorkout = () => {
   const dispatch = useDispatch();
@@ -13,6 +16,8 @@ const PresetWorkout = () => {
   const status = useSelector((state) => state.presetWorkouts.status);
   const error = useSelector((state) => state.presetWorkouts.error);
   const [selectedWorkoutID, setSelectedWorkoutID] = useState(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingWorkout, setEditingWorkout] = useState(null);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -29,6 +34,18 @@ const PresetWorkout = () => {
     dispatch(unlinkExerciseFromPresetWorkout({ presetWorkoutID, exerciseID }));
   };
 
+  const handleAddWorkout = () => {
+    setShowAddForm(true);
+  };
+
+  const handleEditWorkout = (workout) => {
+    setEditingWorkout(workout);
+  };
+
+  const handleDeleteWorkout = (presetWorkoutID) => {
+    dispatch(deletePresetWorkout(presetWorkoutID));
+  };
+
   let content;
 
   if (status === 'loading') {
@@ -41,6 +58,8 @@ const PresetWorkout = () => {
             <div>
               {workout.presetWorkoutName} - {workout.presetWorkoutDays} days - {workout.presetWorkoutDifficulty}
               <button onClick={() => handleViewExercises(workout.presetWorkoutID)}>View Exercises</button>
+              <button onClick={() => handleEditWorkout(workout)}>Edit</button>
+              <button onClick={() => handleDeleteWorkout(workout.presetWorkoutID)}>Delete</button>
             </div>
             {selectedWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
               <ul>
@@ -65,7 +84,12 @@ const PresetWorkout = () => {
   return (
     <section>
       <h2>Preset Workouts</h2>
+      <button onClick={handleAddWorkout}>Add Preset Workout</button>
       {content}
+      {showAddForm && <AddPresetWorkoutForm onClose={() => setShowAddForm(false)} />}
+      {editingWorkout && (
+        <EditPresetWorkoutForm workout={editingWorkout} onClose={() => setEditingWorkout(null)} />
+      )}
     </section>
   );
 };

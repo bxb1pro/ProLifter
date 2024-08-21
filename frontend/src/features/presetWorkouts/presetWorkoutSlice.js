@@ -1,5 +1,3 @@
-// src/features/presetWorkouts/presetWorkoutSlice.js
-
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
 
@@ -54,6 +52,48 @@ export const fetchExercisesForPresetWorkout = createAsyncThunk(
     }
   );
 
+// Thunk to create a preset workout
+export const createPresetWorkout = createAsyncThunk(
+    'presetWorkouts/createPresetWorkout',
+    async ({ presetWorkoutName, presetWorkoutDays, presetWorkoutDifficulty, presetWorkoutGoal, presetWorkoutLocation }, { rejectWithValue }) => {
+      try {
+        const response = await api.post('/preset-workouts', { presetWorkoutName, presetWorkoutDays, presetWorkoutDifficulty, presetWorkoutGoal, presetWorkoutLocation });
+        return response.data;
+      } catch (error) {
+        console.error('Create preset workout error:', error.response ? error.response.data : error.message);
+        return rejectWithValue(error.response.data || 'Failed to create preset workout');
+      }
+    }
+  );
+  
+// Thunk to edit a preset workout
+export const editPresetWorkout = createAsyncThunk(
+'presetWorkouts/editPresetWorkout',
+async ({ id, presetWorkoutName, presetWorkoutDays, presetWorkoutDifficulty, presetWorkoutGoal, presetWorkoutLocation }, { rejectWithValue }) => {
+    try {
+    const response = await api.put(`/preset-workouts/${id}`, { presetWorkoutName, presetWorkoutDays, presetWorkoutDifficulty, presetWorkoutGoal, presetWorkoutLocation });
+    return response.data;
+    } catch (error) {
+    console.error('Edit preset workout error:', error.response ? error.response.data : error.message);
+    return rejectWithValue(error.response.data || 'Failed to edit preset workout');
+    }
+}
+);
+  
+// Thunk to delete a preset workout
+export const deletePresetWorkout = createAsyncThunk(
+'presetWorkouts/deletePresetWorkout',
+async (id, { rejectWithValue }) => {
+    try {
+    const response = await api.delete(`/preset-workouts/${id}`);
+    return id;
+    } catch (error) {
+    console.error('Delete preset workout error:', error.response ? error.response.data : error.message);
+    return rejectWithValue(error.response.data || 'Failed to delete preset workout');
+    }
+}
+);
+  
   const presetWorkoutSlice = createSlice({
     name: 'presetWorkouts',
     initialState: {
@@ -100,6 +140,34 @@ export const fetchExercisesForPresetWorkout = createAsyncThunk(
           state.exercises[action.meta.arg] = action.payload;
         })
         .addCase(fetchExercisesForPresetWorkout.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.error.message;
+        })
+        .addCase(createPresetWorkout.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          state.workouts.push(action.payload);
+        })
+        .addCase(createPresetWorkout.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.error.message;
+        })
+        .addCase(editPresetWorkout.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          const updatedWorkout = action.payload;
+          const index = state.workouts.findIndex(workout => workout.presetWorkoutID === updatedWorkout.presetWorkoutID);
+          if (index !== -1) {
+            state.workouts[index] = updatedWorkout;
+          }
+        })
+        .addCase(editPresetWorkout.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.error.message;
+        })
+        .addCase(deletePresetWorkout.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          state.workouts = state.workouts.filter(workout => workout.presetWorkoutID !== action.payload);
+        })
+        .addCase(deletePresetWorkout.rejected, (state, action) => {
           state.status = 'failed';
           state.error = action.error.message;
         });

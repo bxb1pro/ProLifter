@@ -51,6 +51,48 @@ export const fetchExercisesForCustomWorkout = createAsyncThunk(
       }
     }
   );
+
+  // Thunk to create a custom workout
+export const createCustomWorkout = createAsyncThunk(
+    'customWorkouts/createCustomWorkout',
+    async ({ customWorkoutName, customWorkoutDays }, { rejectWithValue }) => {
+      try {
+        const response = await api.post('/custom-workouts', { customWorkoutName, customWorkoutDays });
+        return response.data;
+      } catch (error) {
+        console.error('Create custom workout error:', error.response ? error.response.data : error.message);
+        return rejectWithValue(error.response.data || 'Failed to create custom workout');
+      }
+    }
+  );
+  
+  // Thunk to edit a custom workout
+  export const editCustomWorkout = createAsyncThunk(
+    'customWorkouts/editCustomWorkout',
+    async ({ id, customWorkoutName, customWorkoutDays }, { rejectWithValue }) => {
+      try {
+        const response = await api.put(`/custom-workouts/${id}/edit`, { customWorkoutName, customWorkoutDays });
+        return response.data;
+      } catch (error) {
+        console.error('Edit custom workout error:', error.response ? error.response.data : error.message);
+        return rejectWithValue(error.response.data || 'Failed to edit custom workout');
+      }
+    }
+  );
+
+  // Thunk to delete a custom workout
+    export const deleteCustomWorkout = createAsyncThunk(
+    'customWorkouts/deleteCustomWorkout',
+    async (id, { rejectWithValue }) => {
+      try {
+        const response = await api.delete(`/custom-workouts/${id}/delete`);
+        return id; // Return the id to remove it from the state
+      } catch (error) {
+        console.error('Delete custom workout error:', error.response ? error.response.data : error.message);
+        return rejectWithValue(error.response.data || 'Failed to delete custom workout');
+      }
+    }
+  );    
   
   const customWorkoutSlice = createSlice({
     name: 'customWorkouts',
@@ -100,6 +142,14 @@ export const fetchExercisesForCustomWorkout = createAsyncThunk(
         .addCase(fetchExercisesForCustomWorkout.rejected, (state, action) => {
           state.status = 'failed';
           state.error = action.error.message;
+        })
+        .addCase(deleteCustomWorkout.fulfilled, (state, action) => {
+            state.status = 'succeeded';
+            state.workouts = state.workouts.filter(workout => workout.customWorkoutID !== action.payload);
+        })
+        .addCase(deleteCustomWorkout.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
         });
     },
   });

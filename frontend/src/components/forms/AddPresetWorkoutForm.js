@@ -1,0 +1,90 @@
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { createPresetWorkout } from '../../features/presetWorkouts/presetWorkoutSlice';
+
+const AddPresetWorkoutForm = ({ onClose }) => {
+  const [presetWorkoutName, setPresetWorkoutName] = useState('');
+  const [presetWorkoutDays, setPresetWorkoutDays] = useState('');
+  const [presetWorkoutDifficulty, setPresetWorkoutDifficulty] = useState('');
+  const [presetWorkoutGoal, setPresetWorkoutGoal] = useState('');
+  const [presetWorkoutLocation, setPresetWorkoutLocation] = useState('');
+  const dispatch = useDispatch();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (
+      presetWorkoutName &&
+      presetWorkoutDays &&
+      presetWorkoutDifficulty &&
+      presetWorkoutGoal &&
+      presetWorkoutLocation
+    ) {
+      dispatch(
+        createPresetWorkout({
+          presetWorkoutName,
+          presetWorkoutDays,
+          presetWorkoutDifficulty,
+          presetWorkoutGoal,
+          presetWorkoutLocation,
+        })
+      );
+      onClose();
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        Workout Name:
+        <input
+          type="text"
+          value={presetWorkoutName}
+          onChange={(e) => setPresetWorkoutName(e.target.value)}
+          required
+        />
+      </label>
+      <label>
+        Number of Days:
+        <input
+          type="number"
+          value={presetWorkoutDays}
+          onChange={(e) => setPresetWorkoutDays(e.target.value)}
+          required
+        />
+      </label>
+      <label>
+        Difficulty:
+        <input
+          type="text"
+          value={presetWorkoutDifficulty}
+          onChange={(e) => setPresetWorkoutDifficulty(e.target.value)}
+          required
+        />
+      </label>
+      <label>
+        Goal:
+        <input
+          type="text"
+          value={presetWorkoutGoal}
+          onChange={(e) => setPresetWorkoutGoal(e.target.value)}
+          required
+        />
+      </label>
+      <label>
+        Location:
+        <input
+          type="text"
+          value={presetWorkoutLocation}
+          onChange={(e) => setPresetWorkoutLocation(e.target.value)}
+          required
+        />
+      </label>
+      <button type="submit">Add Workout</button>
+      <button type="button" onClick={onClose}>
+        Cancel
+      </button>
+    </form>
+  );
+};
+
+export default AddPresetWorkoutForm;
