@@ -26,6 +26,20 @@ export const linkExerciseToPresetWorkout = createAsyncThunk(
   }
 );
 
+// Thunk to unlink an exercise from a preset workout
+export const unlinkExerciseFromPresetWorkout = createAsyncThunk(
+    'presetWorkouts/unlinkExerciseFromPresetWorkout',
+    async ({ presetWorkoutID, exerciseID }, { rejectWithValue }) => {
+      try {
+        const response = await api.post(`/preset-workout-exercises/${presetWorkoutID}/unlink-exercise`, { exerciseID });
+        return response.data;
+      } catch (error) {
+        console.error('Unlink exercise from preset workout error:', error.response ? error.response.data : error.message);
+        return rejectWithValue(error.response.data || 'Failed to unlink exercise');
+      }
+    }
+  );
+
 // Thunk to fetch exercises for a specific preset workout
 export const fetchExercisesForPresetWorkout = createAsyncThunk(
     'presetWorkouts/fetchExercisesForPresetWorkout',
@@ -63,9 +77,18 @@ export const fetchExercisesForPresetWorkout = createAsyncThunk(
           state.error = action.error.message;
         })
         .addCase(linkExerciseToPresetWorkout.fulfilled, (state, action) => {
-          state.status = 'succeeded';  // Handle successful linking if needed
+          state.status = 'succeeded';
         })
         .addCase(linkExerciseToPresetWorkout.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.error.message;
+        })
+        .addCase(unlinkExerciseFromPresetWorkout.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          const { presetWorkoutID, exerciseID } = action.meta.arg;
+          state.exercises[presetWorkoutID] = state.exercises[presetWorkoutID].filter(exercise => exercise.exerciseID !== exerciseID);
+        })
+        .addCase(unlinkExerciseFromPresetWorkout.rejected, (state, action) => {
           state.status = 'failed';
           state.error = action.error.message;
         })
@@ -74,7 +97,7 @@ export const fetchExercisesForPresetWorkout = createAsyncThunk(
         })
         .addCase(fetchExercisesForPresetWorkout.fulfilled, (state, action) => {
           state.status = 'succeeded';
-          state.exercises[action.meta.arg] = action.payload; // Store exercises by workout ID
+          state.exercises[action.meta.arg] = action.payload;
         })
         .addCase(fetchExercisesForPresetWorkout.rejected, (state, action) => {
           state.status = 'failed';

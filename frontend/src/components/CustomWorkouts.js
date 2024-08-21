@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchUserCustomWorkouts, fetchExercisesForCustomWorkout } from '../features/customWorkouts/customWorkoutSlice';
+import {fetchUserCustomWorkouts, fetchExercisesForCustomWorkout, unlinkExerciseFromCustomWorkout,} from '../features/customWorkouts/customWorkoutSlice';
 
 const CustomWorkouts = () => {
   const dispatch = useDispatch();
@@ -21,6 +21,10 @@ const CustomWorkouts = () => {
     dispatch(fetchExercisesForCustomWorkout(customWorkoutID));
   };
 
+  const handleUnlinkExercise = (customWorkoutID, exerciseID) => {
+    dispatch(unlinkExerciseFromCustomWorkout({ customWorkoutID, exerciseID }));
+  };
+
   let content;
 
   if (status === 'loading') {
@@ -39,6 +43,9 @@ const CustomWorkouts = () => {
                 {exercises[workout.customWorkoutID].map((exercise) => (
                   <li key={exercise.exerciseID}>
                     {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
+                    <button onClick={() => handleUnlinkExercise(workout.customWorkoutID, exercise.exerciseID)}>
+                      Remove
+                    </button>
                   </li>
                 ))}
               </ul>

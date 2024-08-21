@@ -24,6 +24,20 @@ export const linkExerciseToCustomWorkout = createAsyncThunk(
   }
 );
 
+// Thunk to unlink an exercise from a custom workout
+export const unlinkExerciseFromCustomWorkout = createAsyncThunk(
+    'customWorkouts/unlinkExerciseFromCustomWorkout',
+    async ({ customWorkoutID, exerciseID }, { rejectWithValue }) => {
+      try {
+        const response = await api.post(`/custom-workout-exercises/${customWorkoutID}/unlink-exercise`, { exerciseID });
+        return response.data;
+      } catch (error) {
+        console.error('Unlink exercise from custom workout error:', error.response ? error.response.data : error.message);
+        return rejectWithValue(error.response.data || 'Failed to unlink exercise');
+      }
+    }
+  );
+
 // New Thunk to fetch exercises for a specific custom workout
 export const fetchExercisesForCustomWorkout = createAsyncThunk(
     'customWorkouts/fetchExercisesForCustomWorkout',
@@ -64,6 +78,15 @@ export const fetchExercisesForCustomWorkout = createAsyncThunk(
           state.status = 'succeeded';
         })
         .addCase(linkExerciseToCustomWorkout.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.error.message;
+        })
+        .addCase(unlinkExerciseFromCustomWorkout.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          const { customWorkoutID, exerciseID } = action.meta.arg;
+          state.exercises[customWorkoutID] = state.exercises[customWorkoutID].filter(exercise => exercise.exerciseID !== exerciseID);
+        })
+        .addCase(unlinkExerciseFromCustomWorkout.rejected, (state, action) => {
           state.status = 'failed';
           state.error = action.error.message;
         })

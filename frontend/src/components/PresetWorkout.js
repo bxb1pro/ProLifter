@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchPresetWorkouts, fetchExercisesForPresetWorkout } from '../features/presetWorkouts/presetWorkoutSlice';
+import {
+  fetchPresetWorkouts,
+  fetchExercisesForPresetWorkout,
+  unlinkExerciseFromPresetWorkout,
+} from '../features/presetWorkouts/presetWorkoutSlice';
 
 const PresetWorkout = () => {
   const dispatch = useDispatch();
@@ -21,6 +25,10 @@ const PresetWorkout = () => {
     dispatch(fetchExercisesForPresetWorkout(presetWorkoutID));
   };
 
+  const handleUnlinkExercise = (presetWorkoutID, exerciseID) => {
+    dispatch(unlinkExerciseFromPresetWorkout({ presetWorkoutID, exerciseID }));
+  };
+
   let content;
 
   if (status === 'loading') {
@@ -39,6 +47,9 @@ const PresetWorkout = () => {
                 {exercises[workout.presetWorkoutID].map((exercise) => (
                   <li key={exercise.exerciseID}>
                     {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
+                    <button onClick={() => handleUnlinkExercise(workout.presetWorkoutID, exercise.exerciseID)}>
+                      Remove
+                    </button>
                   </li>
                 ))}
               </ul>
