@@ -8,7 +8,9 @@ import Exercises from './components/Exercises';
 import ExerciseDetails from './components/ExerciseDetails';
 import PresetWorkout from './components/PresetWorkout';
 import WorkoutLogs from './components/WorkoutLogs';
-import ExerciseLogs from './components/ExerciseLogs'; 
+import ExerciseLogs from './components/ExerciseLogs';
+import SetLogs from './components/SetLogs'; 
+import CustomWorkouts from './components/CustomWorkouts'; 
 
 function App() {
     return (
@@ -22,6 +24,8 @@ function App() {
             <Route path="/preset-workouts" element={<PresetWorkout />} />
             <Route path="/workout-logs" element={<WorkoutLogs />} />
             <Route path="/workout-logs/:workoutLogID/exercise-logs" element={<ExerciseLogs />} /> 
+            <Route path="/exercise-logs/:exerciseLogID/set-logs" element={<SetLogs />} /> 
+            <Route path="/custom-workouts" element={<CustomWorkouts />} /> 
         </Routes>
     );
 }

@@ -3,7 +3,9 @@ import authReducer from '../features/auth/authSlice';
 import exerciseReducer from '../features/exercises/exerciseSlice';
 import presetWorkoutReducer from '../features/presetWorkouts/presetWorkoutSlice';
 import workoutLogReducer from '../features/workoutLogs/workoutLogSlice';
-import exerciseLogSlice from '../features/exerciseLogs/exerciseLogSlice';
+import exerciseLogReducer from '../features/exerciseLogs/exerciseLogSlice';
+import setLogReducer from '../features/setLogs/setLogSlice';
+import customWorkoutReducer from '../features/customWorkouts/customWorkoutSlice'; 
 
 const store = configureStore({
     reducer: {
@@ -11,7 +13,9 @@ const store = configureStore({
         exercises: exerciseReducer,
         presetWorkouts: presetWorkoutReducer,
         workoutLogs: workoutLogReducer,
-        exerciseLog: exerciseLogSlice,
+        exerciseLogs: exerciseLogReducer,
+        setLogs: setLogReducer,
+        customWorkouts: customWorkoutReducer,
     },
 });
 
