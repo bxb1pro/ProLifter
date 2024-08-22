@@ -6,6 +6,7 @@ import {
   unlinkExerciseFromPresetWorkout,
   deletePresetWorkout,
 } from '../features/presetWorkouts/presetWorkoutSlice';
+import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice'; // Import the startWorkoutLog action
 import AddPresetWorkoutForm from './forms/AddPresetWorkoutForm';
 import EditPresetWorkoutForm from './forms/EditPresetWorkoutForm';
 
@@ -49,6 +50,10 @@ const PresetWorkout = () => {
 
   const handleDeleteWorkout = (presetWorkoutID) => {
     dispatch(deletePresetWorkout(presetWorkoutID));
+  };
+
+  const handleStartWorkout = (presetWorkoutID) => {
+    dispatch(startWorkoutLog({ presetWorkoutID })); // Start a workout log for the selected preset workout
   };
 
   // Filtered workouts based on the selected filters
@@ -100,6 +105,7 @@ const PresetWorkout = () => {
                 <button onClick={() => handleViewExercises(workout.presetWorkoutID)}>View Exercises</button>
                 <button onClick={() => handleEditWorkout(workout)}>Edit</button>
                 <button onClick={() => handleDeleteWorkout(workout.presetWorkoutID)}>Delete</button>
+                <button onClick={() => handleStartWorkout(workout.presetWorkoutID)}>Start Workout</button> {/* Add the Start Workout button */}
               </div>
               {selectedWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
                 <ul>

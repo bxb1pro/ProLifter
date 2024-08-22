@@ -2,7 +2,8 @@ const { WorkoutLog, PresetWorkoutExercise, ExerciseLog, SetLog } = require('../m
 
 const startWorkout = async (req, res) => {
     try {
-        const { userID, presetWorkoutID, customWorkoutID } = req.body;
+        const userID = req.user.userID;  // Extract userID from the authenticated user's JWT
+        const { presetWorkoutID, customWorkoutID } = req.body;
 
         // Create workout log
         const newWorkoutLog = await WorkoutLog.create({
@@ -43,64 +44,6 @@ const startWorkout = async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 };
-
-
-// const { sequelize } = require('../config/db');
-// const { WorkoutLog, PresetWorkoutExercise, ExerciseLog, SetLog } = require('../models');
-
-// const startWorkout = async (req, res) => {
-//     const transaction = await sequelize.transaction(); // Start a transaction
-
-//     try {
-//         const { userID, presetWorkoutID, customWorkoutID } = req.body;
-
-//         // Create the WorkoutLog
-//         const newWorkoutLog = await WorkoutLog.create(
-//             { userID, presetWorkoutID, customWorkoutID },
-//             { transaction }
-//         );
-
-//         // If it's a PresetWorkout, create ExerciseLogs and SetLogs with default values
-//         if (presetWorkoutID) {
-//             const presetExercises = await PresetWorkoutExercise.findAll({
-//                 where: { presetWorkoutID },
-//                 transaction,
-//             });
-
-//             for (const presetExercise of presetExercises) {
-//                 // Create an ExerciseLog for each exercise in the preset workout
-//                 const exerciseLog = await ExerciseLog.create(
-//                     {
-//                         workoutLogID: newWorkoutLog.workoutLogID,
-//                         exerciseID: presetExercise.exerciseID,
-//                         exerciseLogSets: presetExercise.defaultSets,
-//                     },
-//                     { transaction }
-//                 );
-
-//                 // Create SetLogs for each set in the ExerciseLog using the default values
-//                 for (let i = 0; i < presetExercise.defaultSets; i++) {
-//                     await SetLog.create(
-//                         {
-//                             exerciseLogID: exerciseLog.exerciseLogID,
-//                             setLogReps: presetExercise.defaultReps,
-//                             setLogRPE: presetExercise.defaultRPE,
-//                         },
-//                         { transaction }
-//                     );
-//                 }
-//             }
-//         }
-
-//         await transaction.commit(); // Commit the transaction
-
-//         res.status(201).json(newWorkoutLog);
-//     } catch (error) {
-//         await transaction.rollback(); // Rollback the transaction in case of error
-//         console.error(error);
-//         res.status(500).json({ error: 'Server error' });
-//     }
-// };
 
 const finishWorkout = async (req, res) => {
     try {

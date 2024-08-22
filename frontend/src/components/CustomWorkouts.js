@@ -4,8 +4,9 @@ import {
   fetchUserCustomWorkouts,
   fetchExercisesForCustomWorkout,
   unlinkExerciseFromCustomWorkout,
-  deleteCustomWorkout, // Import the delete thunk
+  deleteCustomWorkout,
 } from '../features/customWorkouts/customWorkoutSlice';
+import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice'; // Import the startWorkoutLog action
 import AddCustomWorkoutForm from './forms/AddCustomWorkoutForm';
 import EditCustomWorkoutForm from './forms/EditCustomWorkoutForm';
 
@@ -46,6 +47,11 @@ const CustomWorkouts = () => {
     setEditingWorkout(workout);
   };
 
+  // New handler to start a workout log
+  const handleStartWorkout = (customWorkoutID) => {
+    dispatch(startWorkoutLog({ customWorkoutID }));
+  };
+
   let content;
 
   if (status === 'loading') {
@@ -60,6 +66,7 @@ const CustomWorkouts = () => {
               <button onClick={() => handleViewExercises(workout.customWorkoutID)}>View Exercises</button>
               <button onClick={() => handleEditWorkout(workout)}>Edit</button>
               <button onClick={() => handleDeleteWorkout(workout.customWorkoutID)}>Delete</button>
+              <button onClick={() => handleStartWorkout(workout.customWorkoutID)}>Start Workout</button> {/* Start Workout button */}
             </div>
             {selectedWorkoutID === workout.customWorkoutID && exercises[workout.customWorkoutID] && (
               <ul>
