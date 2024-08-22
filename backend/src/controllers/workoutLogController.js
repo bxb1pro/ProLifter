@@ -109,10 +109,29 @@ const getUserWorkoutLogs = async (req, res) => {
     }
 };
 
+const getWorkoutLogDetails = async (req, res) => {
+    try {
+      const workoutLogID = req.params.id;
+  
+      // Find the workout log by ID
+      const workoutLog = await WorkoutLog.findByPk(workoutLogID);
+  
+      if (!workoutLog) {
+        return res.status(404).json({ error: 'Workout log not found' });
+      }
+  
+      res.status(200).json(workoutLog);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Server error' });
+    }
+  };
+
 module.exports = {
     startWorkout,
     finishWorkout,
     editWorkoutLog,
     deleteWorkoutLog,
     getUserWorkoutLogs,
+    getWorkoutLogDetails
 };

@@ -13,6 +13,7 @@ import SetLogs from './components/SetLogs';
 import CustomWorkouts from './components/CustomWorkouts'; 
 import Account from './components/Account';
 import UserWorkouts from './components/UserWorkouts';
+import WorkoutLogDetails from './components/WorkoutLogDetails';
 
 function App() {
     return (
@@ -30,6 +31,7 @@ function App() {
             <Route path="/custom-workouts" element={<CustomWorkouts />} /> 
             <Route path="/account" element={<Account />} />
             <Route path="/user-workouts" element={<UserWorkouts />} /> 
+            <Route path="/workout-logs/:workoutLogID" element={<WorkoutLogDetails />} />
         </Routes>
     );
 }
