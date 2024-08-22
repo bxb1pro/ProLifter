@@ -98,11 +98,53 @@ async (id, { rejectWithValue }) => {
     }
 }
 );
+
+// Thunk to link a preset workout to a user
+export const linkPresetWorkoutToUser = createAsyncThunk(
+    'presetWorkouts/linkPresetWorkoutToUser',
+    async ({ userID, presetWorkoutID }, { rejectWithValue }) => {
+      try {
+        const response = await api.post(`/user-preset-workouts/${userID}/link-preset-workout`, { presetWorkoutID });
+        return response.data;
+      } catch (error) {
+        console.error('Link preset workout to user error:', error.response ? error.response.data : error.message);
+        return rejectWithValue(error.response.data || 'Failed to link preset workout to user');
+      }
+    }
+  );
+
+  // Thunk to unlink a preset workout from a user
+export const unlinkPresetWorkoutFromUser = createAsyncThunk(
+    'presetWorkouts/unlinkPresetWorkoutFromUser',
+    async ({ userID, presetWorkoutID }, { rejectWithValue }) => {
+      try {
+        const response = await api.post(`/user-preset-workouts/${userID}/unlink-preset-workout`, { presetWorkoutID });
+        return { userID, presetWorkoutID };
+      } catch (error) {
+        console.error('Unlink preset workout from user error:', error.response ? error.response.data : error.message);
+        return rejectWithValue(error.response.data || 'Failed to unlink preset workout from user');
+      }
+    }
+  );
+
+// Thunk to fetch preset workouts linked to a user
+export const fetchUserPresetWorkouts = createAsyncThunk(
+    'presetWorkouts/fetchUserPresetWorkouts',
+    async (userID, { rejectWithValue }) => {
+      try {
+        const response = await api.get(`/user-preset-workouts/${userID}/preset-workouts`);
+        return response.data;
+      } catch (error) {
+        return rejectWithValue(error.response.data || 'Failed to fetch user preset workouts');
+      }
+    }
+);
   
   const presetWorkoutSlice = createSlice({
     name: 'presetWorkouts',
     initialState: {
       workouts: [],
+      userWorkouts: [], 
       exercises: {},  // Store exercises for each preset workout
       status: 'idle', // idle, loading, succeeded, failed
       error: null,
@@ -175,6 +217,32 @@ async (id, { rejectWithValue }) => {
         .addCase(deletePresetWorkout.rejected, (state, action) => {
           state.status = 'failed';
           state.error = action.error.message;
+        })
+        .addCase(linkPresetWorkoutToUser.fulfilled, (state, action) => {
+            state.status = 'succeeded';
+        })
+        .addCase(linkPresetWorkoutToUser.rejected, (state, action) => {
+            state.status = 'failed';
+            state.error = action.error.message;
+        })
+        .addCase(fetchUserPresetWorkouts.pending, (state) => {
+            state.status = 'loading';
+          })
+        .addCase(fetchUserPresetWorkouts.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.userWorkouts = action.payload;
+        })
+        .addCase(fetchUserPresetWorkouts.rejected, (state, action) => {
+            state.status = 'failed';
+            state.error = action.payload;
+        })
+        .addCase(unlinkPresetWorkoutFromUser.fulfilled, (state, action) => {
+            state.status = 'succeeded';
+            state.userWorkouts = state.userWorkouts.filter(workout => workout.presetWorkoutID !== action.payload.presetWorkoutID);
+        })
+        .addCase(unlinkPresetWorkoutFromUser.rejected, (state, action) => {
+            state.status = 'failed';
+            state.error = action.error.message;
         });
     },
   });

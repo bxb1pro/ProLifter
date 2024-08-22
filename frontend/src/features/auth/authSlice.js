@@ -1,36 +1,42 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import api from '../../services/api';
 
-// Thunk to log user in
 export const loginUser = createAsyncThunk(
     'auth/login',
-    async (userData, { rejectWithValue }) => {
-        try {
-            const response = await api.post('/auth/login', userData);
-            console.log('Login successful, response:', response.data); // Add this line
-            localStorage.setItem('token', response.data.token);
-            return response.data;
-        } catch (error) {
-            console.error('Login error:', error.response ? error.response.data : error.message); // Add this line
-            return rejectWithValue(error.response.data || 'Login failed');
-        }
+    async (userData, { dispatch, rejectWithValue }) => {
+      try {
+        const response = await api.post('/auth/login', userData);
+        console.log('Login successful, response:', response.data);
+        localStorage.setItem('token', response.data.token);
+  
+        // Fetch account details after login
+        await dispatch(fetchAccountDetails());
+  
+        return response.data;
+      } catch (error) {
+        console.error('Login error:', error.response ? error.response.data : error.message);
+        return rejectWithValue(error.response.data || 'Login failed');
+      }
     }
-);
-
-// Thunk to sign up user
-export const signupUser = createAsyncThunk(
+  );
+  
+  export const signupUser = createAsyncThunk(
     'auth/signup',
-    async (userData, { rejectWithValue }) => {
-        try {
-            const response = await api.post('/auth/signup', userData);
-            localStorage.setItem('token', response.data.token);
-            return response.data;
-        } catch (error) {
-            console.error('Signup error:', error.response ? error.response.data : error.message);
-            return rejectWithValue(error.response.data || 'Signup failed');
-        }
+    async (userData, { dispatch, rejectWithValue }) => {
+      try {
+        const response = await api.post('/auth/signup', userData);
+        localStorage.setItem('token', response.data.token);
+  
+        // Fetch account details after signup
+        await dispatch(fetchAccountDetails());
+  
+        return response.data;
+      } catch (error) {
+        console.error('Signup error:', error.response ? error.response.data : error.message);
+        return rejectWithValue(error.response.data || 'Signup failed');
+      }
     }
-);
+  );
 
 // Thunk to fetch account details
 export const fetchAccountDetails = createAsyncThunk(

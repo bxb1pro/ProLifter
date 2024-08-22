@@ -42,7 +42,32 @@ const unlinkPresetWorkout = async (req, res) => {
     }
 };
 
+const getUserPresetWorkouts = async (req, res) => {
+    try {
+        const userID = req.params.id;
+
+        // Fetch all preset workouts linked to the user
+        const userPresetWorkouts = await UserPresetWorkout.findAll({
+            where: { userID },
+            include: [{ model: PresetWorkout }] // Include the PresetWorkout model to get workout details
+        });
+
+        if (!userPresetWorkouts) {
+            return res.status(404).json({ error: 'No preset workouts found for this user' });
+        }
+
+        // Extract the preset workouts from the linked data
+        const presetWorkouts = userPresetWorkouts.map((userPresetWorkout) => userPresetWorkout.PresetWorkout);
+
+        res.status(200).json(presetWorkouts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
 module.exports = {
     linkPresetWorkout,
     unlinkPresetWorkout,
+    getUserPresetWorkouts
 };

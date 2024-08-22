@@ -5,10 +5,12 @@ import {
   fetchExercisesForPresetWorkout,
   unlinkExerciseFromPresetWorkout,
   deletePresetWorkout,
+  linkPresetWorkoutToUser
 } from '../features/presetWorkouts/presetWorkoutSlice';
-import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice'; // Import the startWorkoutLog action
 import AddPresetWorkoutForm from './forms/AddPresetWorkoutForm';
 import EditPresetWorkoutForm from './forms/EditPresetWorkoutForm';
+import { fetchAccountDetails } from '../features/auth/authSlice'; 
+
 
 const PresetWorkout = () => {
   const dispatch = useDispatch();
@@ -16,6 +18,22 @@ const PresetWorkout = () => {
   const exercises = useSelector((state) => state.presetWorkouts.exercises);
   const status = useSelector((state) => state.presetWorkouts.status);
   const error = useSelector((state) => state.presetWorkouts.error);
+
+  const user = useSelector((state) => state.auth.user);
+  const userID = user ? user.userID : null;
+
+  useEffect(() => {
+    if (!user) {
+      dispatch(fetchAccountDetails()); // Fetch user details if not already available
+    }
+  }, [user, dispatch]);
+
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchPresetWorkouts());
+    }
+  }, [status, dispatch]);
+
   const [selectedWorkoutID, setSelectedWorkoutID] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState(null);
@@ -25,15 +43,20 @@ const PresetWorkout = () => {
   const [goalFilter, setGoalFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
 
-  useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchPresetWorkouts());
-    }
-  }, [status, dispatch]);
-
   const handleViewExercises = (presetWorkoutID) => {
     setSelectedWorkoutID(presetWorkoutID);
     dispatch(fetchExercisesForPresetWorkout(presetWorkoutID));
+  };
+
+  const handleLinkWorkoutToUser = (presetWorkoutID) => {
+    console.log('User ID:', userID);
+
+    if (!userID) {
+      console.error('User ID is not defined. Cannot link preset workout to user.');
+      return;
+    }
+
+    dispatch(linkPresetWorkoutToUser({ userID, presetWorkoutID }));
   };
 
   const handleUnlinkExercise = (presetWorkoutID, exerciseID) => {
@@ -50,10 +73,6 @@ const PresetWorkout = () => {
 
   const handleDeleteWorkout = (presetWorkoutID) => {
     dispatch(deletePresetWorkout(presetWorkoutID));
-  };
-
-  const handleStartWorkout = (presetWorkoutID) => {
-    dispatch(startWorkoutLog({ presetWorkoutID })); // Start a workout log for the selected preset workout
   };
 
   // Filtered workouts based on the selected filters
@@ -105,7 +124,7 @@ const PresetWorkout = () => {
                 <button onClick={() => handleViewExercises(workout.presetWorkoutID)}>View Exercises</button>
                 <button onClick={() => handleEditWorkout(workout)}>Edit</button>
                 <button onClick={() => handleDeleteWorkout(workout.presetWorkoutID)}>Delete</button>
-                <button onClick={() => handleStartWorkout(workout.presetWorkoutID)}>Start Workout</button> {/* Add the Start Workout button */}
+                <button onClick={() => handleLinkWorkoutToUser(workout.presetWorkoutID)}>Add to My Workouts</button>
               </div>
               {selectedWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
                 <ul>
