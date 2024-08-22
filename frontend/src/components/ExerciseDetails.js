@@ -3,8 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchExerciseById } from '../features/exercises/exerciseSlice';
 import { fetchUserCustomWorkouts } from '../features/customWorkouts/customWorkoutSlice';
 import { linkExerciseToCustomWorkout } from '../features/customWorkouts/customWorkoutSlice';
-import { fetchPresetWorkouts } from '../features/presetWorkouts/presetWorkoutSlice'; // New import
-import { linkExerciseToPresetWorkout } from '../features/presetWorkouts/presetWorkoutSlice'; // New import
+import { fetchPresetWorkouts, linkExerciseToPresetWorkout } from '../features/presetWorkouts/presetWorkoutSlice';
 import { useParams } from 'react-router-dom';
 import './ExerciseDetails.css';
 
@@ -16,6 +15,9 @@ const ExerciseDetails = () => {
     const presetWorkouts = useSelector((state) => state.presetWorkouts.workouts); // Fetch preset workouts
     const [selectedCustomWorkout, setSelectedCustomWorkout] = useState(''); // State to manage selected custom workout
     const [selectedPresetWorkout, setSelectedPresetWorkout] = useState(''); // State to manage selected preset workout
+    const [defaultSets, setDefaultSets] = useState(''); // State to manage default sets
+    const [defaultReps, setDefaultReps] = useState(''); // State to manage default reps
+    const [defaultRPE, setDefaultRPE] = useState(''); // State to manage default RPE
 
     useEffect(() => {
         dispatch(fetchExerciseById(id));
@@ -30,8 +32,14 @@ const ExerciseDetails = () => {
     };
 
     const handleLinkExerciseToPresetWorkout = () => {
-        if (selectedPresetWorkout) {
-            dispatch(linkExerciseToPresetWorkout({ presetWorkoutID: selectedPresetWorkout, exerciseID: id }));
+        if (selectedPresetWorkout && defaultSets && defaultReps) {
+            dispatch(linkExerciseToPresetWorkout({ 
+                presetWorkoutID: selectedPresetWorkout, 
+                exerciseID: id,
+                defaultSets: parseInt(defaultSets),
+                defaultReps: parseInt(defaultReps),
+                defaultRPE: parseFloat(defaultRPE) || null 
+            }));
         }
     };
 
@@ -75,7 +83,36 @@ const ExerciseDetails = () => {
                         </option>
                     ))}
                 </select>
-                <button onClick={handleLinkExerciseToPresetWorkout} disabled={!selectedPresetWorkout}>
+
+                {/* Input fields for default values */}
+                <div>
+                    <label>Default Sets: </label>
+                    <input 
+                        type="number" 
+                        value={defaultSets} 
+                        onChange={(e) => setDefaultSets(e.target.value)} 
+                        required 
+                    />
+                </div>
+                <div>
+                    <label>Default Reps: </label>
+                    <input 
+                        type="number" 
+                        value={defaultReps} 
+                        onChange={(e) => setDefaultReps(e.target.value)} 
+                        required 
+                    />
+                </div>
+                <div>
+                    <label>Default RPE: </label>
+                    <input 
+                        type="number" 
+                        value={defaultRPE} 
+                        onChange={(e) => setDefaultRPE(e.target.value)} 
+                    />
+                </div>
+
+                <button onClick={handleLinkExerciseToPresetWorkout} disabled={!selectedPresetWorkout || !defaultSets || !defaultReps}>
                     Add to Preset Workout
                 </button>
             </div>

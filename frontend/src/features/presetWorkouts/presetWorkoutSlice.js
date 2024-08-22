@@ -12,17 +12,22 @@ export const fetchPresetWorkouts = createAsyncThunk(
 
 // Thunk to link an exercise to a preset workout
 export const linkExerciseToPresetWorkout = createAsyncThunk(
-  'presetWorkouts/linkExerciseToPresetWorkout',
-  async ({ presetWorkoutID, exerciseID }, { rejectWithValue }) => {
-    try {
-      const response = await api.post(`/preset-workout-exercises/${presetWorkoutID}/link-exercise`, { exerciseID });
-      return response.data;
-    } catch (error) {
-      console.error('Link exercise to preset workout error:', error.response ? error.response.data : error.message);
-      return rejectWithValue(error.response.data || 'Failed to link exercise');
+    'presetWorkouts/linkExerciseToPresetWorkout',
+    async ({ presetWorkoutID, exerciseID, defaultSets, defaultReps, defaultRPE }, { rejectWithValue }) => {
+      try {
+        const response = await api.post(`/preset-workout-exercises/${presetWorkoutID}/link-exercise`, { 
+          exerciseID, 
+          defaultSets, 
+          defaultReps, 
+          defaultRPE 
+        });
+        return response.data;
+      } catch (error) {
+        console.error('Link exercise to preset workout error:', error.response ? error.response.data : error.message);
+        return rejectWithValue(error.response.data || 'Failed to link exercise');
+      }
     }
-  }
-);
+  );
 
 // Thunk to unlink an exercise from a preset workout
 export const unlinkExerciseFromPresetWorkout = createAsyncThunk(
