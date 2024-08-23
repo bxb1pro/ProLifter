@@ -103,9 +103,27 @@ const getUserExerciseLogsByWorkout = async (req, res) => {
     }
 };
 
+const deleteExerciseLog = async (req, res) => {
+    try {
+        const exerciseLog = await ExerciseLog.findByPk(req.params.id);
+
+        if (!exerciseLog) {
+            return res.status(404).json({ error: 'Exercise log not found' });
+        }
+
+        await exerciseLog.destroy();
+
+        res.status(200).json({ message: 'Exercise log deleted successfully', exerciseLogID: exerciseLog.exerciseLogID });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
 module.exports = {
     startExerciseLog,
     editExerciseLog,
     finishExerciseLog,
     getUserExerciseLogsByWorkout,
+    deleteExerciseLog,
 };
