@@ -73,7 +73,7 @@ const WorkoutLogs = () => {
       </>
     );
   } else if (workoutLogStatus === 'failed') {
-    content = <p>{error}</p>;
+    content = <p>Error: {error?.message || 'Failed to load workout logs.'}</p>; // Safely display the error message
   }
 
   return (

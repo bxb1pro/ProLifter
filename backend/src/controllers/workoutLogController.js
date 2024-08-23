@@ -1,4 +1,4 @@
-const { WorkoutLog, PresetWorkoutExercise, ExerciseLog, SetLog } = require('../models');
+const { WorkoutLog, PresetWorkoutExercise, CustomWorkoutExercise, ExerciseLog, SetLog, Exercise } = require('../models');
 
 const startWorkout = async (req, res) => {
     try {
@@ -12,10 +12,11 @@ const startWorkout = async (req, res) => {
             customWorkoutID
         });
 
-        // If it's a preset workout (because it could instead be a log for custom workout that doesn't require default values)
+        // Logic for preset workout
         if (presetWorkoutID) {
             const presetExercises = await PresetWorkoutExercise.findAll({
-                where: { presetWorkoutID }
+                where: { presetWorkoutID },
+                include: [Exercise]  // Include exercise details
             });
 
             for (const presetExercise of presetExercises) {
@@ -35,6 +36,27 @@ const startWorkout = async (req, res) => {
                         setLogRPE: presetExercise.defaultRPE
                     });
                 }
+            }
+        }
+
+        // Logic for custom workout
+        if (customWorkoutID) {
+            const customExercises = await CustomWorkoutExercise.findAll({
+                where: { customWorkoutID },
+                include: [Exercise]  // Include exercise details
+            });
+
+            for (const customExercise of customExercises) {
+                // Create an exercise log for each exercise of the custom workout
+                // Note: The user is expected to provide the sets, reps, and RPE later
+                await ExerciseLog.create({
+                    userID,
+                    workoutLogID: newWorkoutLog.workoutLogID,
+                    exerciseID: customExercise.exerciseID,
+                    exerciseLogSets: null // Sets will be added by the user later
+                });
+
+                // No SetLogs are created here because the user will set these manually
             }
         }
 
@@ -111,21 +133,37 @@ const getUserWorkoutLogs = async (req, res) => {
 
 const getWorkoutLogDetails = async (req, res) => {
     try {
-      const workoutLogID = req.params.id;
-  
-      // Find the workout log by ID
-      const workoutLog = await WorkoutLog.findByPk(workoutLogID);
-  
-      if (!workoutLog) {
-        return res.status(404).json({ error: 'Workout log not found' });
-      }
-  
-      res.status(200).json(workoutLog);
+        const workoutLogID = req.params.id;
+
+        // Find the workout log by ID and include related ExerciseLogs and SetLogs
+        const workoutLog = await WorkoutLog.findByPk(workoutLogID, {
+            include: [{
+                model: ExerciseLog,
+                include: [
+                    {
+                        model: SetLog,
+                        attributes: ['setLogWeight', 'setLogReps', 'setLogRPE', 'setLog1RM'] // Include the attributes you need
+                    },
+                    {
+                        model: Exercise, // Include exercise details
+                        attributes: ['exerciseName', 'exerciseBodypart']
+                    }
+                ],
+                attributes: ['exerciseLogID', 'exerciseID', 'exerciseLogSets', 'exerciseLogCompleted']
+            }],
+            attributes: ['workoutLogID', 'workoutLogDate', 'workoutLogCompleted']
+        });
+
+        if (!workoutLog) {
+            return res.status(404).json({ error: 'Workout log not found' });
+        }
+
+        res.status(200).json(workoutLog);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Server error' });
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
     }
-  };
+};
 
 module.exports = {
     startWorkout,
