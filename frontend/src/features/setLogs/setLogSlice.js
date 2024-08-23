@@ -24,7 +24,7 @@ export const addSetLog = createAsyncThunk(
       }
     }
   );
-
+// Thunk to delete a set log
   export const deleteSetLog = createAsyncThunk(
     'setLogs/deleteSetLog',
     async (setLogID, { rejectWithValue }) => {
@@ -37,6 +37,25 @@ export const addSetLog = createAsyncThunk(
       }
     }
   );
+
+// Thunk to edit a set log
+export const editSetLog = createAsyncThunk(
+    'setLogs/editSetLog',
+    async ({ id, setLogWeight, setLogReps, setLogRPE, setLog1RM }, { rejectWithValue }) => {
+      try {
+        const response = await api.put(`/set-logs/${id}/edit`, {
+          setLogWeight,
+          setLogReps,
+          setLogRPE,
+          setLog1RM
+        });
+        return response.data;
+      } catch (error) {
+        return rejectWithValue(error.response.data || 'Failed to edit set log');
+      }
+    }
+  );
+
 
   const setLogSlice = createSlice({
     name: 'setLogs',
@@ -74,6 +93,16 @@ export const addSetLog = createAsyncThunk(
         .addCase(deleteSetLog.rejected, (state, action) => {
           state.status = 'failed';
           state.error = action.payload;
+        })
+        .addCase(editSetLog.fulfilled, (state, action) => {
+            const index = state.logs.findIndex(log => log.setLogID === action.payload.setLogID);
+            if (index !== -1) {
+              state.logs[index] = action.payload;
+            }
+        })
+        .addCase(editSetLog.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
         });
     },
   });
