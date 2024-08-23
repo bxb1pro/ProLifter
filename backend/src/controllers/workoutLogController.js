@@ -142,7 +142,7 @@ const getWorkoutLogDetails = async (req, res) => {
                 include: [
                     {
                         model: SetLog,
-                        attributes: ['setLogWeight', 'setLogReps', 'setLogRPE', 'setLog1RM'] // Include the attributes you need
+                        attributes: ['setLogID', 'setLogWeight', 'setLogReps', 'setLogRPE', 'setLog1RM'] // Include setLogID and other necessary attributes
                     },
                     {
                         model: Exercise, // Include exercise details

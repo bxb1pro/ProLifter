@@ -12,28 +12,70 @@ export const fetchSetLogsByExercise = createAsyncThunk(
   }
 );
 
-const setLogSlice = createSlice({
-  name: 'setLogs',
-  initialState: {
-    logs: [],
-    status: 'idle', // idle, loading, succeeded, failed
-    error: null,
-  },
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchSetLogsByExercise.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchSetLogsByExercise.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.logs = action.payload;
-      })
-      .addCase(fetchSetLogsByExercise.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message;
-      });
-  },
-});
+// Thunk to add a new set log
+export const addSetLog = createAsyncThunk(
+    'setLogs/addSetLog',
+    async (setLogData, { rejectWithValue }) => {
+      try {
+        const response = await api.post('/set-logs', setLogData);
+        return response.data;
+      } catch (error) {
+        return rejectWithValue(error.response.data || 'Failed to add set log');
+      }
+    }
+  );
 
-export default setLogSlice.reducer;
+  export const deleteSetLog = createAsyncThunk(
+    'setLogs/deleteSetLog',
+    async (setLogID, { rejectWithValue }) => {
+      try {
+        console.log("Deleting set log with ID:", setLogID); // Ensure this is not undefined
+        await api.delete(`/set-logs/${setLogID}/delete`);
+        return setLogID;
+      } catch (error) {
+        return rejectWithValue(error.response.data || 'Failed to delete set log');
+      }
+    }
+  );
+
+  const setLogSlice = createSlice({
+    name: 'setLogs',
+    initialState: {
+      logs: [],
+      status: 'idle', // idle, loading, succeeded, failed
+      error: null,
+    },
+    reducers: {},
+    extraReducers: (builder) => {
+      builder
+        .addCase(fetchSetLogsByExercise.pending, (state) => {
+          state.status = 'loading';
+        })
+        .addCase(fetchSetLogsByExercise.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          state.logs = action.payload;
+        })
+        .addCase(fetchSetLogsByExercise.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.error.message;
+        })
+        .addCase(addSetLog.fulfilled, (state, action) => {
+          state.logs.push(action.payload); // Add the new set log to the list
+          state.status = 'succeeded';
+        })
+        .addCase(addSetLog.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.payload;
+        })
+        .addCase(deleteSetLog.fulfilled, (state, action) => {
+          state.logs = state.logs.filter(log => log.setLogID !== action.payload); // Remove the deleted set log from the list
+          state.status = 'succeeded';
+        })
+        .addCase(deleteSetLog.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.payload;
+        });
+    },
+  });
+  
+  export default setLogSlice.reducer;

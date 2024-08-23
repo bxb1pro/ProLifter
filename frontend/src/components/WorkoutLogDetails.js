@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchWorkoutLogDetails, finishWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 import { editExerciseLog, deleteExerciseLog } from '../features/exerciseLogs/exerciseLogSlice';
+import { addSetLog, deleteSetLog } from '../features/setLogs/setLogSlice';
 import { useParams } from 'react-router-dom';
 
 const WorkoutLogDetails = () => {
@@ -10,10 +11,13 @@ const WorkoutLogDetails = () => {
   const workoutLog = useSelector((state) => state.workoutLogs.currentLog);
   const status = useSelector((state) => state.workoutLogs.status);
   const error = useSelector((state) => state.workoutLogs.error);
+  const [newSet, setNewSet] = useState({ setLogWeight: '', setLogReps: '', setLogRPE: '', exerciseLogID: null });
 
   useEffect(() => {
     if (workoutLogID) {
-      dispatch(fetchWorkoutLogDetails(workoutLogID));
+      dispatch(fetchWorkoutLogDetails(workoutLogID)).then((res) => {
+        console.log("Fetched workout log details: ", res.payload); // Debugging line
+      });
     }
   }, [dispatch, workoutLogID]);
 
@@ -28,6 +32,22 @@ const WorkoutLogDetails = () => {
   const handleDeleteExercise = (exerciseLogID) => {
     if (window.confirm('Are you sure you want to delete this exercise log?')) {
       dispatch(deleteExerciseLog(exerciseLogID));
+    }
+  };
+
+  const handleAddSetLog = (exerciseLogID) => {
+    const setLogData = {
+      ...newSet,
+      exerciseLogID,
+    };
+    dispatch(addSetLog(setLogData));
+    setNewSet({ setLogWeight: '', setLogReps: '', setLogRPE: '', exerciseLogID: null });
+  };
+
+  const handleDeleteSetLog = (setLogID) => {
+    console.log("Deleting set log with ID:", setLogID); // Debugging line
+    if (window.confirm('Are you sure you want to delete this set log?')) {
+      dispatch(deleteSetLog(setLogID));
     }
   };
 
@@ -66,14 +86,42 @@ const WorkoutLogDetails = () => {
               <ul>
                 {exerciseLog.SetLogs && exerciseLog.SetLogs.length > 0 ? (
                   exerciseLog.SetLogs.map((setLog, index) => (
-                    <li key={index}>
+                    <li key={setLog.setLogID}>
                       Set {index + 1}: {setLog.setLogReps} reps @ {setLog.setLogRPE} RPE
+                      <button onClick={() => handleDeleteSetLog(setLog.setLogID)}>
+                        Delete Set
+                      </button>
+                      {console.log("Set Log ID: ", setLog.setLogID)} {/* Debugging */}
                     </li>
                   ))
                 ) : (
                   <li>No sets recorded for this exercise.</li>
                 )}
               </ul>
+              <div>
+                <h4>Add Set Log</h4>
+                <input
+                  type="number"
+                  placeholder="Weight"
+                  value={newSet.setLogWeight}
+                  onChange={(e) => setNewSet({ ...newSet, setLogWeight: e.target.value })}
+                />
+                <input
+                  type="number"
+                  placeholder="Reps"
+                  value={newSet.setLogReps}
+                  onChange={(e) => setNewSet({ ...newSet, setLogReps: e.target.value })}
+                />
+                <input
+                  type="number"
+                  placeholder="RPE"
+                  value={newSet.setLogRPE}
+                  onChange={(e) => setNewSet({ ...newSet, setLogRPE: e.target.value })}
+                />
+                <button onClick={() => handleAddSetLog(exerciseLog.exerciseLogID)}>
+                  Add Set
+                </button>
+              </div>
             </li>
           ))
         ) : (
