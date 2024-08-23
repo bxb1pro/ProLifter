@@ -11,19 +11,20 @@ const CustomWorkout = sequelize.define('CustomWorkout', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    customWorkoutDays: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-    },
     customWorkoutDateCreated: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW,
     },
     userID: {
-        type: DataTypes.UUID,
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
 });
+
+CustomWorkout.associate = (models) => {
+    CustomWorkout.belongsTo(models.User, { foreignKey: 'userID', onDelete: 'CASCADE' });
+    CustomWorkout.hasMany(models.CustomWorkoutExercise, { foreignKey: 'customWorkoutID', onDelete: 'CASCADE' });
+};
 
 module.exports = CustomWorkout;

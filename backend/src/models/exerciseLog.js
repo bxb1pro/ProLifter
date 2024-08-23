@@ -30,9 +30,15 @@ const ExerciseLog = sequelize.define('ExerciseLog', {
         allowNull: false,
     },
     exerciseID: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
     },
 });
+
+ExerciseLog.associate = (models) => {
+    ExerciseLog.belongsTo(models.WorkoutLog, { foreignKey: 'workoutLogID', onDelete: 'CASCADE' });
+    ExerciseLog.belongsTo(models.Exercise, { foreignKey: 'exerciseID', onDelete: 'CASCADE' });
+    ExerciseLog.hasMany(models.SetLog, { foreignKey: 'exerciseLogID', onDelete: 'CASCADE' });
+};
 
 module.exports = ExerciseLog;

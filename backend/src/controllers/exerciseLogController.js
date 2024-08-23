@@ -1,4 +1,4 @@
-const ExerciseLog = require('../models/exerciseLog');
+const { ExerciseLog, WorkoutLog } = require('../models');
 
 // Start an exercise log
 const startExerciseLog = async (req, res) => {
@@ -70,8 +70,60 @@ const finishExerciseLog = async (req, res) => {
     }
 };
 
+const getUserExerciseLogsByWorkout = async (req, res) => {
+    try {
+        const userID = req.user.userID; // Extract user ID from the JWT token
+        const { workoutLogID } = req.params; // Get workoutLogID from the URL parameters
+
+        // Ensure the workout log belongs to the user
+        const workoutLog = await WorkoutLog.findOne({
+            where: {
+                workoutLogID,
+                userID,
+            },
+        });
+
+        if (!workoutLog) {
+            return res.status(404).json({ error: 'Workout log not found or does not belong to the user.' });
+        }
+
+        // Fetch all exercise logs associated with this workout log and user
+        const exerciseLogs = await ExerciseLog.findAll({
+            where: {
+                workoutLogID,
+                userID,
+            },
+            order: [['createdAt', 'ASC']], // Optional: order by creation time
+        });
+
+        res.status(200).json(exerciseLogs);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+const deleteExerciseLog = async (req, res) => {
+    try {
+        const exerciseLog = await ExerciseLog.findByPk(req.params.id);
+
+        if (!exerciseLog) {
+            return res.status(404).json({ error: 'Exercise log not found' });
+        }
+
+        await exerciseLog.destroy();
+
+        res.status(200).json({ message: 'Exercise log deleted successfully', exerciseLogID: exerciseLog.exerciseLogID });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
 module.exports = {
     startExerciseLog,
     editExerciseLog,
     finishExerciseLog,
+    getUserExerciseLogsByWorkout,
+    deleteExerciseLog,
 };

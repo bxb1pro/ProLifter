@@ -1,8 +1,11 @@
 const express = require('express');
-const { createPresetWorkout, viewDetails, editPresetWorkout, deletePresetWorkout } = require('../controllers/presetWorkoutController');
+const { createPresetWorkout, viewDetails, editPresetWorkout, deletePresetWorkout, viewAllPresetWorkouts } = require('../controllers/presetWorkoutController');
 const verifyRole = require('../middleware/roleMiddleware'); // Import middleware
 
 const router = express.Router();
+
+// Route to view all preset workouts
+router.get('/', viewAllPresetWorkouts);
 
 // Anyone can view preset workouts
 router.get('/:id', viewDetails);

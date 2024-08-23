@@ -11,11 +11,11 @@ const PresetWorkout = sequelize.define('PresetWorkout', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    presetWorkoutDays: {
-        type: DataTypes.INTEGER,
+    presetWorkoutDifficulty: {
+        type: DataTypes.STRING,
         allowNull: false,
     },
-    presetWorkoutDifficulty: {
+    presetWorkoutGoal: {
         type: DataTypes.STRING,
         allowNull: false,
     },
@@ -29,5 +29,10 @@ const PresetWorkout = sequelize.define('PresetWorkout', {
         defaultValue: DataTypes.NOW,
     },
 });
+
+PresetWorkout.associate = (models) => {
+    PresetWorkout.hasMany(models.PresetWorkoutExercise, { foreignKey: 'presetWorkoutID', onDelete: 'CASCADE' });
+    PresetWorkout.hasMany(models.UserPresetWorkout, { foreignKey: 'presetWorkoutID', onDelete: 'CASCADE' });
+};
 
 module.exports = PresetWorkout;

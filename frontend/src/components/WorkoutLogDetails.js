@@ -1,0 +1,166 @@
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchWorkoutLogDetails, finishWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
+import { editExerciseLog, deleteExerciseLog } from '../features/exerciseLogs/exerciseLogSlice';
+import { addSetLog, deleteSetLog, editSetLog } from '../features/setLogs/setLogSlice'; // Import editSetLog
+import { useParams } from 'react-router-dom';
+
+const WorkoutLogDetails = () => {
+  const { workoutLogID } = useParams();
+  const dispatch = useDispatch();
+  const workoutLog = useSelector((state) => state.workoutLogs.currentLog);
+  const status = useSelector((state) => state.workoutLogs.status);
+  const error = useSelector((state) => state.workoutLogs.error);
+
+  const [editMode, setEditMode] = useState(null); // Track which set log is in edit mode
+  const [editSetData, setEditSetData] = useState({
+    setLogWeight: '',
+    setLogReps: '',
+    setLogRPE: '',
+    setLog1RM: ''
+  });
+
+  useEffect(() => {
+    if (workoutLogID) {
+      dispatch(fetchWorkoutLogDetails(workoutLogID));
+    }
+  }, [dispatch, workoutLogID]);
+
+  const handleFinishWorkout = () => {
+    dispatch(finishWorkoutLog(workoutLogID));
+  };
+
+  const handleCompleteExercise = (exerciseLogID) => {
+    dispatch(editExerciseLog({ exerciseLogID, exerciseLogCompleted: true }));
+  };
+
+  const handleDeleteExercise = (exerciseLogID) => {
+    if (window.confirm('Are you sure you want to delete this exercise log?')) {
+      dispatch(deleteExerciseLog(exerciseLogID));
+    }
+  };
+
+  const handleAddSetLog = (exerciseLogID) => {
+    const setLogData = {
+      ...editSetData,
+      exerciseLogID,
+    };
+    dispatch(addSetLog(setLogData));
+    setEditSetData({ setLogWeight: '', setLogReps: '', setLogRPE: '', setLog1RM: '' });
+  };
+
+  const handleDeleteSetLog = (setLogID) => {
+    if (window.confirm('Are you sure you want to delete this set log?')) {
+      dispatch(deleteSetLog(setLogID));
+    }
+  };
+
+  const handleEditSetLog = (setLog) => {
+    setEditMode(setLog.setLogID); // Enter edit mode for the selected set log
+    setEditSetData({
+      setLogWeight: setLog.setLogWeight || '',
+      setLogReps: setLog.setLogReps || '',
+      setLogRPE: setLog.setLogRPE || '',
+      setLog1RM: setLog.setLog1RM || ''
+    });
+  };
+
+  const handleSaveSetLog = (setLogID) => {
+    dispatch(editSetLog({ ...editSetData, id: setLogID }));
+    setEditMode(null); // Exit edit mode
+  };
+
+  if (status === 'loading') {
+    return <p>Loading...</p>;
+  }
+
+  if (status === 'failed') {
+    return <p>Error: {error?.message || 'Failed to load workout log.'}</p>;
+  }
+
+  if (!workoutLog) {
+    return <p>No workout log found.</p>;
+  }
+
+  return (
+    <section>
+      <h2>Workout Log Details</h2>
+      <p>Date: {new Date(workoutLog.workoutLogDate).toLocaleDateString()}</p>
+      <p>Completed: {workoutLog.workoutLogCompleted ? 'Yes' : 'No'}</p>
+      <h3>Exercises:</h3>
+      <ul>
+        {workoutLog.ExerciseLogs && workoutLog.ExerciseLogs.length > 0 ? (
+          workoutLog.ExerciseLogs.map((exerciseLog) => (
+            <li key={exerciseLog.exerciseLogID}>
+              <strong>{exerciseLog.Exercise.exerciseName} - {exerciseLog.Exercise.exerciseBodypart}</strong>
+              <p>Status: {exerciseLog.exerciseLogCompleted ? 'Completed' : 'Incomplete'}</p>
+              {!exerciseLog.exerciseLogCompleted && (
+                <button onClick={() => handleCompleteExercise(exerciseLog.exerciseLogID)}>
+                  Mark as Completed
+                </button>
+              )}
+              <button onClick={() => handleDeleteExercise(exerciseLog.exerciseLogID)}>
+                Delete Exercise
+              </button>
+              <ul>
+                {exerciseLog.SetLogs && exerciseLog.SetLogs.length > 0 ? (
+                  exerciseLog.SetLogs.map((setLog, index) => (
+                    <li key={setLog.setLogID}>
+                      {editMode === setLog.setLogID ? (
+                        <div>
+                          <input
+                            type="number"
+                            placeholder="Weight"
+                            value={editSetData.setLogWeight}
+                            onChange={(e) => setEditSetData({ ...editSetData, setLogWeight: e.target.value })}
+                          />
+                          <input
+                            type="number"
+                            placeholder="Reps"
+                            value={editSetData.setLogReps}
+                            onChange={(e) => setEditSetData({ ...editSetData, setLogReps: e.target.value })}
+                          />
+                          <input
+                            type="number"
+                            placeholder="RPE"
+                            value={editSetData.setLogRPE}
+                            onChange={(e) => setEditSetData({ ...editSetData, setLogRPE: e.target.value })}
+                          />
+                          <input
+                            type="number"
+                            placeholder="1RM"
+                            value={editSetData.setLog1RM}
+                            onChange={(e) => setEditSetData({ ...editSetData, setLog1RM: e.target.value })}
+                          />
+                          <button onClick={() => handleSaveSetLog(setLog.setLogID)}>Save</button>
+                          <button onClick={() => setEditMode(null)}>Cancel</button>
+                        </div>
+                      ) : (
+                        <div>
+                          Set {index + 1}: {setLog.setLogWeight} kg, {setLog.setLogReps} reps @ {setLog.setLogRPE} RPE
+                          <button onClick={() => handleEditSetLog(setLog)}>Edit</button>
+                          <button onClick={() => handleDeleteSetLog(setLog.setLogID)}>
+                            Delete Set
+                          </button>
+                        </div>
+                      )}
+                    </li>
+                  ))
+                ) : (
+                  <li>No sets recorded for this exercise.</li>
+                )}
+              </ul>
+            </li>
+          ))
+        ) : (
+          <p>No exercises found for this workout log.</p>
+        )}
+      </ul>
+      {!workoutLog.workoutLogCompleted && (
+        <button onClick={handleFinishWorkout}>Finish Workout</button>
+      )}
+    </section>
+  );
+};
+
+export default WorkoutLogDetails;

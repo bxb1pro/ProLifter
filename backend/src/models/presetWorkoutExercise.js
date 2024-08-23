@@ -12,9 +12,27 @@ const PresetWorkoutExercise = sequelize.define('PresetWorkoutExercise', {
         allowNull: false,
     },
     exerciseID: {
-        type: DataTypes.UUID,
+        type: DataTypes.STRING,
         allowNull: false,
     },
+    // Attributes for preset workout exercises to be set by admins/other
+    defaultSets: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    defaultReps: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    defaultRPE: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+    },
 });
+
+PresetWorkoutExercise.associate = (models) => {
+    PresetWorkoutExercise.belongsTo(models.PresetWorkout, { foreignKey: 'presetWorkoutID' });
+    PresetWorkoutExercise.belongsTo(models.Exercise, { foreignKey: 'exerciseID' });
+};
 
 module.exports = PresetWorkoutExercise;

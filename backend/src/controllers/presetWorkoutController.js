@@ -1,13 +1,13 @@
-const PresetWorkout = require('../models/presetWorkout');
+const { PresetWorkout } = require('../models');
 
 const createPresetWorkout = async (req, res) => {
     try {
-        const { presetWorkoutName, presetWorkoutDays, presetWorkoutDifficulty, presetWorkoutLocation } = req.body;
+        const { presetWorkoutName, presetWorkoutDifficulty, presetWorkoutGoal, presetWorkoutLocation } = req.body;
 
         const newWorkout = await PresetWorkout.create({
             presetWorkoutName,
-            presetWorkoutDays,
             presetWorkoutDifficulty,
+            presetWorkoutGoal,
             presetWorkoutLocation,
         });
 
@@ -34,7 +34,7 @@ const viewDetails = async (req, res) => {
 const editPresetWorkout = async (req, res) => {
     try {
         const presetWorkoutID = req.params.id;
-        const { presetWorkoutName, presetWorkoutDays, presetWorkoutDifficulty, presetWorkoutLocation } = req.body;
+        const { presetWorkoutName, presetWorkoutDifficulty, presetWorkoutGoal, presetWorkoutLocation } = req.body;
 
         const workout = await PresetWorkout.findByPk(presetWorkoutID);
         if (!workout) {
@@ -42,8 +42,8 @@ const editPresetWorkout = async (req, res) => {
         }
 
         workout.presetWorkoutName = presetWorkoutName || workout.presetWorkoutName;
-        workout.presetWorkoutDays = presetWorkoutDays || workout.presetWorkoutDays;
         workout.presetWorkoutDifficulty = presetWorkoutDifficulty || workout.presetWorkoutDifficulty;
+        workout.presetWorkoutGoal = presetWorkoutGoal || workout.presetWorkoutGoal;
         workout.presetWorkoutLocation = presetWorkoutLocation || workout.presetWorkoutLocation;
 
         await workout.save();
@@ -73,9 +73,20 @@ const deletePresetWorkout = async (req, res) => {
     }
 };
 
+const viewAllPresetWorkouts = async (req, res) => {
+    try {
+        const workouts = await PresetWorkout.findAll();  // Retrieve all preset workouts from the database
+        res.status(200).json(workouts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
 module.exports = {
     createPresetWorkout,
     viewDetails,
     editPresetWorkout,
     deletePresetWorkout,
+    viewAllPresetWorkouts,
 };

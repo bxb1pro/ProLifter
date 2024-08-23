@@ -9,7 +9,7 @@ const SetLog = sequelize.define('SetLog', {
     },
     setLogWeight: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
     },
     setLogReps: {
         type: DataTypes.INTEGER,
@@ -28,5 +28,9 @@ const SetLog = sequelize.define('SetLog', {
         allowNull: false,
     },
 });
+
+SetLog.associate = (models) => {
+    SetLog.belongsTo(models.ExerciseLog, { foreignKey: 'exerciseLogID', onDelete: 'CASCADE' });
+};
 
 module.exports = SetLog;

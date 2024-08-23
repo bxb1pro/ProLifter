@@ -39,4 +39,10 @@ const User = sequelize.define('User', {
     },
 });
 
+User.associate = (models) => {
+    User.hasMany(models.CustomWorkout, { foreignKey: 'userID', onDelete: 'CASCADE' });
+    User.hasMany(models.WorkoutLog, { foreignKey: 'userID', onDelete: 'CASCADE' });
+    User.hasMany(models.UserPresetWorkout, { foreignKey: 'userID', onDelete: 'CASCADE' });
+};
+
 module.exports = User;
