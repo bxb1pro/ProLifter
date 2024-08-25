@@ -12,6 +12,7 @@ const WorkoutLogDetails = () => {
   const status = useSelector((state) => state.workoutLogs.status);
   const error = useSelector((state) => state.workoutLogs.error);
 
+  const [newSetData, setNewSetData] = useState({}); // Hold new set data per exercise log ID
   const [editMode, setEditMode] = useState(null); // Track which set log is in edit mode
   const [editSetData, setEditSetData] = useState({
     setLogWeight: '',
@@ -42,11 +43,16 @@ const WorkoutLogDetails = () => {
 
   const handleAddSetLog = (exerciseLogID) => {
     const setLogData = {
-      ...editSetData,
+      ...newSetData[exerciseLogID],
       exerciseLogID,
     };
-    dispatch(addSetLog(setLogData));
-    setEditSetData({ setLogWeight: '', setLogReps: '', setLogRPE: '', setLog1RM: '' });
+    dispatch(addSetLog(setLogData)).then(() => {
+      // Reset the input fields for this specific exercise
+      setNewSetData((prevData) => ({
+        ...prevData,
+        [exerciseLogID]: { setLogWeight: '', setLogReps: '', setLogRPE: '', setLog1RM: '' },
+      }));
+    });
   };
 
   const handleDeleteSetLog = (setLogID) => {
@@ -68,6 +74,16 @@ const WorkoutLogDetails = () => {
   const handleSaveSetLog = (setLogID) => {
     dispatch(editSetLog({ ...editSetData, id: setLogID }));
     setEditMode(null); // Exit edit mode
+  };
+
+  const handleChangeNewSetData = (exerciseLogID, field, value) => {
+    setNewSetData((prevData) => ({
+      ...prevData,
+      [exerciseLogID]: {
+        ...prevData[exerciseLogID],
+        [field]: value,
+      },
+    }));
   };
 
   if (status === 'loading') {
@@ -150,6 +166,37 @@ const WorkoutLogDetails = () => {
                   <li>No sets recorded for this exercise.</li>
                 )}
               </ul>
+              {/* Form to Add a New Set */}
+              <div>
+                <h4>Add Set Log</h4>
+                <input
+                  type="number"
+                  placeholder="Weight"
+                  value={newSetData[exerciseLog.exerciseLogID]?.setLogWeight || ''}
+                  onChange={(e) => handleChangeNewSetData(exerciseLog.exerciseLogID, 'setLogWeight', e.target.value)}
+                />
+                <input
+                  type="number"
+                  placeholder="Reps"
+                  value={newSetData[exerciseLog.exerciseLogID]?.setLogReps || ''}
+                  onChange={(e) => handleChangeNewSetData(exerciseLog.exerciseLogID, 'setLogReps', e.target.value)}
+                />
+                <input
+                  type="number"
+                  placeholder="RPE"
+                  value={newSetData[exerciseLog.exerciseLogID]?.setLogRPE || ''}
+                  onChange={(e) => handleChangeNewSetData(exerciseLog.exerciseLogID, 'setLogRPE', e.target.value)}
+                />
+                <input
+                  type="number"
+                  placeholder="1RM"
+                  value={newSetData[exerciseLog.exerciseLogID]?.setLog1RM || ''}
+                  onChange={(e) => handleChangeNewSetData(exerciseLog.exerciseLogID, 'setLog1RM', e.target.value)}
+                />
+                <button onClick={() => handleAddSetLog(exerciseLog.exerciseLogID)}>
+                  Add Set
+                </button>
+              </div>
             </li>
           ))
         ) : (
