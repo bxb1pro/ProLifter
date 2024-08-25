@@ -25,6 +25,8 @@ const ExerciseDetails = () => {
         dispatch(fetchPresetWorkouts()); // Fetch all preset workouts
     }, [dispatch, id]);
 
+    console.log(selectedExercise); // Debugging: Check the structure of the data
+
     const handleLinkExerciseToCustomWorkout = () => {
         if (selectedCustomWorkout) {
             dispatch(linkExerciseToCustomWorkout({ customWorkoutID: selectedCustomWorkout, exerciseID: id }));
@@ -50,11 +52,26 @@ const ExerciseDetails = () => {
 
     return (
         <div className="exercise-details">
-            <img src={selectedExercise.gifUrl} alt={selectedExercise.name} className="exercise-image" />
+            <img 
+                src={selectedExercise.gifUrl} 
+                alt={selectedExercise.name} 
+                onError={(e) => { 
+                    e.target.onerror = null; 
+                    e.target.src = "/images/placeholder.jpg"; 
+                }} 
+                className="exercise-image" 
+            />
             <h2>{selectedExercise.name}</h2>
             <p>Body Part: {selectedExercise.bodyPart}</p>
             <p>Equipment: {selectedExercise.equipment}</p>
             <p>Target Muscle: {selectedExercise.target}</p>
+            <p>Secondary Muscles: {selectedExercise.secondaryMuscles.join(', ')}</p>
+            <h3>Instructions:</h3>
+            <ol>
+                {selectedExercise.instructions.map((instruction, index) => (
+                    <li key={index}>{instruction}</li>
+                ))}
+            </ol>
 
             {/* Add exercise to custom workout */}
             <div>
