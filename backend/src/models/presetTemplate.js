@@ -23,8 +23,8 @@ const PresetTemplate = sequelize.define('PresetTemplate', {
 });
 
 PresetTemplate.associate = (models) => {
-    PresetTemplate.hasMany(models.PresetTemplatePresetWorkout, { foreignKey: 'PresetTemplateID', onDelete: 'CASCADE' });
-    PresetTemplate.hasMany(models.UserPresetTemplate, { foreignKey: 'PresetTemplateID', onDelete: 'CASCADE' });
+    PresetTemplate.hasMany(models.PresetTemplatePresetWorkout, { foreignKey: 'presetTemplateID', onDelete: 'CASCADE' });
+    PresetTemplate.hasMany(models.UserPresetTemplate, { foreignKey: 'presetTemplateID', onDelete: 'CASCADE' });
 };
 
 module.exports = PresetTemplate;

@@ -24,6 +24,9 @@ const setLogRoutes = require('./routes/setLogRoutes');
 const authRoutes = require('./routes/authRoutes');
 const customTemplateCustomWorkoutRoutes = require('./routes/customTemplateCustomWorkoutRoutes')
 const customTemplateRoutes = require('./routes/customTemplateRoutes');
+const customTemplatePresetWorkoutRoutes = require('./routes/customTemplatePresetWorkoutRoutes');
+const presetTemplateRoutes = require('./routes/presetTemplateRoutes')
+const presetTemplatePresetWorkoutRoutes = require('./routes/presetTemplatePresetWorkoutRoutes')
 
 app.use('/api/users', userRoutes);
 app.use('/api/exercises', exerciseRoutes);
@@ -38,5 +41,8 @@ app.use('/api/set-logs', setLogRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/custom-template-custom-workouts', customTemplateCustomWorkoutRoutes)
 app.use('/api/custom-templates', customTemplateRoutes);
+app.use('/api/custom-template-preset-workouts', customTemplatePresetWorkoutRoutes);
+app.use('/api/preset-templates', presetTemplateRoutes)
+app.use('/api/preset-template-preset-workouts', presetTemplatePresetWorkoutRoutes)
 
 module.exports = app;
