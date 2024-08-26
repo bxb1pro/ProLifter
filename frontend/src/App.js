@@ -15,6 +15,7 @@ import Account from './components/Account';
 import UserWorkouts from './components/UserWorkouts';
 import WorkoutLogDetails from './components/WorkoutLogDetails';
 import PresetTemplate from './components/PresetTemplate'
+import UserTemplates from './components/UserTemplates'
 
 function App() {
     return (
@@ -34,6 +35,7 @@ function App() {
             <Route path="/user-workouts" element={<UserWorkouts />} /> 
             <Route path="/workout-logs/:workoutLogID" element={<WorkoutLogDetails />} />
             <Route path="/preset-templates" element={<PresetTemplate />} />
+            <Route path="/user-templates" element={<UserTemplates />} />
         </Routes>
     );
 }

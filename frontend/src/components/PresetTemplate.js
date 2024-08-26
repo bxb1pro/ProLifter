@@ -4,7 +4,6 @@ import {
   fetchPresetTemplates,
   deletePresetTemplate,
   linkPresetTemplate,
-  unlinkPresetTemplate,
 } from '../features/presetTemplates/presetTemplateSlice';
 import AddPresetTemplateForm from './forms/AddPresetTemplateForm';
 import EditPresetTemplateForm from './forms/EditPresetTemplateForm';
@@ -46,14 +45,6 @@ const PresetTemplate = () => {
       return;
     }
     dispatch(linkPresetTemplate({ userID, presetTemplateID }));
-  };
-
-  const handleUnlinkTemplateFromUser = (presetTemplateID) => {
-    if (!userID) {
-      console.error('User ID is not defined. Cannot unlink preset template from user.');
-      return;
-    }
-    dispatch(unlinkPresetTemplate({ userID, presetTemplateID }));
   };
 
   const handleAddTemplate = () => {
@@ -130,7 +121,6 @@ const PresetTemplate = () => {
                 <button onClick={() => handleEditTemplate(template)}>Edit</button>
                 <button onClick={() => handleDeleteTemplate(template.presetTemplateID)}>Delete</button>
                 <button onClick={() => handleLinkTemplateToUser(template.presetTemplateID)}>Add to My Templates</button>
-                <button onClick={() => handleUnlinkTemplateFromUser(template.presetTemplateID)}>Remove from My Templates</button>
               </div>
             </li>
           ))}
