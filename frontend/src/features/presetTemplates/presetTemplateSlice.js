@@ -105,11 +105,51 @@ export const fetchUserPresetTemplates = createAsyncThunk(
     }
 );
 
+// Thunk to link a preset workout to a preset template
+export const linkPresetWorkoutToTemplate = createAsyncThunk(
+    'presetTemplates/linkPresetWorkout',
+    async ({ presetTemplateID, presetWorkoutID }, { rejectWithValue }) => {
+        try {
+            const response = await api.post(`/preset-templates/${presetTemplateID}/link-preset-workout`, { presetWorkoutID });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || 'Failed to link preset workout to template');
+        }
+    }
+);
+
+// Thunk to unlink a preset workout from a preset template
+export const unlinkPresetWorkoutFromTemplate = createAsyncThunk(
+    'presetTemplates/unlinkPresetWorkout',
+    async ({ presetTemplateID, presetWorkoutID }, { rejectWithValue }) => {
+        try {
+            const response = await api.post(`/preset-templates/${presetTemplateID}/unlink-preset-workout`, { presetWorkoutID });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || 'Failed to unlink preset workout from template');
+        }
+    }
+);
+
+// Thunk to fetch all preset workouts linked to a preset template
+export const fetchPresetWorkoutsForTemplate = createAsyncThunk(
+    'presetTemplates/fetchPresetWorkouts',
+    async (presetTemplateID, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/preset-templates/${presetTemplateID}/preset-workouts`);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || 'Failed to fetch preset workouts for template');
+        }
+    }
+);
+
 const presetTemplateSlice = createSlice({
     name: 'presetTemplates',
     initialState: {
         templates: [],
         templateDetails: null,
+        presetWorkouts: [],
         status: 'idle', // idle, loading, succeeded, failed
         error: null,
     },
@@ -187,6 +227,36 @@ const presetTemplateSlice = createSlice({
                 state.templates = action.payload;
             })
             .addCase(fetchUserPresetTemplates.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
+            })
+            // Handle linking preset workout to template
+            .addCase(linkPresetWorkoutToTemplate.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+            })
+            .addCase(linkPresetWorkoutToTemplate.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
+            })
+
+            // Handle unlinking preset workout from template
+            .addCase(unlinkPresetWorkoutFromTemplate.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+            })
+            .addCase(unlinkPresetWorkoutFromTemplate.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
+            })
+
+            // Handle fetching preset workouts linked to a template
+            .addCase(fetchPresetWorkoutsForTemplate.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchPresetWorkoutsForTemplate.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.presetWorkouts = action.payload;
+            })
+            .addCase(fetchPresetWorkoutsForTemplate.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.payload;
             });
