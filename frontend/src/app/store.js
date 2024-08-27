@@ -6,6 +6,8 @@ import workoutLogReducer from '../features/workoutLogs/workoutLogSlice';
 import exerciseLogReducer from '../features/exerciseLogs/exerciseLogSlice';
 import setLogReducer from '../features/setLogs/setLogSlice';
 import customWorkoutReducer from '../features/customWorkouts/customWorkoutSlice'; 
+import presetTemplateReducer from '../features/presetTemplates/presetTemplateSlice';
+import customTemplateReducer from '../features/customTemplates/customTemplateSlice';
 
 const store = configureStore({
     reducer: {
@@ -16,6 +18,8 @@ const store = configureStore({
         exerciseLogs: exerciseLogReducer,
         setLogs: setLogReducer,
         customWorkouts: customWorkoutReducer,
+        presetTemplates: presetTemplateReducer,
+        customTemplates: customTemplateReducer,
     },
 });
 

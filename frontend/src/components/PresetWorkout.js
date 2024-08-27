@@ -5,20 +5,29 @@ import {
   fetchExercisesForPresetWorkout,
   unlinkExerciseFromPresetWorkout,
   deletePresetWorkout,
-  linkPresetWorkoutToUser
+  linkPresetWorkoutToUser,
 } from '../features/presetWorkouts/presetWorkoutSlice';
+import {
+  fetchPresetTemplates,
+  linkPresetWorkoutToTemplate as linkWorkoutToPresetTemplate, // renamed for clarity
+} from '../features/presetTemplates/presetTemplateSlice';
+import {
+  fetchUserCustomTemplates,
+  linkPresetWorkoutToTemplate as linkWorkoutToCustomTemplate, // renamed for clarity
+} from '../features/customTemplates/customTemplateSlice';
 import AddPresetWorkoutForm from './forms/AddPresetWorkoutForm';
 import EditPresetWorkoutForm from './forms/EditPresetWorkoutForm';
-import { fetchAccountDetails } from '../features/auth/authSlice'; 
-
+import { fetchAccountDetails } from '../features/auth/authSlice';
 
 const PresetWorkout = () => {
   const dispatch = useDispatch();
   const workouts = useSelector((state) => state.presetWorkouts.workouts);
   const exercises = useSelector((state) => state.presetWorkouts.exercises);
+  const templates = useSelector((state) => state.presetTemplates.templates);
+  const customTemplates = useSelector((state) => state.customTemplates.templates); // custom templates
   const status = useSelector((state) => state.presetWorkouts.status);
   const error = useSelector((state) => state.presetWorkouts.error);
-
+  
   const user = useSelector((state) => state.auth.user);
   const userID = user ? user.userID : null;
 
@@ -31,12 +40,16 @@ const PresetWorkout = () => {
   useEffect(() => {
     if (status === 'idle') {
       dispatch(fetchPresetWorkouts());
+      dispatch(fetchPresetTemplates()); // Fetch all preset templates
+      dispatch(fetchUserCustomTemplates()); // Fetch all custom templates
     }
   }, [status, dispatch]);
 
   const [selectedWorkoutID, setSelectedWorkoutID] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState(null);
+  const [selectedPresetTemplateID, setSelectedPresetTemplateID] = useState('');
+  const [selectedCustomTemplateID, setSelectedCustomTemplateID] = useState('');
 
   // Filters
   const [difficultyFilter, setDifficultyFilter] = useState('');
@@ -49,13 +62,10 @@ const PresetWorkout = () => {
   };
 
   const handleLinkWorkoutToUser = (presetWorkoutID) => {
-    console.log('User ID:', userID);
-
     if (!userID) {
       console.error('User ID is not defined. Cannot link preset workout to user.');
       return;
     }
-
     dispatch(linkPresetWorkoutToUser({ userID, presetWorkoutID }));
   };
 
@@ -73,6 +83,20 @@ const PresetWorkout = () => {
 
   const handleDeleteWorkout = (presetWorkoutID) => {
     dispatch(deletePresetWorkout(presetWorkoutID));
+  };
+
+  const handleLinkWorkoutToTemplate = (presetWorkoutID, presetTemplateID) => {
+    if (presetTemplateID) {
+      dispatch(linkWorkoutToPresetTemplate({ presetTemplateID, presetWorkoutID }));
+      setSelectedPresetTemplateID(''); // Reset after linking
+    }
+  };
+
+  const handleLinkWorkoutToCustomTemplate = (presetWorkoutID, customTemplateID) => {
+    if (customTemplateID) {
+      dispatch(linkWorkoutToCustomTemplate({ id: customTemplateID, presetWorkoutID }));
+      setSelectedCustomTemplateID(''); // Reset after linking
+    }
   };
 
   // Filtered workouts based on the selected filters
@@ -125,6 +149,38 @@ const PresetWorkout = () => {
                 <button onClick={() => handleEditWorkout(workout)}>Edit</button>
                 <button onClick={() => handleDeleteWorkout(workout.presetWorkoutID)}>Delete</button>
                 <button onClick={() => handleLinkWorkoutToUser(workout.presetWorkoutID)}>Add to My Workouts</button>
+
+                {/* Dropdown to select a preset template to link the workout */}
+                <select
+                  value={selectedPresetTemplateID}
+                  onChange={(e) => {
+                    setSelectedPresetTemplateID(e.target.value);
+                    handleLinkWorkoutToTemplate(workout.presetWorkoutID, e.target.value);
+                  }}
+                >
+                  <option value="">Select Preset Template</option>
+                  {templates.map((template) => (
+                    <option key={template.presetTemplateID} value={template.presetTemplateID}>
+                      {template.presetTemplateName}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Dropdown to select a custom template to link the workout */}
+                <select
+                  value={selectedCustomTemplateID}
+                  onChange={(e) => {
+                    setSelectedCustomTemplateID(e.target.value);
+                    handleLinkWorkoutToCustomTemplate(workout.presetWorkoutID, e.target.value);
+                  }}
+                >
+                  <option value="">Select Custom Template</option>
+                  {customTemplates.map((template) => (
+                    <option key={template.customTemplateID} value={template.customTemplateID}>
+                      {template.customTemplateName}
+                    </option>
+                  ))}
+                </select>
               </div>
               {selectedWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
                 <ul>

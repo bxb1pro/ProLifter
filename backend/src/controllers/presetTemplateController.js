@@ -3,11 +3,20 @@ const { PresetTemplate } = require('../models');
 // Create a new preset template
 const createTemplate = async (req, res) => {
     try {
-        const { presetTemplateName, presetTemplateDays } = req.body;
+        const {
+            presetTemplateName,
+            presetTemplateDays,
+            presetWorkoutDifficulty,
+            presetWorkoutGoal,
+            presetWorkoutLocation,
+        } = req.body;
 
         const newTemplate = await PresetTemplate.create({
             presetTemplateName,
-            presetTemplateDays
+            presetTemplateDays,
+            presetWorkoutDifficulty,
+            presetWorkoutGoal,
+            presetWorkoutLocation,
         });
 
         res.status(201).json(newTemplate);
@@ -20,7 +29,13 @@ const createTemplate = async (req, res) => {
 // Edit an existing preset template
 const editTemplate = async (req, res) => {
     try {
-        const { presetTemplateName, presetTemplateDays } = req.body;
+        const {
+            presetTemplateName,
+            presetTemplateDays,
+            presetWorkoutDifficulty,
+            presetWorkoutGoal,
+            presetWorkoutLocation,
+        } = req.body;
         const presetTemplateID = req.params.id;
 
         const template = await PresetTemplate.findByPk(presetTemplateID);
@@ -31,6 +46,9 @@ const editTemplate = async (req, res) => {
 
         template.presetTemplateName = presetTemplateName || template.presetTemplateName;
         template.presetTemplateDays = presetTemplateDays || template.presetTemplateDays;
+        template.presetWorkoutDifficulty = presetWorkoutDifficulty || template.presetWorkoutDifficulty;
+        template.presetWorkoutGoal = presetWorkoutGoal || template.presetWorkoutGoal;
+        template.presetWorkoutLocation = presetWorkoutLocation || template.presetWorkoutLocation;
 
         await template.save();
 

@@ -5,7 +5,11 @@ import {
   fetchExercisesForCustomWorkout,
   deleteCustomWorkout,
 } from '../features/customWorkouts/customWorkoutSlice';
-import { fetchUserPresetWorkouts, unlinkPresetWorkoutFromUser } from '../features/presetWorkouts/presetWorkoutSlice';
+import {
+  fetchUserPresetWorkouts,
+  unlinkPresetWorkoutFromUser,
+  fetchExercisesForPresetWorkout, // Import the thunk for fetching exercises for a preset workout
+} from '../features/presetWorkouts/presetWorkoutSlice';
 import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 import { fetchAccountDetails } from '../features/auth/authSlice';
 
@@ -17,7 +21,8 @@ const UserWorkouts = () => {
 
   const customWorkouts = useSelector((state) => state.customWorkouts.workouts);
   const presetWorkouts = useSelector((state) => state.presetWorkouts.userWorkouts);
-  const exercises = useSelector((state) => state.customWorkouts.exercises);
+  const customExercises = useSelector((state) => state.customWorkouts.exercises);
+  const presetExercises = useSelector((state) => state.presetWorkouts.exercises); // Select preset exercises
 
   const customWorkoutsStatus = useSelector((state) => state.customWorkouts.status);
   const presetWorkoutsStatus = useSelector((state) => state.presetWorkouts.status);
@@ -26,6 +31,7 @@ const UserWorkouts = () => {
   const presetWorkoutsError = useSelector((state) => state.presetWorkouts.error);
 
   const [selectedWorkoutID, setSelectedWorkoutID] = useState(null);
+  const [selectedPresetWorkoutID, setSelectedPresetWorkoutID] = useState(null); // Track selected preset workout
 
   useEffect(() => {
     if (!user) {
@@ -43,6 +49,11 @@ const UserWorkouts = () => {
   const handleViewExercises = (customWorkoutID) => {
     setSelectedWorkoutID(customWorkoutID);
     dispatch(fetchExercisesForCustomWorkout(customWorkoutID));
+  };
+
+  const handleViewPresetExercises = (presetWorkoutID) => {
+    setSelectedPresetWorkoutID(presetWorkoutID);
+    dispatch(fetchExercisesForPresetWorkout(presetWorkoutID));
   };
 
   const handleStartWorkout = (workoutID, isCustom) => {
@@ -81,9 +92,9 @@ const UserWorkouts = () => {
                   <button onClick={() => handleStartWorkout(workout.customWorkoutID, true)}>Start Workout</button>
                   <button onClick={() => handleDeleteCustomWorkout(workout.customWorkoutID)}>Delete</button>
                 </div>
-                {selectedWorkoutID === workout.customWorkoutID && exercises[workout.customWorkoutID] && (
+                {selectedWorkoutID === workout.customWorkoutID && customExercises[workout.customWorkoutID] && (
                   <ul>
-                    {exercises[workout.customWorkoutID].map((exercise) => (
+                    {customExercises[workout.customWorkoutID].map((exercise) => (
                       <li key={exercise.exerciseID}>
                         {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
                       </li>
@@ -104,9 +115,19 @@ const UserWorkouts = () => {
               <li key={workout.presetWorkoutID}>
                 <div>
                   {workout.presetWorkoutName}
+                  <button onClick={() => handleViewPresetExercises(workout.presetWorkoutID)}>View Exercises</button>
                   <button onClick={() => handleStartWorkout(workout.presetWorkoutID, false)}>Start Workout</button>
                   <button onClick={() => handleUnlinkPresetWorkout(workout.presetWorkoutID)}>Delete</button>
                 </div>
+                {selectedPresetWorkoutID === workout.presetWorkoutID && presetExercises[workout.presetWorkoutID] && (
+                  <ul>
+                    {presetExercises[workout.presetWorkoutID].map((exercise) => (
+                      <li key={exercise.exerciseID}>
+                        {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>

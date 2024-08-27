@@ -15,6 +15,18 @@ const PresetTemplate = sequelize.define('PresetTemplate', {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+    presetWorkoutDifficulty: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    presetWorkoutGoal: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    presetWorkoutLocation: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     presetTemplateDateCreated: {
         type: DataTypes.DATE,
         allowNull: false,
