@@ -1,8 +1,7 @@
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup';
-import Dashboard from './components/Dashboard';
 import Logout from './components/Auth/Logout';
 import Exercises from './components/Exercises';
 import ExerciseDetails from './components/ExerciseDetails';
@@ -17,27 +16,37 @@ import WorkoutLogDetails from './components/WorkoutLogDetails';
 import PresetTemplate from './components/PresetTemplate'
 import UserTemplates from './components/UserTemplates'
 import CustomTemplate from './components/CustomTemplate'
+import LandingPage from './components/LandingPage';
+import PrivateRoute from './components/PrivateRoute';
+import HomePage from './components/HomePage';
 
 function App() {
     return (
         <Routes>
-            <Route path="/" element={<Login />} />
+            {/* Public routes */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/logout" element={<Logout />} /> 
-            <Route path="/exercises" element={<Exercises />} />
-            <Route path="/exercises/:id" element={<ExerciseDetails />} />
-            <Route path="/preset-workouts" element={<PresetWorkout />} />
-            <Route path="/workout-logs" element={<WorkoutLogs />} />
-            <Route path="/workout-logs/:workoutLogID/exercise-logs" element={<ExerciseLogs />} /> 
-            <Route path="/exercise-logs/:exerciseLogID/set-logs" element={<SetLogs />} /> 
-            <Route path="/custom-workouts" element={<CustomWorkouts />} /> 
-            <Route path="/account" element={<Account />} />
-            <Route path="/user-workouts" element={<UserWorkouts />} /> 
-            <Route path="/workout-logs/:workoutLogID" element={<WorkoutLogDetails />} />
-            <Route path="/preset-templates" element={<PresetTemplate />} />
-            <Route path="/user-templates" element={<UserTemplates />} />
-            <Route path="/custom-templates" element={<CustomTemplate />} />
+
+            {/* Protected routes */}
+            <Route path="/home" element={<PrivateRoute><HomePage /></PrivateRoute>} />
+            <Route path="/logout" element={<PrivateRoute><Logout /></PrivateRoute>} />
+            <Route path="/exercises" element={<PrivateRoute><Exercises /></PrivateRoute>} />
+            <Route path="/exercises/:id" element={<PrivateRoute><ExerciseDetails /></PrivateRoute>} />
+            <Route path="/preset-workouts" element={<PrivateRoute><PresetWorkout /></PrivateRoute>} />
+            <Route path="/workout-logs" element={<PrivateRoute><WorkoutLogs /></PrivateRoute>} />
+            <Route path="/workout-logs/:workoutLogID/exercise-logs" element={<PrivateRoute><ExerciseLogs /></PrivateRoute>} />
+            <Route path="/exercise-logs/:exerciseLogID/set-logs" element={<PrivateRoute><SetLogs /></PrivateRoute>} />
+            <Route path="/custom-workouts" element={<PrivateRoute><CustomWorkouts /></PrivateRoute>} />
+            <Route path="/account" element={<PrivateRoute><Account /></PrivateRoute>} />
+            <Route path="/user-workouts" element={<PrivateRoute><UserWorkouts /></PrivateRoute>} />
+            <Route path="/workout-logs/:workoutLogID" element={<PrivateRoute><WorkoutLogDetails /></PrivateRoute>} />
+            <Route path="/preset-templates" element={<PrivateRoute><PresetTemplate /></PrivateRoute>} />
+            <Route path="/user-templates" element={<PrivateRoute><UserTemplates /></PrivateRoute>} />
+            <Route path="/custom-templates" element={<PrivateRoute><CustomTemplate /></PrivateRoute>} />
+
+            {/* Redirect to landing page for any unmatched routes */}
+            <Route path="*" element={<Navigate to="/" />} />
         </Routes>
     );
 }

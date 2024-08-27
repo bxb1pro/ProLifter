@@ -9,13 +9,13 @@ const Signup = () => {
     const [password, setPassword] = useState('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { isAuthenticated, error, isLoading } = useSelector((state) => state.auth);
+    const { signupSuccess, error, isLoading } = useSelector((state) => state.auth);
 
     useEffect(() => {
-        if (isAuthenticated) {
-            navigate('/dashboard');  // Redirect to a dashboard or home page
+        if (signupSuccess) {
+            navigate('/login');  // Redirect to login page after successful signup
         }
-    }, [isAuthenticated, navigate]);
+    }, [signupSuccess, navigate]);
 
     useEffect(() => {
         return () => {

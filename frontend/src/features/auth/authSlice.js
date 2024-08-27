@@ -71,6 +71,7 @@ export const fetchAccountDetails = createAsyncThunk(
       user: null,
       token: localStorage.getItem('token') || null,
       isAuthenticated: false,
+      signupSuccess: false,
       isLoading: false,
       error: null,
     },
@@ -80,6 +81,7 @@ export const fetchAccountDetails = createAsyncThunk(
         state.user = null;
         state.token = null;
         state.isAuthenticated = false;
+        state.signupSuccess = false;
       },
       clearErrors(state) {
         state.error = null;
@@ -90,16 +92,17 @@ export const fetchAccountDetails = createAsyncThunk(
         .addCase(signupUser.pending, (state) => {
           state.isLoading = true;
           state.error = null;
+          state.signupSuccess = false;
         })
-        .addCase(signupUser.fulfilled, (state, action) => {
-          state.token = action.payload.token;
-          state.isAuthenticated = true;
+        .addCase(signupUser.fulfilled, (state) => {
           state.isLoading = false;
           state.error = null;
+          state.signupSuccess = true;
         })
         .addCase(signupUser.rejected, (state, action) => {
           state.error = action.payload;
           state.isLoading = false;
+          state.signupSuccess = false;
         })
         .addCase(loginUser.pending, (state) => {
           state.isLoading = true;
@@ -121,6 +124,7 @@ export const fetchAccountDetails = createAsyncThunk(
         })
         .addCase(fetchAccountDetails.fulfilled, (state, action) => {
           state.user = action.payload;
+          state.isAuthenticated = true;
           state.isLoading = false;
           state.error = null;
         })
