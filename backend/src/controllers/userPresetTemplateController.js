@@ -55,8 +55,9 @@ const getUserPresetTemplates = async (req, res) => {
             include: [{ model: PresetTemplate }] // Include the PresetTemplate model to get template details
         });
 
+        // Instead of 404, return an empty array
         if (!userPresetTemplates || userPresetTemplates.length === 0) {
-            return res.status(404).json({ error: 'No preset templates found for this user' });
+            return res.status(200).json([]); // Return an empty array instead of 404
         }
 
         // Extract the preset templates from the linked data

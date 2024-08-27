@@ -58,7 +58,7 @@ export const linkCustomWorkoutToTemplate = createAsyncThunk(
   'customTemplates/linkWorkout',
   async ({ id, customWorkoutID }, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/custom-templates/${id}/link-workout`, { customWorkoutID });
+      const response = await api.post(`/custom-template-custom-workouts/${id}/link-workout`, { customWorkoutID });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to link custom workout to template');
@@ -71,7 +71,7 @@ export const unlinkCustomWorkoutFromTemplate = createAsyncThunk(
   'customTemplates/unlinkWorkout',
   async ({ id, customWorkoutID }, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/custom-templates/${id}/unlink-workout`, { customWorkoutID });
+      const response = await api.post(`/custom-template-custom-workouts/${id}/unlink-workout`, { customWorkoutID });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to unlink custom workout from template');
@@ -84,7 +84,7 @@ export const fetchCustomWorkoutsForTemplate = createAsyncThunk(
   'customTemplates/fetchCustomWorkouts',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/custom-templates/${id}/custom-workouts`);
+      const response = await api.get(`/custom-template-custom-workouts/${id}/custom-workouts`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch custom workouts for template');
@@ -97,7 +97,7 @@ export const linkPresetWorkoutToTemplate = createAsyncThunk(
   'customTemplates/linkPresetWorkout',
   async ({ id, presetWorkoutID }, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/custom-templates/${id}/link-preset-workout`, { presetWorkoutID });
+      const response = await api.post(`/custom-template-preset-workouts/${id}/link-preset-workout`, { presetWorkoutID });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to link preset workout to template');
@@ -110,7 +110,7 @@ export const unlinkPresetWorkoutFromTemplate = createAsyncThunk(
   'customTemplates/unlinkPresetWorkout',
   async ({ id, presetWorkoutID }, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/custom-templates/${id}/unlink-preset-workout`, { presetWorkoutID });
+      const response = await api.post(`/custom-template-preset-workouts/${id}/unlink-preset-workout`, { presetWorkoutID });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to unlink preset workout from template');
@@ -123,7 +123,7 @@ export const fetchPresetWorkoutsForTemplate = createAsyncThunk(
   'customTemplates/fetchPresetWorkouts',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/custom-templates/${id}/preset-workouts`);
+      const response = await api.get(`/custom-template-preset-workouts/${id}/preset-workouts`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Failed to fetch preset workouts for template');
@@ -132,85 +132,117 @@ export const fetchPresetWorkoutsForTemplate = createAsyncThunk(
 );
 
 const customTemplateSlice = createSlice({
-  name: 'customTemplates',
-  initialState: {
-    templates: [],
-    templateDetails: null,
-    customWorkouts: [],
-    presetWorkouts: [],
-    status: 'idle', // idle, loading, succeeded, failed
-    error: null,
-  },
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      // Fetch all custom templates
-      .addCase(fetchUserCustomTemplates.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchUserCustomTemplates.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.templates = action.payload;
-      })
-      .addCase(fetchUserCustomTemplates.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
-      })
-      // Create a new custom template
-      .addCase(createCustomTemplate.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.templates.push(action.payload);
-      })
-      .addCase(createCustomTemplate.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
-      })
-      // Edit a custom template
-      .addCase(editCustomTemplate.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        const index = state.templates.findIndex(template => template.customTemplateID === action.payload.customTemplateID);
-        if (index !== -1) {
-          state.templates[index] = action.payload;
-        }
-      })
-      .addCase(editCustomTemplate.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
-      })
-      // Delete a custom template
-      .addCase(deleteCustomTemplate.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.templates = state.templates.filter(template => template.customTemplateID !== action.payload);
-      })
-      .addCase(deleteCustomTemplate.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
-      })
-      // Fetch custom workouts linked to a custom template
-      .addCase(fetchCustomWorkoutsForTemplate.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchCustomWorkoutsForTemplate.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.customWorkouts = action.payload;
-      })
-      .addCase(fetchCustomWorkoutsForTemplate.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
-      })
-      // Fetch preset workouts linked to a custom template
-      .addCase(fetchPresetWorkoutsForTemplate.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchPresetWorkoutsForTemplate.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.presetWorkouts = action.payload;
-      })
-      .addCase(fetchPresetWorkoutsForTemplate.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
-      });
-  },
-});
-
-export default customTemplateSlice.reducer;
+    name: 'customTemplates',
+    initialState: {
+      templates: [],
+      templateDetails: null,
+      customWorkouts: [],
+      presetWorkouts: [],
+      status: 'idle', // idle, loading, succeeded, failed
+      error: null,
+    },
+    reducers: {},
+    extraReducers: (builder) => {
+      builder
+        // Fetch all custom templates
+        .addCase(fetchUserCustomTemplates.pending, (state) => {
+          state.status = 'loading';
+        })
+        .addCase(fetchUserCustomTemplates.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          state.templates = action.payload;
+        })
+        .addCase(fetchUserCustomTemplates.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.payload;
+        })
+        // Create a new custom template
+        .addCase(createCustomTemplate.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          state.templates.push(action.payload);
+        })
+        .addCase(createCustomTemplate.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.payload;
+        })
+        // Edit a custom template
+        .addCase(editCustomTemplate.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          const index = state.templates.findIndex(template => template.customTemplateID === action.payload.customTemplateID);
+          if (index !== -1) {
+            state.templates[index] = action.payload;
+          }
+        })
+        .addCase(editCustomTemplate.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.payload;
+        })
+        // Delete a custom template
+        .addCase(deleteCustomTemplate.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          state.templates = state.templates.filter(template => template.customTemplateID !== action.payload);
+        })
+        .addCase(deleteCustomTemplate.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.payload;
+        })
+        // Fetch custom workouts linked to a custom template
+        .addCase(fetchCustomWorkoutsForTemplate.pending, (state) => {
+          state.status = 'loading';
+        })
+        .addCase(fetchCustomWorkoutsForTemplate.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          state.customWorkouts = action.payload;
+        })
+        .addCase(fetchCustomWorkoutsForTemplate.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.payload;
+        })
+        // Fetch preset workouts linked to a custom template
+        .addCase(fetchPresetWorkoutsForTemplate.pending, (state) => {
+          state.status = 'loading';
+        })
+        .addCase(fetchPresetWorkoutsForTemplate.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          state.presetWorkouts = action.payload;
+        })
+        .addCase(fetchPresetWorkoutsForTemplate.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.payload;
+        })
+        // Link a custom workout to a custom template
+        .addCase(linkCustomWorkoutToTemplate.fulfilled, (state) => {
+          state.status = 'succeeded';
+        })
+        .addCase(linkCustomWorkoutToTemplate.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.payload;
+        })
+        // Unlink a custom workout from a custom template
+        .addCase(unlinkCustomWorkoutFromTemplate.fulfilled, (state) => {
+          state.status = 'succeeded';
+        })
+        .addCase(unlinkCustomWorkoutFromTemplate.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.payload;
+        })
+        // Link a preset workout to a custom template
+        .addCase(linkPresetWorkoutToTemplate.fulfilled, (state) => {
+            state.status = 'succeeded';
+          })
+          .addCase(linkPresetWorkoutToTemplate.rejected, (state, action) => {
+            state.status = 'failed';
+            state.error = action.payload;
+          })
+          // Unlink a preset workout from a custom template
+          .addCase(unlinkPresetWorkoutFromTemplate.fulfilled, (state) => {
+            state.status = 'succeeded';
+          })
+          .addCase(unlinkPresetWorkoutFromTemplate.rejected, (state, action) => {
+            state.status = 'failed';
+            state.error = action.payload;
+          });
+      },
+  });
+  
+  export default customTemplateSlice.reducer;

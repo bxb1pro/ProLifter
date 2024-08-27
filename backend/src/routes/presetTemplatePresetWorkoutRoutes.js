@@ -11,6 +11,6 @@ router.post('/:id/link-preset-workout', verifyRole(['admin', 'superadmin']), lin
 router.post('/:id/unlink-preset-workout', verifyRole(['admin', 'superadmin']), unlinkPresetWorkout);
 
 // Get all preset workouts linked to a preset template
-router.get('/:id/preset-workouts', verifyRole(['admin', 'superadmin']), getPresetWorkoutsForPresetTemplate);
+router.get('/:id/preset-workouts', getPresetWorkoutsForPresetTemplate);
 
 module.exports = router;

@@ -110,7 +110,7 @@ export const linkPresetWorkoutToTemplate = createAsyncThunk(
     'presetTemplates/linkPresetWorkout',
     async ({ presetTemplateID, presetWorkoutID }, { rejectWithValue }) => {
         try {
-            const response = await api.post(`/preset-templates/${presetTemplateID}/link-preset-workout`, { presetWorkoutID });
+            const response = await api.post(`/preset-template-preset-workouts/${presetTemplateID}/link-preset-workout`, { presetWorkoutID });
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Failed to link preset workout to template');
@@ -123,7 +123,7 @@ export const unlinkPresetWorkoutFromTemplate = createAsyncThunk(
     'presetTemplates/unlinkPresetWorkout',
     async ({ presetTemplateID, presetWorkoutID }, { rejectWithValue }) => {
         try {
-            const response = await api.post(`/preset-templates/${presetTemplateID}/unlink-preset-workout`, { presetWorkoutID });
+            const response = await api.post(`/preset-template-preset-workouts/${presetTemplateID}/unlink-preset-workout`, { presetWorkoutID });
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Failed to unlink preset workout from template');
@@ -136,7 +136,7 @@ export const fetchPresetWorkoutsForTemplate = createAsyncThunk(
     'presetTemplates/fetchPresetWorkouts',
     async (presetTemplateID, { rejectWithValue }) => {
         try {
-            const response = await api.get(`/preset-templates/${presetTemplateID}/preset-workouts`);
+            const response = await api.get(`/preset-template-preset-workouts/${presetTemplateID}/preset-workouts`);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data || 'Failed to fetch preset workouts for template');

@@ -6,6 +6,10 @@ import {
   unlinkExerciseFromCustomWorkout,
   deleteCustomWorkout,
 } from '../features/customWorkouts/customWorkoutSlice';
+import {
+  fetchUserCustomTemplates,
+  linkCustomWorkoutToTemplate,
+} from '../features/customTemplates/customTemplateSlice';
 import AddCustomWorkoutForm from './forms/AddCustomWorkoutForm';
 import EditCustomWorkoutForm from './forms/EditCustomWorkoutForm';
 
@@ -13,15 +17,19 @@ const CustomWorkouts = () => {
   const dispatch = useDispatch();
   const workouts = useSelector((state) => state.customWorkouts.workouts);
   const exercises = useSelector((state) => state.customWorkouts.exercises);
+  const templates = useSelector((state) => state.customTemplates.templates);
   const status = useSelector((state) => state.customWorkouts.status);
   const error = useSelector((state) => state.customWorkouts.error);
+
   const [selectedWorkoutID, setSelectedWorkoutID] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState(null);
+  const [selectedTemplateID, setSelectedTemplateID] = useState('');
 
   useEffect(() => {
     if (status === 'idle') {
       dispatch(fetchUserCustomWorkouts());
+      dispatch(fetchUserCustomTemplates()); // Fetch all custom templates
     }
   }, [status, dispatch]);
 
@@ -46,6 +54,13 @@ const CustomWorkouts = () => {
     setEditingWorkout(workout);
   };
 
+  const handleLinkWorkoutToTemplate = (customWorkoutID, templateID) => {
+    if (templateID) {
+      dispatch(linkCustomWorkoutToTemplate({ id: templateID, customWorkoutID }));
+      setSelectedTemplateID(''); // Reset after linking
+    }
+  };
+
   let content;
 
   if (status === 'loading') {
@@ -60,6 +75,22 @@ const CustomWorkouts = () => {
               <button onClick={() => handleViewExercises(workout.customWorkoutID)}>View Exercises</button>
               <button onClick={() => handleEditWorkout(workout)}>Edit</button>
               <button onClick={() => handleDeleteWorkout(workout.customWorkoutID)}>Delete</button>
+
+              {/* Dropdown to select a template to link the workout */}
+              <select
+                value={selectedTemplateID}
+                onChange={(e) => {
+                  setSelectedTemplateID(e.target.value);
+                  handleLinkWorkoutToTemplate(workout.customWorkoutID, e.target.value);
+                }}
+              >
+                <option value="">Add to Custom Template</option>
+                {templates.map((template) => (
+                  <option key={template.customTemplateID} value={template.customTemplateID}>
+                    {template.customTemplateName}
+                  </option>
+                ))}
+              </select>
             </div>
             {selectedWorkoutID === workout.customWorkoutID && exercises[workout.customWorkoutID] && (
               <ul>

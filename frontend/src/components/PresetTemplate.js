@@ -4,6 +4,8 @@ import {
   fetchPresetTemplates,
   deletePresetTemplate,
   linkPresetTemplate,
+  fetchPresetWorkoutsForTemplate,
+  unlinkPresetWorkoutFromTemplate,
 } from '../features/presetTemplates/presetTemplateSlice';
 import AddPresetTemplateForm from './forms/AddPresetTemplateForm';
 import EditPresetTemplateForm from './forms/EditPresetTemplateForm';
@@ -12,6 +14,7 @@ import { fetchAccountDetails } from '../features/auth/authSlice';
 const PresetTemplate = () => {
   const dispatch = useDispatch();
   const templates = useSelector((state) => state.presetTemplates.templates);
+  const presetWorkouts = useSelector((state) => state.presetTemplates.presetWorkouts);
   const status = useSelector((state) => state.presetTemplates.status);
   const error = useSelector((state) => state.presetTemplates.error);
 
@@ -32,6 +35,7 @@ const PresetTemplate = () => {
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState(null);
+  const [viewingWorkouts, setViewingWorkouts] = useState(null);
 
   // Filters
   const [daysFilter, setDaysFilter] = useState('');
@@ -57,6 +61,15 @@ const PresetTemplate = () => {
 
   const handleDeleteTemplate = (presetTemplateID) => {
     dispatch(deletePresetTemplate(presetTemplateID));
+  };
+
+  const handleViewWorkouts = (presetTemplateID) => {
+    dispatch(fetchPresetWorkoutsForTemplate(presetTemplateID));
+    setViewingWorkouts(presetTemplateID);
+  };
+
+  const handleUnlinkWorkout = (presetTemplateID, presetWorkoutID) => {
+    dispatch(unlinkPresetWorkoutFromTemplate({ presetTemplateID, presetWorkoutID }));
   };
 
   // Filtered templates based on the selected filters
@@ -121,6 +134,20 @@ const PresetTemplate = () => {
                 <button onClick={() => handleEditTemplate(template)}>Edit</button>
                 <button onClick={() => handleDeleteTemplate(template.presetTemplateID)}>Delete</button>
                 <button onClick={() => handleLinkTemplateToUser(template.presetTemplateID)}>Add to My Templates</button>
+                <button onClick={() => handleViewWorkouts(template.presetTemplateID)}>View Workouts</button>
+
+                {viewingWorkouts === template.presetTemplateID && presetWorkouts.length > 0 && (
+                  <ul>
+                    {presetWorkouts.map((workout) => (
+                      <li key={workout.presetWorkoutID}>
+                        {workout.PresetWorkout.presetWorkoutName}
+                        <button onClick={() => handleUnlinkWorkout(template.presetTemplateID, workout.presetWorkoutID)}>
+                          Remove
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </li>
           ))}
