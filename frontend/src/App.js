@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Route, Routes, Navigate, useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import NavBar from './components/NavBar';
 import Login from './components/Auth/Login';
 import Signup from './components/Auth/Signup';
@@ -20,10 +21,21 @@ import CustomTemplate from './components/CustomTemplate';
 import LandingPage from './components/LandingPage';
 import PrivateRoute from './components/PrivateRoute';
 import HomePage from './components/HomePage';
+import { fetchAccountDetails } from './features/auth/authSlice';
 
 function App() {
     const location = useLocation();
+    const dispatch = useDispatch();
+    const token = useSelector((state) => state.auth.token);
+
     const hideNavBar = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/signup';
+
+    // Fetch JWT token in app.js to avoid repetitive code through placing it at the start of each component
+    useEffect(() => {
+        if (token) {
+            dispatch(fetchAccountDetails());
+        }
+    }, [dispatch, token]);
 
     return (
         <>

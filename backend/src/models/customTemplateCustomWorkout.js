@@ -23,8 +23,8 @@ const CustomTemplateCustomWorkout = sequelize.define('CustomTemplateCustomWorkou
 });
 
 CustomTemplateCustomWorkout.associate = (models) => {
-    CustomTemplateCustomWorkout.belongsTo(models.CustomTemplate, { foreignKey: 'customTemplateID' });
-    CustomTemplateCustomWorkout.belongsTo(models.CustomWorkout, { foreignKey: 'customWorkoutID' });
+    CustomTemplateCustomWorkout.belongsTo(models.CustomTemplate, { foreignKey: 'customTemplateID', onDelete: 'CASCADE' });
+    CustomTemplateCustomWorkout.belongsTo(models.CustomWorkout, { foreignKey: 'customWorkoutID', onDelete: 'CASCADE' });
 };
 
 module.exports = CustomTemplateCustomWorkout;

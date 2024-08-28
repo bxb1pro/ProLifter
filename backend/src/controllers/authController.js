@@ -53,8 +53,8 @@ const login = async (req, res) => {
             return res.status(400).json({ error: 'Invalid email or password' });
         }
 
-        // Generate JWT using the secret from the environment variable
-        const token = jwt.sign({ userID: user.userID }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        // Generate JWT using the secret from the environment variable, add role in too
+        const token = jwt.sign({ userID: user.userID, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         res.status(200).json({ message: 'Logged in successfully', token });
     } catch (error) {
