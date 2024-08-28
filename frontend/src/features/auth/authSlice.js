@@ -38,6 +38,7 @@ export const loginUser = createAsyncThunk(
     }
   );
 
+  // Thunk to get account details
   export const fetchAccountDetails = createAsyncThunk(
     'auth/fetchAccountDetails',
     async (_, { rejectWithValue }) => {

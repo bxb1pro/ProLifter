@@ -9,11 +9,11 @@ import {
 } from '../features/presetWorkouts/presetWorkoutSlice';
 import {
   fetchPresetTemplates,
-  linkPresetWorkoutToTemplate as linkWorkoutToPresetTemplate, // renamed for clarity
+  linkPresetWorkoutToTemplate as linkWorkoutToPresetTemplate,
 } from '../features/presetTemplates/presetTemplateSlice';
 import {
   fetchUserCustomTemplates,
-  linkPresetWorkoutToTemplate as linkWorkoutToCustomTemplate, // renamed for clarity
+  linkPresetWorkoutToTemplate as linkWorkoutToCustomTemplate,
 } from '../features/customTemplates/customTemplateSlice';
 import AddPresetWorkoutForm from './forms/AddPresetWorkoutForm';
 import EditPresetWorkoutForm from './forms/EditPresetWorkoutForm';
@@ -24,24 +24,26 @@ const PresetWorkout = () => {
   const workouts = useSelector((state) => state.presetWorkouts.workouts);
   const exercises = useSelector((state) => state.presetWorkouts.exercises);
   const templates = useSelector((state) => state.presetTemplates.templates);
-  const customTemplates = useSelector((state) => state.customTemplates.templates); // custom templates
+  const customTemplates = useSelector((state) => state.customTemplates.templates);
   const status = useSelector((state) => state.presetWorkouts.status);
   const error = useSelector((state) => state.presetWorkouts.error);
-  
+  const role = useSelector((state) => state.auth.role); // Get user role from Redux
   const user = useSelector((state) => state.auth.user);
   const userID = user ? user.userID : null;
 
+  console.log('Current Role:', role);
+
   useEffect(() => {
     if (!user) {
-      dispatch(fetchAccountDetails()); // Fetch user details if not already available
+      dispatch(fetchAccountDetails());
     }
   }, [user, dispatch]);
 
   useEffect(() => {
     if (status === 'idle') {
       dispatch(fetchPresetWorkouts());
-      dispatch(fetchPresetTemplates()); // Fetch all preset templates
-      dispatch(fetchUserCustomTemplates()); // Fetch all custom templates
+      dispatch(fetchPresetTemplates());
+      dispatch(fetchUserCustomTemplates());
     }
   }, [status, dispatch]);
 
@@ -50,6 +52,8 @@ const PresetWorkout = () => {
   const [editingWorkout, setEditingWorkout] = useState(null);
   const [selectedPresetTemplateID, setSelectedPresetTemplateID] = useState('');
   const [selectedCustomTemplateID, setSelectedCustomTemplateID] = useState('');
+
+  console.log('Current Role:', role);
 
   // Filters
   const [difficultyFilter, setDifficultyFilter] = useState('');
@@ -99,6 +103,8 @@ const PresetWorkout = () => {
     }
   };
 
+  console.log('Current Role:', role);
+
   // Filtered workouts based on the selected filters
   const filteredWorkouts = workouts.filter((workout) => {
     return (
@@ -107,6 +113,8 @@ const PresetWorkout = () => {
       (locationFilter === '' || workout.presetWorkoutLocation === locationFilter)
     );
   });
+
+  console.log('Current Role:', role);
 
   let content;
 
@@ -146,50 +154,66 @@ const PresetWorkout = () => {
               <div>
                 {workout.presetWorkoutName} - {workout.presetWorkoutDifficulty}
                 <button onClick={() => handleViewExercises(workout.presetWorkoutID)}>View Exercises</button>
-                <button onClick={() => handleEditWorkout(workout)}>Edit</button>
-                <button onClick={() => handleDeleteWorkout(workout.presetWorkoutID)}>Delete</button>
-                <button onClick={() => handleLinkWorkoutToUser(workout.presetWorkoutID)}>Add to My Workouts</button>
+                
+                {/* Conditionally render edit and delete options for admins or superadmins */}
+                {(role === 'admin' || role === 'superadmin') && (
+                  <>
+                    <button onClick={() => handleEditWorkout(workout)}>Edit</button>
+                    <button onClick={() => handleDeleteWorkout(workout.presetWorkoutID)}>Delete</button>
+                  </>
+                )}
+                
+                {/* Only allow users to link workouts to their account */}
+                {role === 'user' && (
+                  <button onClick={() => handleLinkWorkoutToUser(workout.presetWorkoutID)}>Add to My Workouts</button>
+                )}
 
                 {/* Dropdown to select a preset template to link the workout */}
-                <select
-                  value={selectedPresetTemplateID}
-                  onChange={(e) => {
-                    setSelectedPresetTemplateID(e.target.value);
-                    handleLinkWorkoutToTemplate(workout.presetWorkoutID, e.target.value);
-                  }}
-                >
-                  <option value="">Select Preset Template</option>
-                  {templates.map((template) => (
-                    <option key={template.presetTemplateID} value={template.presetTemplateID}>
-                      {template.presetTemplateName}
-                    </option>
-                  ))}
-                </select>
+                {(role === 'admin' || role === 'superadmin') && (
+                  <select
+                    value={selectedPresetTemplateID}
+                    onChange={(e) => {
+                      setSelectedPresetTemplateID(e.target.value);
+                      handleLinkWorkoutToTemplate(workout.presetWorkoutID, e.target.value);
+                    }}
+                  >
+                    <option value="">Select Preset Template</option>
+                    {templates.map((template) => (
+                      <option key={template.presetTemplateID} value={template.presetTemplateID}>
+                        {template.presetTemplateName}
+                      </option>
+                    ))}
+                  </select>
+                )}
 
                 {/* Dropdown to select a custom template to link the workout */}
-                <select
-                  value={selectedCustomTemplateID}
-                  onChange={(e) => {
-                    setSelectedCustomTemplateID(e.target.value);
-                    handleLinkWorkoutToCustomTemplate(workout.presetWorkoutID, e.target.value);
-                  }}
-                >
-                  <option value="">Select Custom Template</option>
-                  {customTemplates.map((template) => (
-                    <option key={template.customTemplateID} value={template.customTemplateID}>
-                      {template.customTemplateName}
-                    </option>
-                  ))}
-                </select>
+                {(role === 'user') && (
+                  <select
+                    value={selectedCustomTemplateID}
+                    onChange={(e) => {
+                      setSelectedCustomTemplateID(e.target.value);
+                      handleLinkWorkoutToCustomTemplate(workout.presetWorkoutID, e.target.value);
+                    }}
+                  >
+                    <option value="">Select Custom Template</option>
+                    {customTemplates.map((template) => (
+                      <option key={template.customTemplateID} value={template.customTemplateID}>
+                        {template.customTemplateName}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
               {selectedWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
                 <ul>
                   {exercises[workout.presetWorkoutID].map((exercise) => (
                     <li key={exercise.exerciseID}>
                       {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
-                      <button onClick={() => handleUnlinkExercise(workout.presetWorkoutID, exercise.exerciseID)}>
-                        Remove
-                      </button>
+                      {(role === 'admin' || role === 'superadmin') && (
+                        <button onClick={() => handleUnlinkExercise(workout.presetWorkoutID, exercise.exerciseID)}>
+                          Remove
+                        </button>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -203,12 +227,18 @@ const PresetWorkout = () => {
     content = <p>{error}</p>;
   }
 
-  return (
+return (
     <section>
       <h2>Preset Workouts</h2>
-      <button onClick={handleAddWorkout}>Add Preset Workout</button>
+
+      {(role === 'admin' || role === 'superadmin') && (
+        <button onClick={handleAddWorkout}>Add Preset Workout</button>
+      )}
+
       {content}
+      
       {showAddForm && <AddPresetWorkoutForm onClose={() => setShowAddForm(false)} />}
+      
       {editingWorkout && (
         <EditPresetWorkoutForm workout={editingWorkout} onClose={() => setEditingWorkout(null)} />
       )}

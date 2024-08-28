@@ -5,9 +5,9 @@ import { editPresetTemplate } from '../../features/presetTemplates/presetTemplat
 const EditPresetTemplateForm = ({ template, onClose }) => {
   const [presetTemplateName, setPresetTemplateName] = useState(template.presetTemplateName);
   const [presetTemplateDays, setPresetTemplateDays] = useState(template.presetTemplateDays);
-  const [presetWorkoutDifficulty, setPresetWorkoutDifficulty] = useState(template.presetWorkoutDifficulty);
-  const [presetWorkoutGoal, setPresetWorkoutGoal] = useState(template.presetWorkoutGoal);
-  const [presetWorkoutLocation, setPresetWorkoutLocation] = useState(template.presetWorkoutLocation);
+  const [presetTemplateDifficulty, setPresetTemplateDifficulty] = useState(template.presetTemplateDifficulty);
+  const [presetTemplateGoal, setPresetTemplateGoal] = useState(template.presetTemplateGoal);
+  const [presetTemplateLocation, setPresetTemplateLocation] = useState(template.presetTemplateLocation);
   const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
@@ -15,9 +15,9 @@ const EditPresetTemplateForm = ({ template, onClose }) => {
     if (
       presetTemplateName &&
       presetTemplateDays &&
-      presetWorkoutDifficulty &&
-      presetWorkoutGoal &&
-      presetWorkoutLocation
+      presetTemplateDifficulty &&
+      presetTemplateGoal &&
+      presetTemplateLocation
     ) {
       dispatch(
         editPresetTemplate({
@@ -25,9 +25,9 @@ const EditPresetTemplateForm = ({ template, onClose }) => {
           presetTemplateData: {
             presetTemplateName,
             presetTemplateDays,
-            presetWorkoutDifficulty,
-            presetWorkoutGoal,
-            presetWorkoutLocation,
+            presetTemplateDifficulty,
+            presetTemplateGoal,
+            presetTemplateLocation,
           },
         })
       );
@@ -59,8 +59,8 @@ const EditPresetTemplateForm = ({ template, onClose }) => {
         Difficulty:
         <input
           type="text"
-          value={presetWorkoutDifficulty}
-          onChange={(e) => setPresetWorkoutDifficulty(e.target.value)}
+          value={presetTemplateDifficulty}
+          onChange={(e) => setPresetTemplateDifficulty(e.target.value)}
           required
         />
       </label>
@@ -68,8 +68,8 @@ const EditPresetTemplateForm = ({ template, onClose }) => {
         Goal:
         <input
           type="text"
-          value={presetWorkoutGoal}
-          onChange={(e) => setPresetWorkoutGoal(e.target.value)}
+          value={presetTemplateGoal}
+          onChange={(e) => setPresetTemplateGoal(e.target.value)}
           required
         />
       </label>
@@ -77,8 +77,8 @@ const EditPresetTemplateForm = ({ template, onClose }) => {
         Location:
         <input
           type="text"
-          value={presetWorkoutLocation}
-          onChange={(e) => setPresetWorkoutLocation(e.target.value)}
+          value={presetTemplateLocation}
+          onChange={(e) => setPresetTemplateLocation(e.target.value)}
           required
         />
       </label>

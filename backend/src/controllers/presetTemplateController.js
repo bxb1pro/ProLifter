@@ -6,17 +6,17 @@ const createTemplate = async (req, res) => {
         const {
             presetTemplateName,
             presetTemplateDays,
-            presetWorkoutDifficulty,
-            presetWorkoutGoal,
-            presetWorkoutLocation,
+            presetTemplateDifficulty,
+            presetTemplateGoal,
+            presetTemplateLocation,
         } = req.body;
 
         const newTemplate = await PresetTemplate.create({
             presetTemplateName,
             presetTemplateDays,
-            presetWorkoutDifficulty,
-            presetWorkoutGoal,
-            presetWorkoutLocation,
+            presetTemplateDifficulty,
+            presetTemplateGoal,
+            presetTemplateLocation,
         });
 
         res.status(201).json(newTemplate);
@@ -32,9 +32,9 @@ const editTemplate = async (req, res) => {
         const {
             presetTemplateName,
             presetTemplateDays,
-            presetWorkoutDifficulty,
-            presetWorkoutGoal,
-            presetWorkoutLocation,
+            presetTemplateDifficulty,
+            presetTemplateGoal,
+            presetTemplateLocation,
         } = req.body;
         const presetTemplateID = req.params.id;
 
@@ -46,9 +46,9 @@ const editTemplate = async (req, res) => {
 
         template.presetTemplateName = presetTemplateName || template.presetTemplateName;
         template.presetTemplateDays = presetTemplateDays || template.presetTemplateDays;
-        template.presetWorkoutDifficulty = presetWorkoutDifficulty || template.presetWorkoutDifficulty;
-        template.presetWorkoutGoal = presetWorkoutGoal || template.presetWorkoutGoal;
-        template.presetWorkoutLocation = presetWorkoutLocation || template.presetWorkoutLocation;
+        template.presetTemplateDifficulty = presetTemplateDifficulty || template.presetTemplateDifficulty;
+        template.presetTemplateGoal = presetTemplateGoal || template.presetTemplateGoal;
+        template.presetTemplateLocation = presetTemplateLocation || template.presetTemplateLocation;
 
         await template.save();
 

@@ -17,7 +17,7 @@ const PresetTemplate = () => {
   const presetWorkouts = useSelector((state) => state.presetTemplates.presetWorkouts);
   const status = useSelector((state) => state.presetTemplates.status);
   const error = useSelector((state) => state.presetTemplates.error);
-
+  const role = useSelector((state) => state.auth.role);
   const user = useSelector((state) => state.auth.user);
   const userID = user ? user.userID : null;
 
@@ -76,9 +76,9 @@ const PresetTemplate = () => {
   const filteredTemplates = templates.filter((template) => {
     return (
       (daysFilter === '' || template.presetTemplateDays === parseInt(daysFilter)) &&
-      (difficultyFilter === '' || template.presetWorkoutDifficulty === difficultyFilter) &&
-      (goalFilter === '' || template.presetWorkoutGoal === goalFilter) &&
-      (locationFilter === '' || template.presetWorkoutLocation === locationFilter)
+      (difficultyFilter === '' || template.presetTemplateDifficulty === difficultyFilter) &&
+      (goalFilter === '' || template.presetTemplateGoal === goalFilter) &&
+      (locationFilter === '' || template.presetTemplateLocation === locationFilter)
     );
   });
 
@@ -130,20 +130,29 @@ const PresetTemplate = () => {
           {filteredTemplates.map((template) => (
             <li key={template.presetTemplateID}>
               <div>
-                {template.presetTemplateName} - {template.presetWorkoutDifficulty} - {template.presetTemplateDays} days
-                <button onClick={() => handleEditTemplate(template)}>Edit</button>
-                <button onClick={() => handleDeleteTemplate(template.presetTemplateID)}>Delete</button>
-                <button onClick={() => handleLinkTemplateToUser(template.presetTemplateID)}>Add to My Templates</button>
+                {template.presetTemplateName} - {template.presetTemplateDifficulty} - {template.presetTemplateDays} days 
                 <button onClick={() => handleViewWorkouts(template.presetTemplateID)}>View Workouts</button>
+                {(role === 'admin' || role === 'superadmin') && (
+                  <>
+                    <button onClick={() => handleEditTemplate(template)}>Edit</button>
+                    <button onClick={() => handleDeleteTemplate(template.presetTemplateID)}>Delete</button>
+                  </>
+                )}
+               
+               {role === 'user' && (
+                  <button onClick={() => handleLinkTemplateToUser(template.presetTemplateID)}>Add to My Templates</button>
+                )}
 
                 {viewingWorkouts === template.presetTemplateID && presetWorkouts.length > 0 && (
                   <ul>
                     {presetWorkouts.map((workout) => (
                       <li key={workout.presetWorkoutID}>
                         {workout.PresetWorkout.presetWorkoutName}
+                        {(role === 'admin' || role === 'superadmin') && (
                         <button onClick={() => handleUnlinkWorkout(template.presetTemplateID, workout.presetWorkoutID)}>
                           Remove
                         </button>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -161,8 +170,13 @@ const PresetTemplate = () => {
   return (
     <section>
       <h2>Preset Templates</h2>
+
+      {(role === 'admin' || role === 'superadmin') && (
       <button onClick={handleAddTemplate}>Add Preset Template</button>
+        )}
+        
       {content}
+
       {showAddForm && <AddPresetTemplateForm onClose={() => setShowAddForm(false)} />}
       {editingTemplate && (
         <EditPresetTemplateForm template={editingTemplate} onClose={() => setEditingTemplate(null)} />
