@@ -8,6 +8,7 @@ import {
   unlinkCustomWorkoutFromTemplate,
   unlinkPresetWorkoutFromTemplate,
 } from '../features/customTemplates/customTemplateSlice';
+import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 import AddCustomTemplateForm from './forms/AddCustomTemplateForm';
 import EditCustomTemplateForm from './forms/EditCustomTemplateForm';
 import { fetchAccountDetails } from '../features/auth/authSlice';
@@ -67,6 +68,14 @@ const CustomTemplate = () => {
     }
   };
 
+  const handleStartWorkout = (workoutID, workoutType) => {
+    if (workoutType === 'Custom') {
+      dispatch(startWorkoutLog({ customWorkoutID: workoutID }));
+    } else if (workoutType === 'Preset') {
+      dispatch(startWorkoutLog({ presetWorkoutID: workoutID }));
+    }
+  };
+
   const combinedWorkouts = [
     ...(customWorkouts || []).map((workout) => ({ ...workout, type: 'Custom' })),
     ...(presetWorkouts || []).map((workout) => ({ ...workout, type: 'Preset' })),
@@ -106,6 +115,11 @@ const CustomTemplate = () => {
                       }
                     >
                       Remove
+                    </button>
+                    <button
+                      onClick={() => handleStartWorkout(workout.customWorkoutID || workout.presetWorkoutID, workout.type)}
+                    >
+                      Start Workout
                     </button>
                   </li>
                 ))}

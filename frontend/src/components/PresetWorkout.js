@@ -6,6 +6,8 @@ import {
   unlinkExerciseFromPresetWorkout,
   deletePresetWorkout,
   linkPresetWorkoutToUser,
+  fetchUserPresetWorkouts,
+  unlinkPresetWorkoutFromUser,
 } from '../features/presetWorkouts/presetWorkoutSlice';
 import {
   fetchPresetTemplates,
@@ -15,6 +17,7 @@ import {
   fetchUserCustomTemplates,
   linkPresetWorkoutToTemplate as linkWorkoutToCustomTemplate,
 } from '../features/customTemplates/customTemplateSlice';
+import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 import AddPresetWorkoutForm from './forms/AddPresetWorkoutForm';
 import EditPresetWorkoutForm from './forms/EditPresetWorkoutForm';
 import { fetchAccountDetails } from '../features/auth/authSlice';
@@ -25,29 +28,18 @@ const PresetWorkout = () => {
   const exercises = useSelector((state) => state.presetWorkouts.exercises);
   const templates = useSelector((state) => state.presetTemplates.templates);
   const customTemplates = useSelector((state) => state.customTemplates.templates);
+  const userPresetWorkouts = useSelector((state) => state.presetWorkouts.userWorkouts); // User's selected preset workouts
   const status = useSelector((state) => state.presetWorkouts.status);
+  const userPresetStatus = useSelector((state) => state.presetWorkouts.status);
   const error = useSelector((state) => state.presetWorkouts.error);
   const role = useSelector((state) => state.auth.role);
   const user = useSelector((state) => state.auth.user);
   const userID = user ? user.userID : null;
 
-  useEffect(() => {
-    if (!user) {
-      dispatch(fetchAccountDetails());
-    }
-  }, [user, dispatch]);
-
-  useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchPresetWorkouts());
-      dispatch(fetchPresetTemplates());
-      dispatch(fetchUserCustomTemplates());
-    }
-  }, [status, dispatch]);
-
-
-
+  const [presetExercises, setPresetExercises] = useState({});
+  const [mainSelectedWorkoutID, setMainSelectedWorkoutID] = useState(null);
   const [selectedWorkoutID, setSelectedWorkoutID] = useState(null);
+  const [selectedPresetWorkoutID, setSelectedPresetWorkoutID] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState(null);
   const [selectedPresetTemplateID, setSelectedPresetTemplateID] = useState('');
@@ -58,8 +50,30 @@ const PresetWorkout = () => {
   const [goalFilter, setGoalFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
 
-  const handleViewExercises = (presetWorkoutID) => {
-    setSelectedWorkoutID(presetWorkoutID);
+  useEffect(() => {
+    if (!user) {
+      dispatch(fetchAccountDetails());
+    }
+  }, [user, dispatch]);
+
+  useEffect(() => {
+    if (user && userID) {
+      if (status === 'idle') {
+        dispatch(fetchPresetWorkouts());
+        dispatch(fetchPresetTemplates());
+        dispatch(fetchUserCustomTemplates());
+        dispatch(fetchUserPresetWorkouts(userID)); // Fetch user's selected preset workouts
+      }
+    }
+  }, [status, dispatch, user, userID]);
+
+  const handleViewMainExercises = (presetWorkoutID) => {
+    setMainSelectedWorkoutID(presetWorkoutID);
+    dispatch(fetchExercisesForPresetWorkout(presetWorkoutID));
+  };
+
+  const handleViewSelectedExercises = (presetWorkoutID) => {
+    setSelectedPresetWorkoutID(presetWorkoutID);
     dispatch(fetchExercisesForPresetWorkout(presetWorkoutID));
   };
 
@@ -68,7 +82,21 @@ const PresetWorkout = () => {
       console.error('User ID is not defined. Cannot link preset workout to user.');
       return;
     }
-    dispatch(linkPresetWorkoutToUser({ userID, presetWorkoutID }));
+    dispatch(linkPresetWorkoutToUser({ userID, presetWorkoutID })).then(() => {
+      dispatch(fetchUserPresetWorkouts(userID)); // Refresh the user's selected preset workouts
+    });
+  };
+
+  const handleStartWorkout = (workoutID) => {
+    dispatch(startWorkoutLog({ presetWorkoutID: workoutID }));
+  };
+
+  const handleUnlinkPresetWorkout = (presetWorkoutID) => {
+    if (userID) {
+      dispatch(unlinkPresetWorkoutFromUser({ userID, presetWorkoutID })).then(() => {
+        dispatch(fetchUserPresetWorkouts(userID)); // Refresh the user's selected preset workouts
+      });
+    }
   };
 
   const handleUnlinkExercise = (presetWorkoutID, exerciseID) => {
@@ -147,7 +175,7 @@ const PresetWorkout = () => {
             <li key={workout.presetWorkoutID}>
               <div>
                 {workout.presetWorkoutName} - {workout.presetWorkoutDifficulty} - {workout.presetWorkoutGoal} - {workout.presetWorkoutLocation}
-                <button onClick={() => handleViewExercises(workout.presetWorkoutID)}>View Exercises</button>
+                <button onClick={() => handleViewMainExercises(workout.presetWorkoutID)}>View Exercises</button>
                 
                 {/* Conditionally render edit and delete options for admins or superadmins */}
                 {(role === 'admin' || role === 'superadmin') && (
@@ -180,7 +208,45 @@ const PresetWorkout = () => {
                   </select>
                 )}
 
-                {/* Dropdown to select a custom template to link the workout */}
+                
+              </div>
+
+              {mainSelectedWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
+              <ul>
+                {exercises[workout.presetWorkoutID].length > 0 ? (
+                  exercises[workout.presetWorkoutID].map((exercise) => (
+                    <li key={exercise.exerciseID}>
+                      {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
+                      {(role === 'admin' || role === 'superadmin') && (
+                        <button onClick={() => handleUnlinkExercise(workout.presetWorkoutID, exercise.exerciseID)}>
+                          Remove
+                        </button>
+                      )}
+                    </li>
+                  ))
+                ) : (
+                  <li>No Exercises Added</li>
+                )}
+              </ul>
+                )}
+            </li>
+          ))}
+        </ul>
+
+        <h3>My Selected Preset Workouts</h3>
+        {userPresetStatus === 'loading' ? (
+          <p>Loading your selected workouts...</p>
+        ) : userPresetWorkouts.length > 0 ? (
+          <ul>
+            {userPresetWorkouts.map((workout) => (
+              <li key={workout.presetWorkoutID}>
+                <div>
+                  {workout.presetWorkoutName}
+                  <button onClick={() => handleViewSelectedExercises(workout.presetWorkoutID)}>View Exercises</button>
+                  <button onClick={() => handleStartWorkout(workout.presetWorkoutID)}>Start Workout</button>
+                  <button onClick={() => handleUnlinkPresetWorkout(workout.presetWorkoutID)}>Delete</button>
+
+                  {/* Dropdown to select a custom template to link the workout */}
                 {(role === 'user') && (
                   <select
                     value={selectedCustomTemplateID}
@@ -197,35 +263,38 @@ const PresetWorkout = () => {
                     ))}
                   </select>
                 )}
-              </div>
-              {selectedWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
+                
+                </div>
+                {selectedPresetWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
                 <ul>
                   {exercises[workout.presetWorkoutID].length > 0 ? (
                     exercises[workout.presetWorkoutID].map((exercise) => (
                       <li key={exercise.exerciseID}>
                         {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
-                        {(role === 'admin' || role === 'superadmin') && (
-                          <button onClick={() => handleUnlinkExercise(workout.presetWorkoutID, exercise.exerciseID)}>
-                            Remove
-                          </button>
-                        )}
                       </li>
                     ))
                   ) : (
                     <li>No Exercises Added</li>
                   )}
                 </ul>
-              )}
-            </li>
-          ))}
-        </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No selected preset workouts found.</p>
+        )}
       </>
     );
   } else if (status === 'failed') {
-    content = <p>{error}</p>;
+    content = (
+      <p>
+        {typeof error === 'string' ? error : error.message || 'An error occurred.'}
+      </p>
+    );
   }
 
-return (
+  return (
     <section>
       <h2>Preset Workouts</h2>
 

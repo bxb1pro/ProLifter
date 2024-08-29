@@ -18,7 +18,6 @@ const NavBar = () => {
                         <li><Link to="/custom-templates">Custom Templates</Link></li>
                         <li><Link to="/custom-workouts">Custom Workouts</Link></li>
                         <li><Link to="/user-templates">My Templates</Link></li>
-                        <li><Link to="/user-workouts">My Workouts</Link></li>
                         <li><Link to="/workout-logs">Workout Logs</Link></li>
                     </>
                 )}

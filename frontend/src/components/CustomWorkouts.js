@@ -12,6 +12,7 @@ import {
 } from '../features/customTemplates/customTemplateSlice';
 import AddCustomWorkoutForm from './forms/AddCustomWorkoutForm';
 import EditCustomWorkoutForm from './forms/EditCustomWorkoutForm';
+import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 
 const CustomWorkouts = () => {
   const dispatch = useDispatch();
@@ -61,6 +62,10 @@ const CustomWorkouts = () => {
     }
   };
 
+  const handleStartWorkout = (workoutID) => {
+    dispatch(startWorkoutLog({ customWorkoutID: workoutID }));
+  };
+
   let content;
 
   if (status === 'loading') {
@@ -75,7 +80,8 @@ const CustomWorkouts = () => {
               <button onClick={() => handleViewExercises(workout.customWorkoutID)}>View Exercises</button>
               <button onClick={() => handleEditWorkout(workout)}>Edit</button>
               <button onClick={() => handleDeleteWorkout(workout.customWorkoutID)}>Delete</button>
-
+              <button onClick={() => handleStartWorkout(workout.customWorkoutID)}>Start Workout</button> {/* Start Workout Button */}
+  
               {/* Dropdown to select a template to link the workout */}
               <select
                 value={selectedTemplateID}

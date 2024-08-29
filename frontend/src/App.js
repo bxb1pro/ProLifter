@@ -13,7 +13,6 @@ import ExerciseLogs from './components/ExerciseLogs';
 import SetLogs from './components/SetLogs'; 
 import CustomWorkouts from './components/CustomWorkouts'; 
 import Account from './components/Account';
-import UserWorkouts from './components/UserWorkouts';
 import WorkoutLogDetails from './components/WorkoutLogDetails';
 import PresetTemplate from './components/PresetTemplate';
 import UserTemplates from './components/UserTemplates';
@@ -57,7 +56,6 @@ function App() {
                 <Route path="/exercise-logs/:exerciseLogID/set-logs" element={<PrivateRoute><SetLogs /></PrivateRoute>} />
                 <Route path="/custom-workouts" element={<PrivateRoute><CustomWorkouts /></PrivateRoute>} />
                 <Route path="/account" element={<PrivateRoute><Account /></PrivateRoute>} />
-                <Route path="/user-workouts" element={<PrivateRoute><UserWorkouts /></PrivateRoute>} />
                 <Route path="/workout-logs/:workoutLogID" element={<PrivateRoute><WorkoutLogDetails /></PrivateRoute>} />
                 <Route path="/preset-templates" element={<PrivateRoute><PresetTemplate /></PrivateRoute>} />
                 <Route path="/user-templates" element={<PrivateRoute><UserTemplates /></PrivateRoute>} />
