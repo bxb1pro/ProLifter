@@ -62,7 +62,7 @@ const PresetTemplate = () => {
   };
 
   const handleStartWorkout = (workoutID) => {
-    dispatch(startWorkoutLog({ workoutID }));
+    dispatch(startWorkoutLog({ presetWorkoutID: workoutID }));
   };
 
   const handleViewWorkouts = (presetTemplateID) => {

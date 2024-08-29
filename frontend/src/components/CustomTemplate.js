@@ -38,6 +38,11 @@ const CustomTemplate = () => {
     }
   }, [status, dispatch]);
 
+  useEffect(() => {
+    console.log('Custom Workouts:', customWorkouts);
+    console.log('Preset Workouts:', presetWorkouts);
+  }, [customWorkouts, presetWorkouts]);
+
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState(null);
 
@@ -62,9 +67,15 @@ const CustomTemplate = () => {
 
   const handleRemoveWorkout = (templateID, workoutID, workoutType) => {
     if (workoutType === 'Custom') {
-      dispatch(unlinkCustomWorkoutFromTemplate({ id: templateID, customWorkoutID: workoutID }));
+      dispatch(unlinkCustomWorkoutFromTemplate({ id: templateID, customWorkoutID: workoutID })).then(() => {
+        // Refresh workouts after removing
+        dispatch(fetchCustomWorkoutsForTemplate(templateID));
+      });
     } else if (workoutType === 'Preset') {
-      dispatch(unlinkPresetWorkoutFromTemplate({ id: templateID, presetWorkoutID: workoutID }));
+      dispatch(unlinkPresetWorkoutFromTemplate({ id: templateID, presetWorkoutID: workoutID })).then(() => {
+        // Refresh workouts after removing
+        dispatch(fetchPresetWorkoutsForTemplate(templateID));
+      });
     }
   };
 
@@ -76,10 +87,31 @@ const CustomTemplate = () => {
     }
   };
 
+  // nested structure fetch for the name fixes the issue with the name not displaying for the workout
   const combinedWorkouts = [
-    ...(customWorkouts || []).map((workout) => ({ ...workout, type: 'Custom' })),
-    ...(presetWorkouts || []).map((workout) => ({ ...workout, type: 'Preset' })),
+    ...(customWorkouts || []).map((workout) => {
+      const name = workout.CustomWorkout?.customWorkoutName || workout.customWorkoutName;
+      console.log('Mapping Custom Workout:', { ...workout, name });
+      return {
+        ...workout,
+        type: 'Custom',
+        name,
+      };
+    }),
+    ...(presetWorkouts || []).map((workout) => {
+      const name = workout.PresetWorkout?.presetWorkoutName || workout.presetWorkoutName;
+      console.log('Mapping Preset Workout:', { ...workout, name });
+      return {
+        ...workout,
+        type: 'Preset',
+        name,
+      };
+    }),
   ];
+
+  useEffect(() => {
+    console.log('Combined Workouts:', combinedWorkouts);
+  }, [combinedWorkouts]);
 
   let content;
 
@@ -104,7 +136,7 @@ const CustomTemplate = () => {
               <ul>
                 {combinedWorkouts.map((workout) => (
                   <li key={workout.customWorkoutID || workout.presetWorkoutID}>
-                    {workout.customWorkoutName || workout.presetWorkoutName} - ({workout.type} Workout)
+                    {workout.name} - ({workout.type} Workout)  {/* Use workout.name */}
                     <button
                       onClick={() =>
                         handleRemoveWorkout(
