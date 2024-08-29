@@ -3,11 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchWorkoutLogDetails, finishWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 import { editExerciseLog, deleteExerciseLog } from '../features/exerciseLogs/exerciseLogSlice';
 import { addSetLog, deleteSetLog, editSetLog } from '../features/setLogs/setLogSlice'; // Import editSetLog
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const WorkoutLogDetails = () => {
   const { workoutLogID } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const workoutLog = useSelector((state) => state.workoutLogs.currentLog);
   const status = useSelector((state) => state.workoutLogs.status);
   const error = useSelector((state) => state.workoutLogs.error);
@@ -28,16 +29,22 @@ const WorkoutLogDetails = () => {
   }, [dispatch, workoutLogID]);
 
   const handleFinishWorkout = () => {
-    dispatch(finishWorkoutLog(workoutLogID));
+    dispatch(finishWorkoutLog(workoutLogID)).then(() => {
+      navigate('/workout-logs'); // Redirect to the workout logs page after finishing the workout
+    });
   };
 
   const handleCompleteExercise = (exerciseLogID) => {
-    dispatch(editExerciseLog({ exerciseLogID, exerciseLogCompleted: true }));
+    dispatch(editExerciseLog({ exerciseLogID, exerciseLogCompleted: true })).then(() => {
+      dispatch(fetchWorkoutLogDetails(workoutLogID)); // Refresh after marking exercise as complete
+    });
   };
 
   const handleDeleteExercise = (exerciseLogID) => {
     if (window.confirm('Are you sure you want to delete this exercise log?')) {
-      dispatch(deleteExerciseLog(exerciseLogID));
+      dispatch(deleteExerciseLog(exerciseLogID)).then(() => {
+        dispatch(fetchWorkoutLogDetails(workoutLogID)); // Refresh after deleting exercise
+      });
     }
   };
 
@@ -47,22 +54,24 @@ const WorkoutLogDetails = () => {
       exerciseLogID,
     };
     dispatch(addSetLog(setLogData)).then(() => {
-      // Reset the input fields for this specific exercise
       setNewSetData((prevData) => ({
         ...prevData,
         [exerciseLogID]: { setLogWeight: '', setLogReps: '', setLogRPE: '', setLog1RM: '' },
       }));
+      dispatch(fetchWorkoutLogDetails(workoutLogID)); // Refresh after adding set
     });
   };
 
   const handleDeleteSetLog = (setLogID) => {
     if (window.confirm('Are you sure you want to delete this set log?')) {
-      dispatch(deleteSetLog(setLogID));
+      dispatch(deleteSetLog(setLogID)).then(() => {
+        dispatch(fetchWorkoutLogDetails(workoutLogID)); // Refresh after deleting set
+      });
     }
   };
 
   const handleEditSetLog = (setLog) => {
-    setEditMode(setLog.setLogID); // Enter edit mode for the selected set log
+    setEditMode(setLog.setLogID);
     setEditSetData({
       setLogWeight: setLog.setLogWeight || '',
       setLogReps: setLog.setLogReps || '',
@@ -72,8 +81,10 @@ const WorkoutLogDetails = () => {
   };
 
   const handleSaveSetLog = (setLogID) => {
-    dispatch(editSetLog({ ...editSetData, id: setLogID }));
-    setEditMode(null); // Exit edit mode
+    dispatch(editSetLog({ ...editSetData, id: setLogID })).then(() => {
+      setEditMode(null);
+      dispatch(fetchWorkoutLogDetails(workoutLogID)); // Refresh after editing set
+    });
   };
 
   const handleChangeNewSetData = (exerciseLogID, field, value) => {
