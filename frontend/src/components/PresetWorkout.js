@@ -45,6 +45,8 @@ const PresetWorkout = () => {
   const [selectedPresetTemplateID, setSelectedPresetTemplateID] = useState('');
   const [selectedCustomTemplateID, setSelectedCustomTemplateID] = useState('');
 
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+
   // Filters
   const [difficultyFilter, setDifficultyFilter] = useState('');
   const [goalFilter, setGoalFilter] = useState('');
@@ -52,18 +54,21 @@ const PresetWorkout = () => {
 
   useEffect(() => {
     if (!user) {
-      dispatch(fetchAccountDetails());
+      dispatch(fetchAccountDetails()).finally(() => setInitialLoadComplete(true)); // Mark initial load complete after fetching user data
+    } else {
+      setInitialLoadComplete(true);
     }
   }, [user, dispatch]);
 
-  // Fix for the bug of Admins not being allowed access on a page refresh
   useEffect(() => {
-    if (user && userID && role) {
+    if (user && userID) {
       if (status === 'idle') {
         dispatch(fetchPresetWorkouts());
         dispatch(fetchPresetTemplates());
-        dispatch(fetchUserCustomTemplates());
-        dispatch(fetchUserPresetWorkouts(userID)); // Fetch user's selected preset workouts
+        if (role === 'user') {
+          dispatch(fetchUserCustomTemplates());
+          dispatch(fetchUserPresetWorkouts(userID)); // Fetch user's selected preset workouts
+        }
       }
     }
   }, [status, dispatch, user, userID, role]);
@@ -175,20 +180,27 @@ const PresetWorkout = () => {
           {filteredWorkouts.map((workout) => (
             <li key={workout.presetWorkoutID}>
               <div>
-                {workout.presetWorkoutName} - {workout.presetWorkoutDifficulty} - {workout.presetWorkoutGoal} - {workout.presetWorkoutLocation}
-                <button onClick={() => handleViewMainExercises(workout.presetWorkoutID)}>View Exercises</button>
-                
+                {workout.presetWorkoutName} - {workout.presetWorkoutDifficulty} -{' '}
+                {workout.presetWorkoutGoal} - {workout.presetWorkoutLocation}
+                <button onClick={() => handleViewMainExercises(workout.presetWorkoutID)}>
+                  View Exercises
+                </button>
+
                 {/* Conditionally render edit and delete options for admins or superadmins */}
                 {(role === 'admin' || role === 'superadmin') && (
                   <>
                     <button onClick={() => handleEditWorkout(workout)}>Edit</button>
-                    <button onClick={() => handleDeleteWorkout(workout.presetWorkoutID)}>Delete</button>
+                    <button onClick={() => handleDeleteWorkout(workout.presetWorkoutID)}>
+                      Delete
+                    </button>
                   </>
                 )}
-                
+
                 {/* Only allow users to link workouts to their account */}
                 {role === 'user' && (
-                  <button onClick={() => handleLinkWorkoutToUser(workout.presetWorkoutID)}>Add to My Workouts</button>
+                  <button onClick={() => handleLinkWorkoutToUser(workout.presetWorkoutID)}>
+                    Add to My Workouts
+                  </button>
                 )}
 
                 {/* Dropdown to select a preset template to link the workout */}
@@ -208,98 +220,103 @@ const PresetWorkout = () => {
                     ))}
                   </select>
                 )}
-
-                
               </div>
 
               {mainSelectedWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
-              <ul>
-                {exercises[workout.presetWorkoutID].length > 0 ? (
-                  exercises[workout.presetWorkoutID].map((exercise) => (
-                    <li key={exercise.exerciseID}>
-                      {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
-                      {(role === 'admin' || role === 'superadmin') && (
-                        <button onClick={() => handleUnlinkExercise(workout.presetWorkoutID, exercise.exerciseID)}>
-                          Remove
-                        </button>
-                      )}
-                    </li>
-                  ))
-                ) : (
-                  <li>No Exercises Added</li>
-                )}
-              </ul>
-                )}
-            </li>
-          ))}
-        </ul>
-
-          
-        <h3>My Selected Preset Workouts</h3>
-        {userPresetStatus === 'loading' ? (
-          <p>Loading your selected workouts...</p>
-        ) : userPresetWorkouts.length > 0 ? (
-          <ul>
-            {userPresetWorkouts.map((workout) => (
-              <li key={workout.presetWorkoutID}>
-                <div>
-                  {workout.presetWorkoutName}
-                  <button onClick={() => handleViewSelectedExercises(workout.presetWorkoutID)}>View Exercises</button>
-                  <button onClick={() => handleStartWorkout(workout.presetWorkoutID)}>Start Workout</button>
-                  <button onClick={() => handleUnlinkPresetWorkout(workout.presetWorkoutID)}>Delete</button>
-
-                  {/* Dropdown to select a custom template to link the workout */}
-                {(role === 'user') && (
-                  <select
-                    value={selectedCustomTemplateID}
-                    onChange={(e) => {
-                      setSelectedCustomTemplateID(e.target.value);
-                      handleLinkWorkoutToCustomTemplate(workout.presetWorkoutID, e.target.value);
-                    }}
-                  >
-                    <option value="">Select Custom Template</option>
-                    {customTemplates.map((template) => (
-                      <option key={template.customTemplateID} value={template.customTemplateID}>
-                        {template.customTemplateName}
-                      </option>
-                    ))}
-                  </select>
-                )}
-                
-                </div>
-                {selectedPresetWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
                 <ul>
                   {exercises[workout.presetWorkoutID].length > 0 ? (
                     exercises[workout.presetWorkoutID].map((exercise) => (
                       <li key={exercise.exerciseID}>
                         {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
+                        {(role === 'admin' || role === 'superadmin') && (
+                          <button onClick={() => handleUnlinkExercise(workout.presetWorkoutID, exercise.exerciseID)}>
+                            Remove
+                          </button>
+                        )}
                       </li>
                     ))
                   ) : (
                     <li>No Exercises Added</li>
                   )}
                 </ul>
-                )}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No selected preset workouts found.</p>
-        )}
-      </>
-    );
-  } else if (status === 'failed') {
-    content = (
-      <p>
-        {typeof error === 'string' ? error : error.message || 'An error occurred.'}
-      </p>
-    );
-  }
+              )}
+            </li>
+          ))}
+        </ul>
+
+      {/* My Selected Preset Workouts - Only for user role */}
+      {role === 'user' && (
+        <>
+          <h3>My Selected Preset Workouts</h3>
+          {userPresetStatus === 'loading' ? (
+            <p>Loading your selected workouts...</p>
+          ) : userPresetWorkouts.length > 0 ? (
+            <ul>
+              {userPresetWorkouts.map((workout) => (
+                <li key={workout.presetWorkoutID}>
+                  <div>
+                    {workout.presetWorkoutName}
+                    <button onClick={() => handleViewSelectedExercises(workout.presetWorkoutID)}>
+                      View Exercises
+                    </button>
+                    <button onClick={() => handleStartWorkout(workout.presetWorkoutID)}>
+                      Start Workout
+                    </button>
+                    <button onClick={() => handleUnlinkPresetWorkout(workout.presetWorkoutID)}>
+                      Delete
+                    </button>
+
+                    {/* Dropdown to select a custom template to link the workout */}
+                    <select
+                      value={selectedCustomTemplateID}
+                      onChange={(e) => {
+                        setSelectedCustomTemplateID(e.target.value);
+                        handleLinkWorkoutToCustomTemplate(workout.presetWorkoutID, e.target.value);
+                      }}
+                    >
+                      <option value="">Select Custom Template</option>
+                      {customTemplates.map((template) => (
+                        <option key={template.customTemplateID} value={template.customTemplateID}>
+                          {template.customTemplateName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {selectedPresetWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
+                    <ul>
+                      {exercises[workout.presetWorkoutID].length > 0 ? (
+                        exercises[workout.presetWorkoutID].map((exercise) => (
+                          <li key={exercise.exerciseID}>
+                            {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
+                          </li>
+                        ))
+                      ) : (
+                        <li>No Exercises Added</li>
+                      )}
+                    </ul>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No selected preset workouts found.</p>
+          )}
+        </>
+      )}
+    </>
+  );
+} else if (status === 'failed') {
+  content = (
+    <p>
+      {typeof error === 'string' ? error : error.message || 'An error occurred.'}
+    </p>
+  );
+}
 
   return (
     <section>
       <h2>Preset Workouts</h2>
-  
+
       {/* Check if user and role are fully loaded before rendering the content */}
       {user && role && (
         <>
@@ -313,7 +330,7 @@ const PresetWorkout = () => {
           )}
         </>
       )}
-  
+
       {/* Optionally, you can add a fallback message or loader if user or role is not yet available */}
       {!user && <p>Loading user data...</p>}
     </section>
