@@ -184,7 +184,9 @@ const PresetTemplate = () => {
                   </>
                 )}
                 {role === 'user' && (
-                  <button onClick={() => handleLinkTemplateToUser(template.presetTemplateID)}>Add to My Templates</button>
+                  <button onClick={() => handleLinkTemplateToUser(template.presetTemplateID)}>
+                    Add to My Templates
+                  </button>
                 )}
                 {viewingWorkouts === template.presetTemplateID && presetWorkouts.length > 0 && (
                   <ul>
@@ -192,9 +194,19 @@ const PresetTemplate = () => {
                       <li key={workout.presetWorkoutID}>
                         {workout.PresetWorkout.presetWorkoutName}
                         {(role === 'admin' || role === 'superadmin') && (
-                          <button onClick={() => handleUnlinkWorkout(template.presetTemplateID, workout.presetWorkoutID)}>Remove</button>
+                          <button
+                            onClick={() =>
+                              handleUnlinkWorkout(template.presetTemplateID, workout.presetWorkoutID)
+                            }
+                          >
+                            Remove
+                          </button>
                         )}
-                        <button onClick={() => handleStartWorkout(workout.presetWorkoutID)}>Start Workout</button>
+                        {role === 'user' && (
+                          <button onClick={() => handleStartWorkout(workout.presetWorkoutID)}>
+                            Start Workout
+                          </button>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -204,23 +216,33 @@ const PresetTemplate = () => {
           ))}
         </ul>
 
-        <h3>My Selected Preset Templates</h3>
-        <ul>
-          {userPresetTemplates.map((template) => (
-            <li key={template.presetTemplateID}>
-              <div>
-                {template.presetTemplateName}
-                <button onClick={() => handleViewUserWorkouts(template.presetTemplateID)}>
-                  View Workouts
-                </button>
-                <button onClick={() => handleUnlinkUserTemplate(template.presetTemplateID)}>
-                  Remove from My Templates
-                </button>
-              </div>
-              {selectedUserTemplateID === template.presetTemplateID && renderPresetWorkouts()}
-            </li>
-          ))}
-        </ul>
+        {/* My Selected Preset Templates - Only for user role */}
+        {role === 'user' && (
+          <>
+            <h3>My Selected Preset Templates</h3>
+            {userPresetTemplates.length > 0 ? (
+              <ul>
+                {userPresetTemplates.map((template) => (
+                  <li key={template.presetTemplateID}>
+                    <div>
+                      {template.presetTemplateName}
+                      <button onClick={() => handleViewUserWorkouts(template.presetTemplateID)}>
+                        View Workouts
+                      </button>
+                      <button onClick={() => handleUnlinkUserTemplate(template.presetTemplateID)}>
+                        Remove from My Templates
+                      </button>
+                    </div>
+                    {selectedUserTemplateID === template.presetTemplateID &&
+                      renderPresetWorkouts()}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No selected preset templates found.</p>
+            )}
+          </>
+        )}
       </>
     );
   } else if (status === 'failed') {
@@ -242,7 +264,10 @@ const PresetTemplate = () => {
       {content}
       {showAddForm && <AddPresetTemplateForm onClose={() => setShowAddForm(false)} />}
       {editingTemplate && (
-        <EditPresetTemplateForm template={editingTemplate} onClose={() => setEditingTemplate(null)} />
+        <EditPresetTemplateForm
+          template={editingTemplate}
+          onClose={() => setEditingTemplate(null)}
+        />
       )}
     </section>
   );
