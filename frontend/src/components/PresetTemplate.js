@@ -105,11 +105,6 @@ const PresetTemplate = () => {
         <li key={workout.presetWorkoutID}>
           {workout.PresetWorkout.presetWorkoutName}
           <button onClick={() => handleStartWorkout(workout.presetWorkoutID)}>Start Workout</button>
-          {(role === 'admin' || role === 'superadmin') && (
-            <button onClick={() => handleUnlinkWorkout(selectedUserTemplateID, workout.presetWorkoutID)}>
-              Remove
-            </button>
-          )}
         </li>
       ))}
     </ul>
@@ -188,29 +183,25 @@ const PresetTemplate = () => {
                     Add to My Templates
                   </button>
                 )}
-                {viewingWorkouts === template.presetTemplateID && presetWorkouts.length > 0 && (
-                  <ul>
-                    {presetWorkouts.map((workout) => (
-                      <li key={workout.presetWorkoutID}>
-                        {workout.PresetWorkout.presetWorkoutName}
-                        {(role === 'admin' || role === 'superadmin') && (
-                          <button
-                            onClick={() =>
-                              handleUnlinkWorkout(template.presetTemplateID, workout.presetWorkoutID)
-                            }
-                          >
-                            Remove
-                          </button>
-                        )}
-                        {role === 'user' && (
-                          <button onClick={() => handleStartWorkout(workout.presetWorkoutID)}>
-                            Start Workout
-                          </button>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                  {viewingWorkouts === template.presetTemplateID && presetWorkouts.length > 0 && (
+                    <ul>
+                      {presetWorkouts.map((workout) => (
+                        <li key={workout.presetWorkoutID}>
+                          {workout.PresetWorkout.presetWorkoutName}
+                          {(role === 'admin' || role === 'superadmin') && (
+                            <button
+                              onClick={() =>
+                                handleUnlinkWorkout(template.presetTemplateID, workout.presetWorkoutID)
+                              }
+                            >
+                              Remove
+                            </button>
+                          )}
+                          {/* No condition for rendering the Start Workout button, just ensure the name renders */}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
               </div>
             </li>
           ))}

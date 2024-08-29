@@ -148,6 +148,7 @@ const presetTemplateSlice = createSlice({
     name: 'presetTemplates',
     initialState: {
         templates: [],
+        userTemplates: [],
         templateDetails: null,
         presetWorkouts: [],
         status: 'idle', // idle, loading, succeeded, failed
@@ -224,7 +225,7 @@ const presetTemplateSlice = createSlice({
             })
             .addCase(fetchUserPresetTemplates.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.templates = action.payload;
+                state.userTemplates = action.payload; // Store user templates separately
             })
             .addCase(fetchUserPresetTemplates.rejected, (state, action) => {
                 state.status = 'failed';

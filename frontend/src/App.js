@@ -15,7 +15,6 @@ import CustomWorkouts from './components/CustomWorkouts';
 import Account from './components/Account';
 import WorkoutLogDetails from './components/WorkoutLogDetails';
 import PresetTemplate from './components/PresetTemplate';
-import UserTemplates from './components/UserTemplates';
 import CustomTemplate from './components/CustomTemplate';
 import LandingPage from './components/LandingPage';
 import PrivateRoute from './components/PrivateRoute';
@@ -58,7 +57,6 @@ function App() {
                 <Route path="/account" element={<PrivateRoute><Account /></PrivateRoute>} />
                 <Route path="/workout-logs/:workoutLogID" element={<PrivateRoute><WorkoutLogDetails /></PrivateRoute>} />
                 <Route path="/preset-templates" element={<PrivateRoute><PresetTemplate /></PrivateRoute>} />
-                <Route path="/user-templates" element={<PrivateRoute><UserTemplates /></PrivateRoute>} />
                 <Route path="/custom-templates" element={<PrivateRoute><CustomTemplate /></PrivateRoute>} />
 
                 {/* Redirect to landing page for any unmatched routes */}
