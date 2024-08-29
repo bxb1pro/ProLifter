@@ -56,8 +56,9 @@ const PresetWorkout = () => {
     }
   }, [user, dispatch]);
 
+  // Fix for the bug of Admins not being allowed access on a page refresh
   useEffect(() => {
-    if (user && userID) {
+    if (user && userID && role) {
       if (status === 'idle') {
         dispatch(fetchPresetWorkouts());
         dispatch(fetchPresetTemplates());
@@ -65,7 +66,7 @@ const PresetWorkout = () => {
         dispatch(fetchUserPresetWorkouts(userID)); // Fetch user's selected preset workouts
       }
     }
-  }, [status, dispatch, user, userID]);
+  }, [status, dispatch, user, userID, role]);
 
   const handleViewMainExercises = (presetWorkoutID) => {
     setMainSelectedWorkoutID(presetWorkoutID);
@@ -233,6 +234,7 @@ const PresetWorkout = () => {
           ))}
         </ul>
 
+          
         <h3>My Selected Preset Workouts</h3>
         {userPresetStatus === 'loading' ? (
           <p>Loading your selected workouts...</p>
@@ -297,18 +299,23 @@ const PresetWorkout = () => {
   return (
     <section>
       <h2>Preset Workouts</h2>
-
-      {(role === 'admin' || role === 'superadmin') && (
-        <button onClick={handleAddWorkout}>Add Preset Workout</button>
+  
+      {/* Check if user and role are fully loaded before rendering the content */}
+      {user && role && (
+        <>
+          {(role === 'admin' || role === 'superadmin') && (
+            <button onClick={handleAddWorkout}>Add Preset Workout</button>
+          )}
+          {content}
+          {showAddForm && <AddPresetWorkoutForm onClose={() => setShowAddForm(false)} />}
+          {editingWorkout && (
+            <EditPresetWorkoutForm workout={editingWorkout} onClose={() => setEditingWorkout(null)} />
+          )}
+        </>
       )}
-
-      {content}
-      
-      {showAddForm && <AddPresetWorkoutForm onClose={() => setShowAddForm(false)} />}
-      
-      {editingWorkout && (
-        <EditPresetWorkoutForm workout={editingWorkout} onClose={() => setEditingWorkout(null)} />
-      )}
+  
+      {/* Optionally, you can add a fallback message or loader if user or role is not yet available */}
+      {!user && <p>Loading user data...</p>}
     </section>
   );
 };

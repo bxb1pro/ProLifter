@@ -6,41 +6,29 @@ import {
   linkPresetTemplate,
   fetchPresetWorkoutsForTemplate,
   unlinkPresetWorkoutFromTemplate,
+  fetchUserPresetTemplates,
+  unlinkPresetTemplate as unlinkUserPresetTemplate,
 } from '../features/presetTemplates/presetTemplateSlice';
+import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 import AddPresetTemplateForm from './forms/AddPresetTemplateForm';
 import EditPresetTemplateForm from './forms/EditPresetTemplateForm';
 import { fetchAccountDetails } from '../features/auth/authSlice';
 
 const PresetTemplate = () => {
   const dispatch = useDispatch();
-  const templates = useSelector((state) => state.presetTemplates.templates);
-  const presetWorkouts = useSelector((state) => state.presetTemplates.presetWorkouts);
+  const templates = useSelector((state) => state.presetTemplates.templates || []);
+  const userPresetTemplates = useSelector((state) => state.presetTemplates.userTemplates || []);
+  const presetWorkouts = useSelector((state) => state.presetTemplates.presetWorkouts || []);
   const status = useSelector((state) => state.presetTemplates.status);
   const error = useSelector((state) => state.presetTemplates.error);
   const role = useSelector((state) => state.auth.role);
   const user = useSelector((state) => state.auth.user);
   const userID = user ? user.userID : null;
 
-  useEffect(() => {
-    if (!user) {
-      dispatch(fetchAccountDetails()); // Fetch user details if not already available
-    }
-  }, [user, dispatch]);
-
-  useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchPresetTemplates());
-    }
-  }, [status, dispatch]);
-
-  // Fix for bug of preset templates being empty after accessing user templates component
-  useEffect(() => {
-    dispatch(fetchPresetTemplates());
-  }, [dispatch]);
-
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState(null);
   const [viewingWorkouts, setViewingWorkouts] = useState(null);
+  const [selectedUserTemplateID, setSelectedUserTemplateID] = useState(null);
 
   // Filters
   const [daysFilter, setDaysFilter] = useState('');
@@ -48,16 +36,55 @@ const PresetTemplate = () => {
   const [goalFilter, setGoalFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
 
+  useEffect(() => {
+    if (!user) {
+      dispatch(fetchAccountDetails());
+    }
+  }, [user, dispatch]);
+
+  useEffect(() => {
+    if (user && userID) {
+      if (status === 'idle') {
+        dispatch(fetchPresetTemplates());
+        dispatch(fetchUserPresetTemplates(userID)); // Fetch user's selected preset templates
+      }
+    }
+  }, [status, dispatch, user, userID]);
+
   const handleLinkTemplateToUser = (presetTemplateID) => {
     if (!userID) {
       console.error('User ID is not defined. Cannot link preset template to user.');
       return;
     }
-    dispatch(linkPresetTemplate({ userID, presetTemplateID }));
+    dispatch(linkPresetTemplate({ userID, presetTemplateID })).then(() => {
+      dispatch(fetchUserPresetTemplates(userID)); // Refresh the user's selected preset templates
+    });
   };
 
-  const handleAddTemplate = () => {
-    setShowAddForm(true);
+  const handleStartWorkout = (workoutID) => {
+    dispatch(startWorkoutLog({ workoutID }));
+  };
+
+  const handleViewWorkouts = (presetTemplateID) => {
+    setViewingWorkouts(presetTemplateID);
+    dispatch(fetchPresetWorkoutsForTemplate(presetTemplateID));
+  };
+
+  const handleViewUserWorkouts = (presetTemplateID) => {
+    setSelectedUserTemplateID(presetTemplateID);
+    dispatch(fetchPresetWorkoutsForTemplate(presetTemplateID));
+  };
+
+  const handleUnlinkWorkout = (presetTemplateID, presetWorkoutID) => {
+    dispatch(unlinkPresetWorkoutFromTemplate({ presetTemplateID, presetWorkoutID })).then(() => {
+      dispatch(fetchPresetWorkoutsForTemplate(presetTemplateID));
+    });
+  };
+
+  const handleUnlinkUserTemplate = (presetTemplateID) => {
+    dispatch(unlinkUserPresetTemplate({ userID, presetTemplateID })).then(() => {
+      dispatch(fetchUserPresetTemplates(userID)); // Refresh the user's selected preset templates
+    });
   };
 
   const handleEditTemplate = (template) => {
@@ -68,18 +95,25 @@ const PresetTemplate = () => {
     dispatch(deletePresetTemplate(presetTemplateID));
   };
 
-  const handleViewWorkouts = (presetTemplateID) => {
-    dispatch(fetchPresetWorkoutsForTemplate(presetTemplateID));
-    setViewingWorkouts(presetTemplateID);
+  const handleAddTemplate = () => {
+    setShowAddForm(true);
   };
 
-  const handleUnlinkWorkout = (presetTemplateID, presetWorkoutID) => {
-    dispatch(unlinkPresetWorkoutFromTemplate({ presetTemplateID, presetWorkoutID }))
-      .then(() => {
-        // Re-fetch the workouts associated with the template to update the UI
-        dispatch(fetchPresetWorkoutsForTemplate(presetTemplateID));
-      });
-  };
+  const renderPresetWorkouts = () => (
+    <ul>
+      {presetWorkouts.map((workout) => (
+        <li key={workout.presetWorkoutID}>
+          {workout.PresetWorkout.presetWorkoutName}
+          <button onClick={() => handleStartWorkout(workout.presetWorkoutID)}>Start Workout</button>
+          {(role === 'admin' || role === 'superadmin') && (
+            <button onClick={() => handleUnlinkWorkout(selectedUserTemplateID, workout.presetWorkoutID)}>
+              Remove
+            </button>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
 
   // Filtered templates based on the selected filters
   const filteredTemplates = templates.filter((template) => {
@@ -139,7 +173,9 @@ const PresetTemplate = () => {
           {filteredTemplates.map((template) => (
             <li key={template.presetTemplateID}>
               <div>
-                {template.presetTemplateName} - {template.presetTemplateDifficulty} - {template.presetTemplateDays} days - {template.presetTemplateGoal} - {template.presetTemplateLocation}
+                {template.presetTemplateName} - {template.presetTemplateDifficulty} -{' '}
+                {template.presetTemplateDays} days - {template.presetTemplateGoal} -{' '}
+                {template.presetTemplateLocation}
                 <button onClick={() => handleViewWorkouts(template.presetTemplateID)}>View Workouts</button>
                 {(role === 'admin' || role === 'superadmin') && (
                   <>
@@ -147,21 +183,18 @@ const PresetTemplate = () => {
                     <button onClick={() => handleDeleteTemplate(template.presetTemplateID)}>Delete</button>
                   </>
                 )}
-               
-               {role === 'user' && (
+                {role === 'user' && (
                   <button onClick={() => handleLinkTemplateToUser(template.presetTemplateID)}>Add to My Templates</button>
                 )}
-
                 {viewingWorkouts === template.presetTemplateID && presetWorkouts.length > 0 && (
                   <ul>
                     {presetWorkouts.map((workout) => (
                       <li key={workout.presetWorkoutID}>
                         {workout.PresetWorkout.presetWorkoutName}
                         {(role === 'admin' || role === 'superadmin') && (
-                        <button onClick={() => handleUnlinkWorkout(template.presetTemplateID, workout.presetWorkoutID)}>
-                          Remove
-                        </button>
+                          <button onClick={() => handleUnlinkWorkout(template.presetTemplateID, workout.presetWorkoutID)}>Remove</button>
                         )}
+                        <button onClick={() => handleStartWorkout(workout.presetWorkoutID)}>Start Workout</button>
                       </li>
                     ))}
                   </ul>
@@ -170,22 +203,43 @@ const PresetTemplate = () => {
             </li>
           ))}
         </ul>
+
+        <h3>My Selected Preset Templates</h3>
+        <ul>
+          {userPresetTemplates.map((template) => (
+            <li key={template.presetTemplateID}>
+              <div>
+                {template.presetTemplateName}
+                <button onClick={() => handleViewUserWorkouts(template.presetTemplateID)}>
+                  View Workouts
+                </button>
+                <button onClick={() => handleUnlinkUserTemplate(template.presetTemplateID)}>
+                  Remove from My Templates
+                </button>
+              </div>
+              {selectedUserTemplateID === template.presetTemplateID && renderPresetWorkouts()}
+            </li>
+          ))}
+        </ul>
       </>
     );
   } else if (status === 'failed') {
-    content = <p>{error}</p>;
+    content = (
+      <p>
+        {typeof error === 'string'
+          ? error
+          : error?.message || 'An unknown error occurred.'}
+      </p>
+    );
   }
 
   return (
     <section>
       <h2>Preset Templates</h2>
-
       {(role === 'admin' || role === 'superadmin') && (
-      <button onClick={handleAddTemplate}>Add Preset Template</button>
-        )}
-        
+        <button onClick={handleAddTemplate}>Add Preset Template</button>
+      )}
       {content}
-
       {showAddForm && <AddPresetTemplateForm onClose={() => setShowAddForm(false)} />}
       {editingTemplate && (
         <EditPresetTemplateForm template={editingTemplate} onClose={() => setEditingTemplate(null)} />
