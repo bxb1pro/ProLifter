@@ -27,11 +27,9 @@ const PresetWorkout = () => {
   const customTemplates = useSelector((state) => state.customTemplates.templates);
   const status = useSelector((state) => state.presetWorkouts.status);
   const error = useSelector((state) => state.presetWorkouts.error);
-  const role = useSelector((state) => state.auth.role); // Get user role from Redux
+  const role = useSelector((state) => state.auth.role);
   const user = useSelector((state) => state.auth.user);
   const userID = user ? user.userID : null;
-
-  console.log('Current Role:', role);
 
   useEffect(() => {
     if (!user) {
@@ -47,13 +45,13 @@ const PresetWorkout = () => {
     }
   }, [status, dispatch]);
 
+
+
   const [selectedWorkoutID, setSelectedWorkoutID] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState(null);
   const [selectedPresetTemplateID, setSelectedPresetTemplateID] = useState('');
   const [selectedCustomTemplateID, setSelectedCustomTemplateID] = useState('');
-
-  console.log('Current Role:', role);
 
   // Filters
   const [difficultyFilter, setDifficultyFilter] = useState('');
@@ -103,8 +101,6 @@ const PresetWorkout = () => {
     }
   };
 
-  console.log('Current Role:', role);
-
   // Filtered workouts based on the selected filters
   const filteredWorkouts = workouts.filter((workout) => {
     return (
@@ -113,8 +109,6 @@ const PresetWorkout = () => {
       (locationFilter === '' || workout.presetWorkoutLocation === locationFilter)
     );
   });
-
-  console.log('Current Role:', role);
 
   let content;
 
@@ -152,7 +146,7 @@ const PresetWorkout = () => {
           {filteredWorkouts.map((workout) => (
             <li key={workout.presetWorkoutID}>
               <div>
-                {workout.presetWorkoutName} - {workout.presetWorkoutDifficulty}
+                {workout.presetWorkoutName} - {workout.presetWorkoutDifficulty} - {workout.presetWorkoutGoal} - {workout.presetWorkoutLocation}
                 <button onClick={() => handleViewExercises(workout.presetWorkoutID)}>View Exercises</button>
                 
                 {/* Conditionally render edit and delete options for admins or superadmins */}
@@ -206,16 +200,20 @@ const PresetWorkout = () => {
               </div>
               {selectedWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
                 <ul>
-                  {exercises[workout.presetWorkoutID].map((exercise) => (
-                    <li key={exercise.exerciseID}>
-                      {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
-                      {(role === 'admin' || role === 'superadmin') && (
-                        <button onClick={() => handleUnlinkExercise(workout.presetWorkoutID, exercise.exerciseID)}>
-                          Remove
-                        </button>
-                      )}
-                    </li>
-                  ))}
+                  {exercises[workout.presetWorkoutID].length > 0 ? (
+                    exercises[workout.presetWorkoutID].map((exercise) => (
+                      <li key={exercise.exerciseID}>
+                        {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
+                        {(role === 'admin' || role === 'superadmin') && (
+                          <button onClick={() => handleUnlinkExercise(workout.presetWorkoutID, exercise.exerciseID)}>
+                            Remove
+                          </button>
+                        )}
+                      </li>
+                    ))
+                  ) : (
+                    <li>No Exercises Added</li>
+                  )}
                 </ul>
               )}
             </li>

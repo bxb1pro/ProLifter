@@ -7,10 +7,13 @@ const Account = () => {
   const { user, isLoading, error } = useSelector((state) => state.auth);
   const [password, setPassword] = useState('');
   const [showDeleteForm, setShowDeleteForm] = useState(false);
+  const role = useSelector((state) => state.auth.role);
 
   useEffect(() => {
-    dispatch(fetchAccountDetails());
-  }, [dispatch]);
+    if (!user) {
+      dispatch(fetchAccountDetails());
+    }
+  }, [dispatch, user]);
 
   const handleDeleteAccount = () => {
     if (password) {
@@ -28,8 +31,10 @@ const Account = () => {
         <div>
           <p>Name: {user.userName}</p>
           <p>Email: {user.userEmail}</p>
+          {(role === 'admin' || role === 'superadmin') && (
           <p>Role: {user.role}</p>
-          <p>Account Created: {new Date(user.userDateCreated).toLocaleDateString()}</p>
+          )}
+          <p>Account Created: {new Date(user.createdAt).toLocaleDateString()}</p>
         </div>
       ) : (
         <p>No user details available.</p>

@@ -46,8 +46,11 @@ export const fetchExercisesForCustomWorkout = createAsyncThunk(
         const response = await api.get(`/custom-workout-exercises/${customWorkoutID}/exercises`);
         return response.data;
       } catch (error) {
-        console.error('Fetch exercises for custom workout error:', error.response ? error.response.data : error.message);
-        return rejectWithValue(error.response.data || 'Failed to fetch exercises');
+        // If no exercises are found, return an empty array instead of rejecting
+        if (error.response && error.response.status === 404) {
+          return []; // Return an empty array when no exercises are found
+        }
+        return rejectWithValue(error.response?.data || 'Failed to fetch exercises');
       }
     }
   );

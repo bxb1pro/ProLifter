@@ -94,14 +94,18 @@ const CustomWorkouts = () => {
             </div>
             {selectedWorkoutID === workout.customWorkoutID && exercises[workout.customWorkoutID] && (
               <ul>
-                {exercises[workout.customWorkoutID].map((exercise) => (
-                  <li key={exercise.exerciseID}>
-                    {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
-                    <button onClick={() => handleUnlinkExercise(workout.customWorkoutID, exercise.exerciseID)}>
-                      Remove
-                    </button>
-                  </li>
-                ))}
+                {exercises[workout.customWorkoutID].length > 0 ? (
+                  exercises[workout.customWorkoutID].map((exercise) => (
+                    <li key={exercise.exerciseID}>
+                      {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
+                      <button onClick={() => handleUnlinkExercise(workout.customWorkoutID, exercise.exerciseID)}>
+                        Remove
+                      </button>
+                    </li>
+                  ))
+                ) : (
+                  <li>No Exercises Added</li>
+                )}
               </ul>
             )}
           </li>

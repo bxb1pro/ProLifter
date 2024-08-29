@@ -7,7 +7,6 @@ import {
 } from '../features/presetTemplates/presetTemplateSlice';
 import {
   fetchUserCustomTemplates,
-  deleteCustomTemplate,
   fetchCustomWorkoutsForTemplate,
   fetchPresetWorkoutsForTemplate as fetchPresetWorkoutsFromCustomSlice,
   unlinkCustomWorkoutFromTemplate,
@@ -55,10 +54,6 @@ const UserTemplates = () => {
     if (userID) {
       dispatch(unlinkPresetTemplate({ userID, presetTemplateID }));
     }
-  };
-
-  const handleDeleteCustomTemplate = (customTemplateID) => {
-    dispatch(deleteCustomTemplate(customTemplateID));
   };
 
   const handleViewWorkouts = (templateID, type) => {
@@ -160,9 +155,6 @@ const UserTemplates = () => {
                     {template.customTemplateName} - {template.customTemplateDays} days
                     <button onClick={() => handleViewWorkouts(template.customTemplateID, 'custom')}>
                       {selectedTemplateID === template.customTemplateID && viewType === 'custom' ? 'Hide Workouts' : 'View Workouts'}
-                    </button>
-                    <button onClick={() => handleDeleteCustomTemplate(template.customTemplateID)}>
-                      Delete Template
                     </button>
                   </div>
                   {selectedTemplateID === template.customTemplateID && viewType === 'custom' && renderCustomWorkouts()}

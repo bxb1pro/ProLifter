@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   fetchUserCustomWorkouts,
   fetchExercisesForCustomWorkout,
-  deleteCustomWorkout,
 } from '../features/customWorkouts/customWorkoutSlice';
 import {
   fetchUserPresetWorkouts,
@@ -64,10 +63,6 @@ const UserWorkouts = () => {
     }
   };
 
-  const handleDeleteCustomWorkout = (customWorkoutID) => {
-    dispatch(deleteCustomWorkout(customWorkoutID));
-  };
-
   const handleUnlinkPresetWorkout = (presetWorkoutID) => {
     if (userID) {
       dispatch(unlinkPresetWorkoutFromUser({ userID, presetWorkoutID }));
@@ -90,7 +85,6 @@ const UserWorkouts = () => {
                   {workout.customWorkoutName}
                   <button onClick={() => handleViewExercises(workout.customWorkoutID)}>View Exercises</button>
                   <button onClick={() => handleStartWorkout(workout.customWorkoutID, true)}>Start Workout</button>
-                  <button onClick={() => handleDeleteCustomWorkout(workout.customWorkoutID)}>Delete</button>
                 </div>
                 {selectedWorkoutID === workout.customWorkoutID && customExercises[workout.customWorkoutID] && (
                   <ul>

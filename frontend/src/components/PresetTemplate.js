@@ -33,6 +33,11 @@ const PresetTemplate = () => {
     }
   }, [status, dispatch]);
 
+  // Fix for bug of preset templates being empty after accessing user templates component
+  useEffect(() => {
+    dispatch(fetchPresetTemplates());
+  }, [dispatch]);
+
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState(null);
   const [viewingWorkouts, setViewingWorkouts] = useState(null);
@@ -69,7 +74,11 @@ const PresetTemplate = () => {
   };
 
   const handleUnlinkWorkout = (presetTemplateID, presetWorkoutID) => {
-    dispatch(unlinkPresetWorkoutFromTemplate({ presetTemplateID, presetWorkoutID }));
+    dispatch(unlinkPresetWorkoutFromTemplate({ presetTemplateID, presetWorkoutID }))
+      .then(() => {
+        // Re-fetch the workouts associated with the template to update the UI
+        dispatch(fetchPresetWorkoutsForTemplate(presetTemplateID));
+      });
   };
 
   // Filtered templates based on the selected filters
@@ -130,7 +139,7 @@ const PresetTemplate = () => {
           {filteredTemplates.map((template) => (
             <li key={template.presetTemplateID}>
               <div>
-                {template.presetTemplateName} - {template.presetTemplateDifficulty} - {template.presetTemplateDays} days 
+                {template.presetTemplateName} - {template.presetTemplateDifficulty} - {template.presetTemplateDays} days - {template.presetTemplateGoal} - {template.presetTemplateLocation}
                 <button onClick={() => handleViewWorkouts(template.presetTemplateID)}>View Workouts</button>
                 {(role === 'admin' || role === 'superadmin') && (
                   <>
