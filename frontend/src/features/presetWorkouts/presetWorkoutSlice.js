@@ -24,7 +24,7 @@ export const linkExerciseToPresetWorkout = createAsyncThunk(
         return response.data;
       } catch (error) {
         console.error('Link exercise to preset workout error:', error.response ? error.response.data : error.message);
-        return rejectWithValue(error.response.data || 'Failed to link exercise');
+        return rejectWithValue(error.response?.data || 'Failed to link exercise');
       }
     }
   );
@@ -51,8 +51,11 @@ export const fetchExercisesForPresetWorkout = createAsyncThunk(
         const response = await api.get(`/preset-workout-exercises/${presetWorkoutID}/exercises`);
         return response.data;
       } catch (error) {
-        console.error('Fetch exercises for preset workout error:', error.response ? error.response.data : error.message);
-        return rejectWithValue(error.response.data || 'Failed to fetch exercises');
+        // If no exercises are found, return an empty array instead of rejecting
+        if (error.response && error.response.status === 404) {
+          return []; // Return an empty array when no exercises are found
+        }
+        return rejectWithValue(error.response?.data || 'Failed to fetch exercises');
       }
     }
   );
@@ -108,7 +111,7 @@ export const linkPresetWorkoutToUser = createAsyncThunk(
         return response.data;
       } catch (error) {
         console.error('Link preset workout to user error:', error.response ? error.response.data : error.message);
-        return rejectWithValue(error.response.data || 'Failed to link preset workout to user');
+        return rejectWithValue(error.response?.data || 'Failed to link preset workout to user');
       }
     }
   );
@@ -168,7 +171,7 @@ export const fetchUserPresetWorkouts = createAsyncThunk(
         })
         .addCase(linkExerciseToPresetWorkout.rejected, (state, action) => {
           state.status = 'failed';
-          state.error = action.error.message;
+          state.error = action.payload;
         })
         .addCase(unlinkExerciseFromPresetWorkout.fulfilled, (state, action) => {
           state.status = 'succeeded';
@@ -222,8 +225,13 @@ export const fetchUserPresetWorkouts = createAsyncThunk(
             state.status = 'succeeded';
         })
         .addCase(linkPresetWorkoutToUser.rejected, (state, action) => {
+          if (action.payload?.error === 'Preset workout is already linked to this user') {
+            state.status = 'succeeded';
+            state.error = action.payload?.error;
+          } else {
             state.status = 'failed';
-            state.error = action.error.message;
+            state.error = action.payload;
+          }
         })
         .addCase(fetchUserPresetWorkouts.pending, (state) => {
             state.status = 'loading';

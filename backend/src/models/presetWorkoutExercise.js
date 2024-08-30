@@ -31,8 +31,8 @@ const PresetWorkoutExercise = sequelize.define('PresetWorkoutExercise', {
 });
 
 PresetWorkoutExercise.associate = (models) => {
-    PresetWorkoutExercise.belongsTo(models.PresetWorkout, { foreignKey: 'presetWorkoutID' });
-    PresetWorkoutExercise.belongsTo(models.Exercise, { foreignKey: 'exerciseID' });
+    PresetWorkoutExercise.belongsTo(models.PresetWorkout, { foreignKey: 'presetWorkoutID', onDelete: 'CASCADE' });
+    PresetWorkoutExercise.belongsTo(models.Exercise, { foreignKey: 'exerciseID', onDelete: 'CASCADE' });
 };
 
 module.exports = PresetWorkoutExercise;

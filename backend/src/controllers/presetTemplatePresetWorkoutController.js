@@ -18,6 +18,15 @@ const linkPresetWorkout = async (req, res) => {
             return res.status(404).json({ error: 'Preset workout not found' });
         }
 
+        // Check if the preset workout is already linked to the preset template
+        const existingLink = await PresetTemplatePresetWorkout.findOne({
+            where: { presetTemplateID, presetWorkoutID },
+        });
+
+        if (existingLink) {
+            return res.status(409).json({ error: 'Preset workout already linked to this template' });
+        }
+
         // Link the preset workout to the preset template
         await PresetTemplatePresetWorkout.create({ presetTemplateID, presetWorkoutID });
 

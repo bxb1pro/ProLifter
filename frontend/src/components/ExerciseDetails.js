@@ -18,6 +18,7 @@ const ExerciseDetails = () => {
     const [defaultSets, setDefaultSets] = useState(''); // State to manage default sets
     const [defaultReps, setDefaultReps] = useState(''); // State to manage default reps
     const [defaultRPE, setDefaultRPE] = useState(''); // State to manage default RPE
+    const role = useSelector((state) => state.auth.role); 
 
     useEffect(() => {
         dispatch(fetchExerciseById(id));
@@ -29,7 +30,15 @@ const ExerciseDetails = () => {
 
     const handleLinkExerciseToCustomWorkout = () => {
         if (selectedCustomWorkout) {
-            dispatch(linkExerciseToCustomWorkout({ customWorkoutID: selectedCustomWorkout, exerciseID: id }));
+            dispatch(linkExerciseToCustomWorkout({ customWorkoutID: selectedCustomWorkout, exerciseID: id }))
+                .unwrap()
+                .then(() => {
+                    alert('Exercise added to custom workout successfully.');
+                })
+                .catch((error) => {
+                    console.error('Error adding exercise to custom workout:', error);
+                    alert(`Failed to add exercise to custom workout: ${error.error || 'Unknown error'}`);
+                });
         }
     };
 
@@ -41,7 +50,14 @@ const ExerciseDetails = () => {
                 defaultSets: parseInt(defaultSets),
                 defaultReps: parseInt(defaultReps),
                 defaultRPE: parseFloat(defaultRPE) || null 
-            }));
+            })).unwrap()
+              .then(() => {
+                  alert('Exercise added successfully.');
+              })
+              .catch((error) => {
+                  console.error('Error adding exercise:', error);
+                  alert(`Failed to add exercise: ${error.error || 'Unknown error'}`);
+              });
         }
     };
 
@@ -74,6 +90,7 @@ const ExerciseDetails = () => {
             </ol>
 
             {/* Add exercise to custom workout */}
+            {role === 'user' && (
             <div>
                 <h3>Add to Custom Workout</h3>
                 <select value={selectedCustomWorkout} onChange={(e) => setSelectedCustomWorkout(e.target.value)}>
@@ -84,12 +101,19 @@ const ExerciseDetails = () => {
                         </option>
                     ))}
                 </select>
-                <button onClick={handleLinkExerciseToCustomWorkout} disabled={!selectedCustomWorkout}>
-                    Add to Custom Workout
-                </button>
+                {role === 'user' && (
+                    <button 
+                        onClick={handleLinkExerciseToCustomWorkout} 
+                        disabled={!selectedCustomWorkout} // Ensure the workout is selected
+                    >
+                        Add to Custom Workout
+                    </button>
+                )}
             </div>
+            )}
 
             {/* Add exercise to preset workout */}
+            {(role === 'admin' || role === 'superadmin') && (
             <div>
                 <h3>Add to Preset Workout</h3>
                 <select value={selectedPresetWorkout} onChange={(e) => setSelectedPresetWorkout(e.target.value)}>
@@ -128,11 +152,16 @@ const ExerciseDetails = () => {
                         onChange={(e) => setDefaultRPE(e.target.value)} 
                     />
                 </div>
-
-                <button onClick={handleLinkExerciseToPresetWorkout} disabled={!selectedPresetWorkout || !defaultSets || !defaultReps}>
-                    Add to Preset Workout
-                </button>
+                {(role === 'admin' || role === 'superadmin') && (
+                    <button 
+                        onClick={handleLinkExerciseToPresetWorkout} 
+                        disabled={!selectedPresetWorkout || !defaultSets || !defaultReps} // Ensure all fields are filled
+                    >
+                        Add to Preset Workout
+                    </button>
+                )}
             </div>
+            )}
         </div>
     );
 };

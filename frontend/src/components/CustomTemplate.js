@@ -8,12 +8,15 @@ import {
   unlinkCustomWorkoutFromTemplate,
   unlinkPresetWorkoutFromTemplate,
 } from '../features/customTemplates/customTemplateSlice';
+import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 import AddCustomTemplateForm from './forms/AddCustomTemplateForm';
 import EditCustomTemplateForm from './forms/EditCustomTemplateForm';
 import { fetchAccountDetails } from '../features/auth/authSlice';
+import { useNavigate } from 'react-router-dom';
 
 const CustomTemplate = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const templates = useSelector((state) => state.customTemplates.templates);
   const customWorkouts = useSelector((state) => state.customTemplates.customWorkouts);
   const presetWorkouts = useSelector((state) => state.customTemplates.presetWorkouts);
@@ -37,6 +40,11 @@ const CustomTemplate = () => {
     }
   }, [status, dispatch]);
 
+  useEffect(() => {
+    console.log('Custom Workouts:', customWorkouts);
+    console.log('Preset Workouts:', presetWorkouts);
+  }, [customWorkouts, presetWorkouts]);
+
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState(null);
 
@@ -49,8 +57,19 @@ const CustomTemplate = () => {
   };
 
   const handleDeleteTemplate = (customTemplateID) => {
-    dispatch(deleteCustomTemplate(customTemplateID));
-  };
+    const confirmed = window.confirm('Are you sure you want to delete this template? This action cannot be undone.');
+    if (confirmed) {
+        dispatch(deleteCustomTemplate(customTemplateID))
+            .unwrap()
+            .then(() => {
+                alert('Template deleted successfully.');
+            })
+            .catch((error) => {
+                console.error('Error deleting template:', error);
+                alert(`Failed to delete template: ${error.message || 'Unknown error'}`);
+            });
+    }
+};
 
   const handleShowWorkouts = (templateID) => {
     setSelectedTemplateID(templateID);
@@ -60,17 +79,78 @@ const CustomTemplate = () => {
   };
 
   const handleRemoveWorkout = (templateID, workoutID, workoutType) => {
-    if (workoutType === 'Custom') {
-      dispatch(unlinkCustomWorkoutFromTemplate({ id: templateID, customWorkoutID: workoutID }));
-    } else if (workoutType === 'Preset') {
-      dispatch(unlinkPresetWorkoutFromTemplate({ id: templateID, presetWorkoutID: workoutID }));
+    const confirmed = window.confirm('Are you sure you want to remove this workout from the template? This action cannot be undone.');
+    
+    if (confirmed) {
+        if (workoutType === 'Custom') {
+            dispatch(unlinkCustomWorkoutFromTemplate({ id: templateID, customWorkoutID: workoutID }))
+                .then(() => {
+                    // Refresh workouts after removing
+                    dispatch(fetchCustomWorkoutsForTemplate(templateID));
+                });
+        } else if (workoutType === 'Preset') {
+            dispatch(unlinkPresetWorkoutFromTemplate({ id: templateID, presetWorkoutID: workoutID }))
+                .then(() => {
+                    // Refresh workouts after removing
+                    dispatch(fetchPresetWorkoutsForTemplate(templateID));
+                });
+        }
     }
-  };
+};
 
+const handleStartWorkout = (workoutID, workoutType) => {
+  const confirmed = window.confirm('Start this workout?');
+
+  if (confirmed) {
+      if (workoutType === 'Custom') {
+          dispatch(startWorkoutLog({ customWorkoutID: workoutID }))
+              .unwrap()
+              .then(() => {
+                  navigate('/workout-logs'); // Redirect to the workout logs page after starting the workout
+              })
+              .catch((error) => {
+                  console.error('Error starting workout:', error);
+                  alert('Failed to start workout. Please try again.');
+              });
+      } else if (workoutType === 'Preset') {
+          dispatch(startWorkoutLog({ presetWorkoutID: workoutID }))
+              .unwrap()
+              .then(() => {
+                  navigate('/workout-logs'); // Redirect to the workout logs page after starting the workout
+              })
+              .catch((error) => {
+                  console.error('Error starting workout:', error);
+                  alert('Failed to start workout. Please try again.');
+              });
+      }
+  }
+};
+
+  // nested structure fetch for the name fixes the issue with the name not displaying for the workout
   const combinedWorkouts = [
-    ...(customWorkouts || []).map((workout) => ({ ...workout, type: 'Custom' })),
-    ...(presetWorkouts || []).map((workout) => ({ ...workout, type: 'Preset' })),
+    ...(customWorkouts || []).map((workout) => {
+      const name = workout.CustomWorkout?.customWorkoutName || workout.customWorkoutName;
+      console.log('Mapping Custom Workout:', { ...workout, name });
+      return {
+        ...workout,
+        type: 'Custom',
+        name,
+      };
+    }),
+    ...(presetWorkouts || []).map((workout) => {
+      const name = workout.PresetWorkout?.presetWorkoutName || workout.presetWorkoutName;
+      console.log('Mapping Preset Workout:', { ...workout, name });
+      return {
+        ...workout,
+        type: 'Preset',
+        name,
+      };
+    }),
   ];
+
+  useEffect(() => {
+    console.log('Combined Workouts:', combinedWorkouts);
+  }, [combinedWorkouts]);
 
   let content;
 
@@ -95,7 +175,7 @@ const CustomTemplate = () => {
               <ul>
                 {combinedWorkouts.map((workout) => (
                   <li key={workout.customWorkoutID || workout.presetWorkoutID}>
-                    {workout.customWorkoutName || workout.presetWorkoutName} - ({workout.type} Workout)
+                    {workout.name} - ({workout.type} Workout)  {/* Use workout.name */}
                     <button
                       onClick={() =>
                         handleRemoveWorkout(
@@ -106,6 +186,11 @@ const CustomTemplate = () => {
                       }
                     >
                       Remove
+                    </button>
+                    <button
+                      onClick={() => handleStartWorkout(workout.customWorkoutID || workout.presetWorkoutID, workout.type)}
+                    >
+                      Start Workout
                     </button>
                   </li>
                 ))}

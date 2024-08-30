@@ -14,6 +14,15 @@ const linkExercise = async (req, res) => {
             return res.status(404).json({ error: 'Preset workout not found' });
         }
 
+        // Check if the exercise is already linked to the preset workout
+        const existingLink = await PresetWorkoutExercise.findOne({
+            where: { presetWorkoutID, exerciseID },
+        });
+
+        if (existingLink) {
+            return res.status(409).json({ error: 'Exercise already linked to this workout' });
+        }
+
         // Check if the exercise exists in the local database
         let exercise = await Exercise.findByPk(exerciseID);
 

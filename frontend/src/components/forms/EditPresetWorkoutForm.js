@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { editPresetWorkout } from '../../features/presetWorkouts/presetWorkoutSlice';
+import { editPresetWorkout, fetchPresetWorkouts } from '../../features/presetWorkouts/presetWorkoutSlice';
 
 const EditPresetWorkoutForm = ({ workout, onClose }) => {
   const [presetWorkoutName, setPresetWorkoutName] = useState(workout.presetWorkoutName);
@@ -24,9 +24,10 @@ const EditPresetWorkoutForm = ({ workout, onClose }) => {
           presetWorkoutDifficulty,
           presetWorkoutGoal,
           presetWorkoutLocation,
-        })
-      );
-      onClose();
+        })).then(() => {
+            dispatch(fetchPresetWorkouts());
+        });
+        onClose();
     }
   };
 

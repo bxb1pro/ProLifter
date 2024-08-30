@@ -12,9 +12,12 @@ import {
 } from '../features/customTemplates/customTemplateSlice';
 import AddCustomWorkoutForm from './forms/AddCustomWorkoutForm';
 import EditCustomWorkoutForm from './forms/EditCustomWorkoutForm';
+import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
+import { useNavigate } from 'react-router-dom';
 
 const CustomWorkouts = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const workouts = useSelector((state) => state.customWorkouts.workouts);
   const exercises = useSelector((state) => state.customWorkouts.exercises);
   const templates = useSelector((state) => state.customTemplates.templates);
@@ -39,12 +42,27 @@ const CustomWorkouts = () => {
   };
 
   const handleUnlinkExercise = (customWorkoutID, exerciseID) => {
-    dispatch(unlinkExerciseFromCustomWorkout({ customWorkoutID, exerciseID }));
-  };
+    const confirmed = window.confirm('Are you sure you want to remove this exercise from the workout? This action cannot be undone.');
+
+    if (confirmed) {
+        dispatch(unlinkExerciseFromCustomWorkout({ customWorkoutID, exerciseID }));
+    }
+};
 
   const handleDeleteWorkout = (customWorkoutID) => {
-    dispatch(deleteCustomWorkout(customWorkoutID));
-  };
+    const confirmed = window.confirm('Are you sure you want to delete this workout? This action cannot be undone.');
+    if (confirmed) {
+        dispatch(deleteCustomWorkout(customWorkoutID))
+            .unwrap()
+            .then(() => {
+                alert('Workout deleted successfully.');
+            })
+            .catch((error) => {
+                console.error('Error deleting workout:', error);
+                alert(`Failed to delete workout: ${error.message || 'Unknown error'}`);
+            });
+    }
+};
 
   const handleAddWorkout = () => {
     setShowAddForm(true);
@@ -56,10 +74,38 @@ const CustomWorkouts = () => {
 
   const handleLinkWorkoutToTemplate = (customWorkoutID, templateID) => {
     if (templateID) {
-      dispatch(linkCustomWorkoutToTemplate({ id: templateID, customWorkoutID }));
-      setSelectedTemplateID(''); // Reset after linking
+        dispatch(linkCustomWorkoutToTemplate({ id: templateID, customWorkoutID }))
+            .unwrap()
+            .then(() => {
+                alert('Custom workout linked to template successfully.');
+                setSelectedTemplateID(''); // Reset after linking
+            })
+            .catch((error) => {
+                if (error.error === 'Custom workout is already linked to this template') {
+                    alert('This workout is already linked to the selected template.');
+                } else {
+                    console.error('Error linking custom workout:', error);
+                    alert(`Failed to link custom workout: ${error || 'Unknown error'}`);
+                }
+            });
     }
-  };
+};
+
+const handleStartWorkout = (workoutID) => {
+  const confirmed = window.confirm('Start this workout?');
+
+  if (confirmed) {
+      dispatch(startWorkoutLog({ customWorkoutID: workoutID }))
+          .unwrap()
+          .then(() => {
+              navigate('/workout-logs'); // Redirect to the workout logs page after starting the workout
+          })
+          .catch((error) => {
+              console.error('Error starting workout:', error);
+              alert('Failed to start workout. Please try again.');
+          });
+  }
+};
 
   let content;
 
@@ -75,7 +121,8 @@ const CustomWorkouts = () => {
               <button onClick={() => handleViewExercises(workout.customWorkoutID)}>View Exercises</button>
               <button onClick={() => handleEditWorkout(workout)}>Edit</button>
               <button onClick={() => handleDeleteWorkout(workout.customWorkoutID)}>Delete</button>
-
+              <button onClick={() => handleStartWorkout(workout.customWorkoutID)}>Start Workout</button> {/* Start Workout Button */}
+  
               {/* Dropdown to select a template to link the workout */}
               <select
                 value={selectedTemplateID}
@@ -94,14 +141,18 @@ const CustomWorkouts = () => {
             </div>
             {selectedWorkoutID === workout.customWorkoutID && exercises[workout.customWorkoutID] && (
               <ul>
-                {exercises[workout.customWorkoutID].map((exercise) => (
-                  <li key={exercise.exerciseID}>
-                    {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
-                    <button onClick={() => handleUnlinkExercise(workout.customWorkoutID, exercise.exerciseID)}>
-                      Remove
-                    </button>
-                  </li>
-                ))}
+                {exercises[workout.customWorkoutID].length > 0 ? (
+                  exercises[workout.customWorkoutID].map((exercise) => (
+                    <li key={exercise.exerciseID}>
+                      {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
+                      <button onClick={() => handleUnlinkExercise(workout.customWorkoutID, exercise.exerciseID)}>
+                        Remove
+                      </button>
+                    </li>
+                  ))
+                ) : (
+                  <li>No Exercises Added</li>
+                )}
               </ul>
             )}
           </li>

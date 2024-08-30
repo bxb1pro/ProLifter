@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { createCustomWorkout } from '../../features/customWorkouts/customWorkoutSlice';
+import { createCustomWorkout, fetchUserCustomWorkouts } from '../../features/customWorkouts/customWorkoutSlice';
 
 const AddCustomWorkoutForm = ({ onClose }) => {
   const [customWorkoutName, setCustomWorkoutName] = useState('');
@@ -9,7 +9,9 @@ const AddCustomWorkoutForm = ({ onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (customWorkoutName) {
-      dispatch(createCustomWorkout({ customWorkoutName }));
+      dispatch(createCustomWorkout({ customWorkoutName })).then(() => {
+        dispatch(fetchUserCustomWorkouts());
+      });
       onClose();
     }
   };

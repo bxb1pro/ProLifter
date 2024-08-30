@@ -18,6 +18,15 @@ const linkWorkout = async (req, res) => {
             return res.status(404).json({ error: 'Custom workout not found' });
         }
 
+        // Check if the custom workout is already linked to the custom template
+        const existingLink = await CustomTemplateCustomWorkout.findOne({
+            where: { customTemplateID, customWorkoutID }
+        });
+
+        if (existingLink) {
+            return res.status(409).json({ error: 'Custom workout is already linked to this template' });
+        }
+
         // Link the custom workout to the custom template
         await CustomTemplateCustomWorkout.create({ customTemplateID, customWorkoutID });
 

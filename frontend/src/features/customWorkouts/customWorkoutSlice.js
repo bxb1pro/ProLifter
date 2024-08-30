@@ -19,7 +19,7 @@ export const linkExerciseToCustomWorkout = createAsyncThunk(
       return response.data;
     } catch (error) {
       console.error('Link exercise to custom workout error:', error.response ? error.response.data : error.message);
-      return rejectWithValue(error.response.data || 'Failed to link exercise');
+      return rejectWithValue(error.response?.data || 'Failed to link exercise');
     }
   }
 );
@@ -46,8 +46,11 @@ export const fetchExercisesForCustomWorkout = createAsyncThunk(
         const response = await api.get(`/custom-workout-exercises/${customWorkoutID}/exercises`);
         return response.data;
       } catch (error) {
-        console.error('Fetch exercises for custom workout error:', error.response ? error.response.data : error.message);
-        return rejectWithValue(error.response.data || 'Failed to fetch exercises');
+        // If no exercises are found, return an empty array instead of rejecting
+        if (error.response && error.response.status === 404) {
+          return []; // Return an empty array when no exercises are found
+        }
+        return rejectWithValue(error.response?.data || 'Failed to fetch exercises');
       }
     }
   );
@@ -121,7 +124,7 @@ export const createCustomWorkout = createAsyncThunk(
         })
         .addCase(linkExerciseToCustomWorkout.rejected, (state, action) => {
           state.status = 'failed';
-          state.error = action.error.message;
+          state.error = action.payload;
         })
         .addCase(unlinkExerciseFromCustomWorkout.fulfilled, (state, action) => {
           state.status = 'succeeded';

@@ -23,8 +23,8 @@ const UserPresetTemplate = sequelize.define('UserPresetTemplate', {
 });
 
 UserPresetTemplate.associate = (models) => {
-    UserPresetTemplate.belongsTo(models.User, { foreignKey: 'userID' });
-    UserPresetTemplate.belongsTo(models.PresetTemplate, { foreignKey: 'presetTemplateID' });
+    UserPresetTemplate.belongsTo(models.User, { foreignKey: 'userID', onDelete: 'CASCADE' });
+    UserPresetTemplate.belongsTo(models.PresetTemplate, { foreignKey: 'presetTemplateID', onDelete: 'CASCADE' });
 };
 
 module.exports = UserPresetTemplate;

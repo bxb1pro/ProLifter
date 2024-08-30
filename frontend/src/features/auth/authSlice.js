@@ -38,18 +38,20 @@ export const loginUser = createAsyncThunk(
     }
   );
 
-// Thunk to fetch account details
-export const fetchAccountDetails = createAsyncThunk(
+  // Thunk to get account details
+  export const fetchAccountDetails = createAsyncThunk(
     'auth/fetchAccountDetails',
     async (_, { rejectWithValue }) => {
       try {
         const response = await api.get('/auth/account');
+        console.log('Account Details:', response.data); // Log the response data
         return response.data;
       } catch (error) {
+        console.error('Error fetching account details:', error.response ? error.response.data : error.message);
         return rejectWithValue(error.response.data || 'Failed to fetch account details');
       }
     }
-  );
+);
   
   // Thunk to delete account
   export const deleteAccount = createAsyncThunk(
@@ -70,7 +72,8 @@ export const fetchAccountDetails = createAsyncThunk(
     initialState: {
       user: null,
       token: localStorage.getItem('token') || null,
-      isAuthenticated: false,
+      isAuthenticated: !!localStorage.getItem('token'),
+      signupSuccess: false,
       isLoading: false,
       error: null,
     },
@@ -80,6 +83,7 @@ export const fetchAccountDetails = createAsyncThunk(
         state.user = null;
         state.token = null;
         state.isAuthenticated = false;
+        state.signupSuccess = false;
       },
       clearErrors(state) {
         state.error = null;
@@ -90,16 +94,17 @@ export const fetchAccountDetails = createAsyncThunk(
         .addCase(signupUser.pending, (state) => {
           state.isLoading = true;
           state.error = null;
+          state.signupSuccess = false;
         })
-        .addCase(signupUser.fulfilled, (state, action) => {
-          state.token = action.payload.token;
-          state.isAuthenticated = true;
+        .addCase(signupUser.fulfilled, (state) => {
           state.isLoading = false;
           state.error = null;
+          state.signupSuccess = true;
         })
         .addCase(signupUser.rejected, (state, action) => {
           state.error = action.payload;
           state.isLoading = false;
+          state.signupSuccess = false;
         })
         .addCase(loginUser.pending, (state) => {
           state.isLoading = true;
@@ -121,6 +126,8 @@ export const fetchAccountDetails = createAsyncThunk(
         })
         .addCase(fetchAccountDetails.fulfilled, (state, action) => {
           state.user = action.payload;
+          state.isAuthenticated = true;
+          state.role = action.payload.role;
           state.isLoading = false;
           state.error = null;
         })
