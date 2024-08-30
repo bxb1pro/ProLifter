@@ -30,7 +30,15 @@ const ExerciseDetails = () => {
 
     const handleLinkExerciseToCustomWorkout = () => {
         if (selectedCustomWorkout) {
-            dispatch(linkExerciseToCustomWorkout({ customWorkoutID: selectedCustomWorkout, exerciseID: id }));
+            dispatch(linkExerciseToCustomWorkout({ customWorkoutID: selectedCustomWorkout, exerciseID: id }))
+                .unwrap()
+                .then(() => {
+                    alert('Exercise added to custom workout successfully.');
+                })
+                .catch((error) => {
+                    console.error('Error adding exercise to custom workout:', error);
+                    alert(`Failed to add exercise to custom workout: ${error.error || 'Unknown error'}`);
+                });
         }
     };
 
@@ -42,7 +50,14 @@ const ExerciseDetails = () => {
                 defaultSets: parseInt(defaultSets),
                 defaultReps: parseInt(defaultReps),
                 defaultRPE: parseFloat(defaultRPE) || null 
-            }));
+            })).unwrap()
+              .then(() => {
+                  alert('Exercise added successfully.');
+              })
+              .catch((error) => {
+                  console.error('Error adding exercise:', error);
+                  alert(`Failed to add exercise: ${error.error || 'Unknown error'}`);
+              });
         }
     };
 

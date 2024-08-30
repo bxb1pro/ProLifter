@@ -16,8 +16,17 @@ const Account = () => {
   }, [dispatch, user]);
 
   const handleDeleteAccount = () => {
-    if (password) {
-      dispatch(deleteAccount(password));
+    const confirmed = window.confirm('Are you sure you want to delete your account? This action cannot be undone.');
+    if (confirmed && password) {
+      dispatch(deleteAccount(password))
+        .unwrap()
+        .then(() => {
+          alert('Account deleted successfully.');
+        })
+        .catch((error) => {
+          console.error('Error deleting account:', error);
+          alert(`Failed to delete account: ${error.message || 'Unknown error'}`);
+        });
     }
   };
 

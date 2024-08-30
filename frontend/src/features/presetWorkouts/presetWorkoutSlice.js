@@ -24,7 +24,7 @@ export const linkExerciseToPresetWorkout = createAsyncThunk(
         return response.data;
       } catch (error) {
         console.error('Link exercise to preset workout error:', error.response ? error.response.data : error.message);
-        return rejectWithValue(error.response.data || 'Failed to link exercise');
+        return rejectWithValue(error.response?.data || 'Failed to link exercise');
       }
     }
   );
@@ -171,7 +171,7 @@ export const fetchUserPresetWorkouts = createAsyncThunk(
         })
         .addCase(linkExerciseToPresetWorkout.rejected, (state, action) => {
           state.status = 'failed';
-          state.error = action.error.message;
+          state.error = action.payload;
         })
         .addCase(unlinkExerciseFromPresetWorkout.fulfilled, (state, action) => {
           state.status = 'succeeded';

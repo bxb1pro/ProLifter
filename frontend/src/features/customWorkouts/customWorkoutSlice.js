@@ -19,7 +19,7 @@ export const linkExerciseToCustomWorkout = createAsyncThunk(
       return response.data;
     } catch (error) {
       console.error('Link exercise to custom workout error:', error.response ? error.response.data : error.message);
-      return rejectWithValue(error.response.data || 'Failed to link exercise');
+      return rejectWithValue(error.response?.data || 'Failed to link exercise');
     }
   }
 );
@@ -124,7 +124,7 @@ export const createCustomWorkout = createAsyncThunk(
         })
         .addCase(linkExerciseToCustomWorkout.rejected, (state, action) => {
           state.status = 'failed';
-          state.error = action.error.message;
+          state.error = action.payload;
         })
         .addCase(unlinkExerciseFromCustomWorkout.fulfilled, (state, action) => {
           state.status = 'succeeded';

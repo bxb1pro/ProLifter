@@ -118,13 +118,32 @@ const PresetWorkout = () => {
   };
 
   const handleDeleteWorkout = (presetWorkoutID) => {
-    dispatch(deletePresetWorkout(presetWorkoutID));
+    const confirmed = window.confirm('Are you sure you want to delete this workout? This action cannot be undone.');
+    if (confirmed) {
+      dispatch(deletePresetWorkout(presetWorkoutID))
+        .unwrap()
+        .then(() => {
+          alert('Workout deleted successfully.');
+        })
+        .catch((error) => {
+          console.error('Error deleting workout:', error);
+          alert(`Failed to delete workout: ${error.message || 'Unknown error'}`);
+        });
+    }
   };
 
   const handleLinkWorkoutToTemplate = (presetWorkoutID, presetTemplateID) => {
     if (presetTemplateID) {
-      dispatch(linkWorkoutToPresetTemplate({ presetTemplateID, presetWorkoutID }));
-      setSelectedPresetTemplateID(''); // Reset after linking
+        dispatch(linkWorkoutToPresetTemplate({ presetTemplateID, presetWorkoutID }))
+            .unwrap()
+            .then(() => {
+                alert('Preset workout linked to template successfully.');
+                setSelectedPresetTemplateID(''); // Reset after linking
+            })
+            .catch((error) => {
+                console.error('Error linking preset workout:', error);
+                alert(`Failed to link preset workout: ${error.error || 'Unknown error'}`);
+            });
     }
   };
 

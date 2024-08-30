@@ -92,7 +92,18 @@ const PresetTemplate = () => {
   };
 
   const handleDeleteTemplate = (presetTemplateID) => {
-    dispatch(deletePresetTemplate(presetTemplateID));
+    const confirmed = window.confirm('Are you sure you want to delete this template? This action cannot be undone.');
+    if (confirmed) {
+      dispatch(deletePresetTemplate(presetTemplateID))
+        .unwrap()
+        .then(() => {
+          alert('Template deleted successfully.');
+        })
+        .catch((error) => {
+          console.error('Error deleting template:', error);
+          alert(`Failed to delete template: ${error.message || 'Unknown error'}`);
+        });
+    }
   };
 
   const handleAddTemplate = () => {
