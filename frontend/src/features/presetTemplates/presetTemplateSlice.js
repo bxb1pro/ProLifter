@@ -154,7 +154,6 @@ const presetTemplateSlice = createSlice({
         status: 'idle', // idle, loading, succeeded, failed
         error: null,
     },
-    reducers: {},
     extraReducers: (builder) => {
         builder
             .addCase(fetchPresetTemplates.pending, (state) => {
@@ -208,10 +207,16 @@ const presetTemplateSlice = createSlice({
             })
             .addCase(linkPresetTemplate.fulfilled, (state) => {
                 state.status = 'succeeded';
+                state.error = null;
             })
             .addCase(linkPresetTemplate.rejected, (state, action) => {
-                state.status = 'failed';
-                state.error = action.payload;
+                if (action.payload?.error === 'Preset template is already linked to this user') {
+                    state.status = 'succeeded'; // Treat this as a successful state to fix bug
+                    state.error = action.payload?.error; // Store the specific error message
+                } else {
+                    state.status = 'failed';
+                    state.error = action.payload;
+                }
             })
             .addCase(unlinkPresetTemplate.fulfilled, (state) => {
                 state.status = 'succeeded';

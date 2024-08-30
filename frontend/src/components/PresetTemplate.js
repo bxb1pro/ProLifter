@@ -53,13 +53,25 @@ const PresetTemplate = () => {
 
   const handleLinkTemplateToUser = (presetTemplateID) => {
     if (!userID) {
-      console.error('User ID is not defined. Cannot link preset template to user.');
-      return;
+        console.error('User ID is not defined. Cannot link preset template to user.');
+        return;
     }
-    dispatch(linkPresetTemplate({ userID, presetTemplateID })).then(() => {
-      dispatch(fetchUserPresetTemplates(userID)); // Refresh the user's selected preset templates
-    });
-  };
+
+    dispatch(linkPresetTemplate({ userID, presetTemplateID }))
+        .unwrap()
+        .then(() => {
+            alert('Preset template linked successfully.');
+            dispatch(fetchUserPresetTemplates(userID)); // Refresh the user's selected preset templates
+        })
+        .catch((error) => {
+            if (error.error === 'Preset template is already linked to this user') {
+                alert('This template is already linked to your account.');
+            } else {
+                console.error('Error linking preset template:', error);
+                alert(`Failed to link preset template: ${error.error || 'Unknown error'}`);
+            }
+        });
+};
 
   const handleStartWorkout = (workoutID) => {
     dispatch(startWorkoutLog({ presetWorkoutID: workoutID }));
@@ -82,10 +94,20 @@ const PresetTemplate = () => {
   };
 
   const handleUnlinkUserTemplate = (presetTemplateID) => {
-    dispatch(unlinkUserPresetTemplate({ userID, presetTemplateID })).then(() => {
-      dispatch(fetchUserPresetTemplates(userID)); // Refresh the user's selected preset templates
-    });
-  };
+    const confirmed = window.confirm('Are you sure you want to remove this template from your favourites?');
+    if (confirmed) {
+        dispatch(unlinkUserPresetTemplate({ userID, presetTemplateID }))
+            .unwrap()
+            .then(() => {
+                alert('Template removed successfully.');
+                dispatch(fetchUserPresetTemplates(userID)); // Refresh the user's selected preset templates
+            })
+            .catch((error) => {
+                console.error('Error removing template:', error);
+                alert(`Failed to remove template: ${error.message || 'Unknown error'}`);
+            });
+    }
+};
 
   const handleEditTemplate = (template) => {
     setEditingTemplate(template);

@@ -85,25 +85,45 @@ const PresetWorkout = () => {
 
   const handleLinkWorkoutToUser = (presetWorkoutID) => {
     if (!userID) {
-      console.error('User ID is not defined. Cannot link preset workout to user.');
-      return;
+        console.error('User ID is not defined. Cannot link preset workout to user.');
+        return;
     }
-    dispatch(linkPresetWorkoutToUser({ userID, presetWorkoutID })).then(() => {
-      dispatch(fetchUserPresetWorkouts(userID)); // Refresh the user's selected preset workouts
-    });
-  };
+
+    dispatch(linkPresetWorkoutToUser({ userID, presetWorkoutID }))
+        .unwrap()
+        .then(() => {
+            alert('Preset workout linked successfully.');
+            dispatch(fetchUserPresetWorkouts(userID)); // Refresh the user's selected preset workouts
+        })
+        .catch((error) => {
+            if (error.error === 'Preset workout is already linked to this user') {
+                alert('This workout is already linked to your account.');
+            } else {
+                console.error('Error linking preset workout:', error);
+                alert(`Failed to link preset workout: ${error.message || 'Unknown error'}`);
+            }
+        });
+};
 
   const handleStartWorkout = (workoutID) => {
     dispatch(startWorkoutLog({ presetWorkoutID: workoutID }));
   };
 
   const handleUnlinkPresetWorkout = (presetWorkoutID) => {
-    if (userID) {
-      dispatch(unlinkPresetWorkoutFromUser({ userID, presetWorkoutID })).then(() => {
-        dispatch(fetchUserPresetWorkouts(userID)); // Refresh the user's selected preset workouts
-      });
+    const confirmed = window.confirm('Are you sure you want to remove this workout from your favourites?');
+    if (confirmed && userID) {
+      dispatch(unlinkPresetWorkoutFromUser({ userID, presetWorkoutID }))
+        .unwrap()
+        .then(() => {
+          alert('Workout removed successfully.');
+          dispatch(fetchUserPresetWorkouts(userID)); // Refresh the user's selected preset workouts
+        })
+        .catch((error) => {
+          console.error('Error removing workout:', error);
+          alert(`Failed to remove workout: ${error.message || 'Unknown error'}`);
+        });
     }
-  };
+};
 
   const handleUnlinkExercise = (presetWorkoutID, exerciseID) => {
     dispatch(unlinkExerciseFromPresetWorkout({ presetWorkoutID, exerciseID }));

@@ -13,6 +13,15 @@ const linkPresetWorkout = async (req, res) => {
             return res.status(404).json({ error: 'User or preset workout not found' });
         }
 
+        // Check if the preset workout is already linked to the user
+        const existingLink = await UserPresetWorkout.findOne({
+            where: { userID, presetWorkoutID }
+        });
+
+        if (existingLink) {
+            return res.status(409).json({ error: 'Preset workout is already linked to this user' });
+        }
+
         // Create the link with the current date
         await UserPresetWorkout.create({
             userID,

@@ -14,6 +14,15 @@ const linkPresetTemplate = async (req, res) => {
             return res.status(404).json({ error: 'User or preset template not found' });
         }
 
+        // Check if the preset template is already linked to the user
+        const existingLink = await UserPresetTemplate.findOne({
+            where: { userID, presetTemplateID }
+        });
+
+        if (existingLink) {
+            return res.status(409).json({ error: 'Preset template is already linked to this user' });
+        }
+
         // Create the link with the current date
         await UserPresetTemplate.create({
             userID,
