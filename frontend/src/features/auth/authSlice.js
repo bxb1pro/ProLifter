@@ -2,23 +2,23 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import api from '../../services/api';
 
 export const loginUser = createAsyncThunk(
-    'auth/login',
-    async (userData, { dispatch, rejectWithValue }) => {
-      try {
-        const response = await api.post('/auth/login', userData);
-        console.log('Login successful, response:', response.data);
-        localStorage.setItem('token', response.data.token);
-  
-        // Fetch account details after login
-        await dispatch(fetchAccountDetails());
-  
-        return response.data;
-      } catch (error) {
-        console.error('Login error:', error.response ? error.response.data : error.message);
-        return rejectWithValue(error.response.data || 'Login failed');
-      }
+  'auth/login',
+  async (userData, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await api.post('/auth/login', userData);
+      console.log('Login successful, response:', response.data);
+      localStorage.setItem('token', response.data.token);
+
+      // Fetch account details after login
+      await dispatch(fetchAccountDetails());
+
+      return response.data;
+    } catch (error) {
+      console.error('Login error:', error.response ? error.response.data : error.message);
+      return rejectWithValue(error.response.data || 'Login failed');
     }
-  );
+  }
+);
   
   export const signupUser = createAsyncThunk(
     'auth/signup',
@@ -117,7 +117,7 @@ export const loginUser = createAsyncThunk(
           state.error = null;
         })
         .addCase(loginUser.rejected, (state, action) => {
-          state.error = action.payload;
+          state.error = action.payload?.error || 'Login failed';
           state.isLoading = false;
         })
         .addCase(fetchAccountDetails.pending, (state) => {
