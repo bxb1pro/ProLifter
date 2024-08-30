@@ -12,9 +12,11 @@ import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 import AddCustomTemplateForm from './forms/AddCustomTemplateForm';
 import EditCustomTemplateForm from './forms/EditCustomTemplateForm';
 import { fetchAccountDetails } from '../features/auth/authSlice';
+import { useNavigate } from 'react-router-dom';
 
 const CustomTemplate = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const templates = useSelector((state) => state.customTemplates.templates);
   const customWorkouts = useSelector((state) => state.customTemplates.customWorkouts);
   const presetWorkouts = useSelector((state) => state.customTemplates.presetWorkouts);
@@ -55,8 +57,19 @@ const CustomTemplate = () => {
   };
 
   const handleDeleteTemplate = (customTemplateID) => {
-    dispatch(deleteCustomTemplate(customTemplateID));
-  };
+    const confirmed = window.confirm('Are you sure you want to delete this template? This action cannot be undone.');
+    if (confirmed) {
+        dispatch(deleteCustomTemplate(customTemplateID))
+            .unwrap()
+            .then(() => {
+                alert('Template deleted successfully.');
+            })
+            .catch((error) => {
+                console.error('Error deleting template:', error);
+                alert(`Failed to delete template: ${error.message || 'Unknown error'}`);
+            });
+    }
+};
 
   const handleShowWorkouts = (templateID) => {
     setSelectedTemplateID(templateID);
@@ -66,26 +79,52 @@ const CustomTemplate = () => {
   };
 
   const handleRemoveWorkout = (templateID, workoutID, workoutType) => {
-    if (workoutType === 'Custom') {
-      dispatch(unlinkCustomWorkoutFromTemplate({ id: templateID, customWorkoutID: workoutID })).then(() => {
-        // Refresh workouts after removing
-        dispatch(fetchCustomWorkoutsForTemplate(templateID));
-      });
-    } else if (workoutType === 'Preset') {
-      dispatch(unlinkPresetWorkoutFromTemplate({ id: templateID, presetWorkoutID: workoutID })).then(() => {
-        // Refresh workouts after removing
-        dispatch(fetchPresetWorkoutsForTemplate(templateID));
-      });
+    const confirmed = window.confirm('Are you sure you want to remove this workout from the template? This action cannot be undone.');
+    
+    if (confirmed) {
+        if (workoutType === 'Custom') {
+            dispatch(unlinkCustomWorkoutFromTemplate({ id: templateID, customWorkoutID: workoutID }))
+                .then(() => {
+                    // Refresh workouts after removing
+                    dispatch(fetchCustomWorkoutsForTemplate(templateID));
+                });
+        } else if (workoutType === 'Preset') {
+            dispatch(unlinkPresetWorkoutFromTemplate({ id: templateID, presetWorkoutID: workoutID }))
+                .then(() => {
+                    // Refresh workouts after removing
+                    dispatch(fetchPresetWorkoutsForTemplate(templateID));
+                });
+        }
     }
-  };
+};
 
-  const handleStartWorkout = (workoutID, workoutType) => {
-    if (workoutType === 'Custom') {
-      dispatch(startWorkoutLog({ customWorkoutID: workoutID }));
-    } else if (workoutType === 'Preset') {
-      dispatch(startWorkoutLog({ presetWorkoutID: workoutID }));
-    }
-  };
+const handleStartWorkout = (workoutID, workoutType) => {
+  const confirmed = window.confirm('Start this workout?');
+
+  if (confirmed) {
+      if (workoutType === 'Custom') {
+          dispatch(startWorkoutLog({ customWorkoutID: workoutID }))
+              .unwrap()
+              .then(() => {
+                  navigate('/workout-logs'); // Redirect to the workout logs page after starting the workout
+              })
+              .catch((error) => {
+                  console.error('Error starting workout:', error);
+                  alert('Failed to start workout. Please try again.');
+              });
+      } else if (workoutType === 'Preset') {
+          dispatch(startWorkoutLog({ presetWorkoutID: workoutID }))
+              .unwrap()
+              .then(() => {
+                  navigate('/workout-logs'); // Redirect to the workout logs page after starting the workout
+              })
+              .catch((error) => {
+                  console.error('Error starting workout:', error);
+                  alert('Failed to start workout. Please try again.');
+              });
+      }
+  }
+};
 
   // nested structure fetch for the name fixes the issue with the name not displaying for the workout
   const combinedWorkouts = [

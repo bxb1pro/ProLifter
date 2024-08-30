@@ -13,9 +13,11 @@ import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 import AddPresetTemplateForm from './forms/AddPresetTemplateForm';
 import EditPresetTemplateForm from './forms/EditPresetTemplateForm';
 import { fetchAccountDetails } from '../features/auth/authSlice';
+import { useNavigate } from 'react-router-dom';
 
 const PresetTemplate = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const templates = useSelector((state) => state.presetTemplates.templates || []);
   const userPresetTemplates = useSelector((state) => state.presetTemplates.userTemplates || []);
   const presetWorkouts = useSelector((state) => state.presetTemplates.presetWorkouts || []);
@@ -74,7 +76,19 @@ const PresetTemplate = () => {
 };
 
   const handleStartWorkout = (workoutID) => {
-    dispatch(startWorkoutLog({ presetWorkoutID: workoutID }));
+    const confirmed = window.confirm('Start this workout?');
+  
+    if (confirmed) {
+        dispatch(startWorkoutLog({ presetWorkoutID: workoutID }))
+            .unwrap()
+            .then(() => {
+                navigate('/workout-logs'); // Redirect to the workout logs page after starting the workout
+            })
+            .catch((error) => {
+                console.error('Error starting workout:', error);
+                alert('Failed to start workout. Please try again.');
+            });
+    }
   };
 
   const handleViewWorkouts = (presetTemplateID) => {

@@ -21,9 +21,11 @@ import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 import AddPresetWorkoutForm from './forms/AddPresetWorkoutForm';
 import EditPresetWorkoutForm from './forms/EditPresetWorkoutForm';
 import { fetchAccountDetails } from '../features/auth/authSlice';
+import { useNavigate } from 'react-router-dom';
 
 const PresetWorkout = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const workouts = useSelector((state) => state.presetWorkouts.workouts);
   const exercises = useSelector((state) => state.presetWorkouts.exercises);
   const templates = useSelector((state) => state.presetTemplates.templates);
@@ -106,8 +108,22 @@ const PresetWorkout = () => {
 };
 
   const handleStartWorkout = (workoutID) => {
-    dispatch(startWorkoutLog({ presetWorkoutID: workoutID }));
+    const confirmed = window.confirm('Start this workout?');
+  
+    if (confirmed) {
+        dispatch(startWorkoutLog({ presetWorkoutID: workoutID }))
+            .unwrap()
+            .then(() => {
+                navigate('/workout-logs'); // Redirect to the workout logs page after starting the workout
+            })
+            .catch((error) => {
+                console.error('Error starting workout:', error);
+                alert('Failed to start workout. Please try again.');
+            });
+    }
   };
+
+
 
   const handleUnlinkPresetWorkout = (presetWorkoutID) => {
     const confirmed = window.confirm('Are you sure you want to remove this workout from your favourites?');
@@ -126,7 +142,11 @@ const PresetWorkout = () => {
 };
 
   const handleUnlinkExercise = (presetWorkoutID, exerciseID) => {
+    const confirmed = window.confirm('Are you sure you want to remove this exercise from the workout? This action cannot be undone.');
+
+    if (confirmed) {
     dispatch(unlinkExerciseFromPresetWorkout({ presetWorkoutID, exerciseID }));
+    }
   };
 
   const handleAddWorkout = () => {
@@ -169,10 +189,22 @@ const PresetWorkout = () => {
 
   const handleLinkWorkoutToCustomTemplate = (presetWorkoutID, customTemplateID) => {
     if (customTemplateID) {
-      dispatch(linkWorkoutToCustomTemplate({ id: customTemplateID, presetWorkoutID }));
-      setSelectedCustomTemplateID(''); // Reset after linking
+        dispatch(linkWorkoutToCustomTemplate({ id: customTemplateID, presetWorkoutID }))
+            .unwrap()
+            .then(() => {
+                alert('Preset workout linked to custom template successfully.');
+                setSelectedCustomTemplateID(''); // Reset after linking
+            })
+            .catch((error) => {
+                if (error === 'Preset workout is already linked to this custom template') {
+                    alert('This workout is already linked to the selected template.');
+                } else {
+                    console.error('Error linking preset workout:', error);
+                    alert(`Failed to link preset workout: ${error || 'Unknown error'}`);
+                }
+            });
     }
-  };
+};
 
   // Filtered workouts based on the selected filters
   const filteredWorkouts = workouts.filter((workout) => {

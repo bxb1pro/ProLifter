@@ -14,10 +14,20 @@ const WorkoutLogs = () => {
   }, [dispatch]);
 
   const handleDeleteWorkoutLog = (workoutLogID) => {
-    if (window.confirm('Are you sure you want to delete this workout log?')) {
-      dispatch(deleteWorkoutLog(workoutLogID));
+    const confirmed = window.confirm('Are you sure you want to delete this workout log? This action cannot be undone.');
+
+    if (confirmed) {
+        dispatch(deleteWorkoutLog(workoutLogID))
+            .unwrap()
+            .then(() => {
+                alert('Workout log deleted successfully.');
+            })
+            .catch((error) => {
+                console.error('Error deleting workout log:', error);
+                alert('Failed to delete workout log. Please try again.');
+            });
     }
-  };
+};
 
   const startedLogs = workoutLogs.filter(log => !log.workoutLogCompleted);
   const finishedLogs = workoutLogs.filter(log => log.workoutLogCompleted);

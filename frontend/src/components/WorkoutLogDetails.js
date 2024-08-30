@@ -29,15 +29,27 @@ const WorkoutLogDetails = () => {
   }, [dispatch, workoutLogID]);
 
   const handleFinishWorkout = () => {
-    dispatch(finishWorkoutLog(workoutLogID)).then(() => {
-      navigate('/workout-logs'); // Redirect to the workout logs page after finishing the workout
-    });
-  };
+    const confirmed = window.confirm('Finish this workout?');
+
+    if (confirmed) {
+        dispatch(finishWorkoutLog(workoutLogID))
+            .unwrap()
+            .then(() => {
+                navigate('/workout-logs'); // Redirect to the workout logs page after finishing the workout
+            })
+            .catch((error) => {
+                console.error('Error finishing workout:', error);
+                alert('Failed to finish the workout. Please try again.');
+            });
+    }
+};
 
   const handleCompleteExercise = (exerciseLogID) => {
+    if (window.confirm('Complete exercise?')) {
     dispatch(editExerciseLog({ exerciseLogID, exerciseLogCompleted: true })).then(() => {
       dispatch(fetchWorkoutLogDetails(workoutLogID)); // Refresh after marking exercise as complete
     });
+   }
   };
 
   const handleDeleteExercise = (exerciseLogID) => {
@@ -49,18 +61,37 @@ const WorkoutLogDetails = () => {
   };
 
   const handleAddSetLog = (exerciseLogID) => {
-    const setLogData = {
-      ...newSetData[exerciseLogID],
-      exerciseLogID,
-    };
-    dispatch(addSetLog(setLogData)).then(() => {
-      setNewSetData((prevData) => ({
-        ...prevData,
-        [exerciseLogID]: { setLogWeight: '', setLogReps: '', setLogRPE: '', setLog1RM: '' },
-      }));
-      dispatch(fetchWorkoutLogDetails(workoutLogID)); // Refresh after adding set
-    });
-  };
+    const { setLogWeight, setLogReps } = newSetData[exerciseLogID];
+
+    // Check if weight and reps are provided
+    if (!setLogWeight || !setLogReps) {
+        alert('Please enter both weight and reps before adding the set.');
+        return; // Exit the function if either field is empty
+    }
+
+    const confirmed = window.confirm('Add set?');
+
+    if (confirmed) {
+        const setLogData = {
+            ...newSetData[exerciseLogID],
+            exerciseLogID,
+        };
+
+        dispatch(addSetLog(setLogData))
+            .unwrap()
+            .then(() => {
+                setNewSetData((prevData) => ({
+                    ...prevData,
+                    [exerciseLogID]: { setLogWeight: '', setLogReps: '', setLogRPE: '', setLog1RM: '' },
+                }));
+                dispatch(fetchWorkoutLogDetails(workoutLogID)); // Refresh after adding set
+            })
+            .catch((error) => {
+                console.error('Error adding set:', error);
+                alert('Failed to add set. Please try again.');
+            });
+    }
+};
 
   const handleDeleteSetLog = (setLogID) => {
     if (window.confirm('Are you sure you want to delete this set log?')) {

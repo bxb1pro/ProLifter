@@ -100,7 +100,8 @@ export const linkPresetWorkoutToTemplate = createAsyncThunk(
       const response = await api.post(`/custom-template-preset-workouts/${id}/link-preset-workout`, { presetWorkoutID });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to link preset workout to template');
+      const errorMessage = error.response?.data?.error || 'Failed to link preset workout to template';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -215,8 +216,13 @@ const customTemplateSlice = createSlice({
           state.status = 'succeeded';
         })
         .addCase(linkCustomWorkoutToTemplate.rejected, (state, action) => {
-          state.status = 'failed';
-          state.error = action.payload;
+          if (action.payload?.error === 'Custom workout is already linked to this template') {
+            state.status = 'succeeded'; // Prevent the page from getting stuck in a 'failed' state
+            state.error = action.payload?.error;
+          } else {
+            state.status = 'failed';
+            state.error = action.payload;
+          }
         })
         // Unlink a custom workout from a custom template
         .addCase(unlinkCustomWorkoutFromTemplate.fulfilled, (state) => {
@@ -229,19 +235,23 @@ const customTemplateSlice = createSlice({
         // Link a preset workout to a custom template
         .addCase(linkPresetWorkoutToTemplate.fulfilled, (state) => {
             state.status = 'succeeded';
-          })
-          .addCase(linkPresetWorkoutToTemplate.rejected, (state, action) => {
-            state.status = 'failed';
-            state.error = action.payload;
-          })
-          // Unlink a preset workout from a custom template
-          .addCase(unlinkPresetWorkoutFromTemplate.fulfilled, (state) => {
-            state.status = 'succeeded';
-          })
-          .addCase(unlinkPresetWorkoutFromTemplate.rejected, (state, action) => {
-            state.status = 'failed';
-            state.error = action.payload;
-          });
+        })
+        .addCase(linkPresetWorkoutToTemplate.rejected, (state, action) => {
+          if (action.payload === 'Preset workout is already linked to this custom template') {
+              state.status = 'succeeded'; // Fix bug with state staying in failed
+          } else {
+              state.status = 'failed';
+          }
+          state.error = action.payload;
+        })
+        // Unlink a preset workout from a custom template
+        .addCase(unlinkPresetWorkoutFromTemplate.fulfilled, (state) => {
+          state.status = 'succeeded';
+        })
+        .addCase(unlinkPresetWorkoutFromTemplate.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.payload;
+        });
       },
   });
   
