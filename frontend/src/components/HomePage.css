@@ -1,0 +1,22 @@
+.home-link {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .home-link:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .home-link img {
+    width: 400px;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  h5 {
+    margin-top: 10px;
+    font-weight: bold;
+    text-align: center;
+  }

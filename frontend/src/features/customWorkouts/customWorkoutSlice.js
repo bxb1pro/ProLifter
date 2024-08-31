@@ -1,6 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
 
+// Function to capitalise exercise words from API (in slice to avoid repetition in components)
+const capitaliseWords = (str) => {
+  return str.replace(/\b\w/g, char => char.toUpperCase());
+};
+
+
 // Thunk to fetch custom workouts for the logged-in user
 export const fetchUserCustomWorkouts = createAsyncThunk(
   'customWorkouts/fetchUserCustomWorkouts',
@@ -40,20 +46,32 @@ export const unlinkExerciseFromCustomWorkout = createAsyncThunk(
 
 // New Thunk to fetch exercises for a specific custom workout
 export const fetchExercisesForCustomWorkout = createAsyncThunk(
-    'customWorkouts/fetchExercisesForCustomWorkout',
-    async (customWorkoutID, { rejectWithValue }) => {
-      try {
-        const response = await api.get(`/custom-workout-exercises/${customWorkoutID}/exercises`);
-        return response.data;
-      } catch (error) {
-        // If no exercises are found, return an empty array instead of rejecting
-        if (error.response && error.response.status === 404) {
-          return []; // Return an empty array when no exercises are found
-        }
-        return rejectWithValue(error.response?.data || 'Failed to fetch exercises');
+  'customWorkouts/fetchExercisesForCustomWorkout',
+  async (customWorkoutID, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/custom-workout-exercises/${customWorkoutID}/exercises`);
+      const exercises = response.data;
+
+      // Capitalise the necessary fields in each exercise
+      const capitalisedExercises = exercises.map(exercise => ({
+        ...exercise,
+        Exercise: {
+          ...exercise.Exercise,
+          exerciseName: capitaliseWords(exercise.Exercise.exerciseName),
+          exerciseBodypart: capitaliseWords(exercise.Exercise.exerciseBodypart),
+        },
+      }));
+
+      return capitalisedExercises;
+    } catch (error) {
+      // If no exercises are found, return an empty array instead of rejecting
+      if (error.response && error.response.status === 404) {
+        return []; // Return an empty array when no exercises are found
       }
+      return rejectWithValue(error.response?.data || 'Failed to fetch exercises');
     }
-  );
+  }
+);
 
   // Thunk to create a custom workout
 export const createCustomWorkout = createAsyncThunk(

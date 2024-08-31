@@ -1,6 +1,30 @@
 .exercise-image {
-    width: 200px; /* Set the desired width */
-    height: auto; /* Maintain the aspect ratio */
-    max-width: 100%; /* Ensure the image doesn't overflow its container */
     border-radius: 8px; /* Optional: adds rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow to the image */
+}
+
+.exercise-details h2 {
+    font-size: 2rem; /* Adjusted size for heading */
+    color: #333; /* Dark color for better contrast */
+}
+
+.exercise-details p {
+    font-size: 1.1rem; /* Slightly larger font for better readability */
+    color: #555; /* A softer color for the text */
+}
+
+.exercise-details ol {
+    padding-left: 20px; /* Ensure list items are properly indented */
+    font-size: 1rem; /* Adjust list font size */
+    color: #666; /* Softer color for instructions */
+}
+
+.exercise-details .form-select {
+    width: auto; /* Make the select dropdown fit its content */
+    margin-right: 10px; /* Add space between the select and the button */
+}
+
+.input-group.mb-3 {
+    display: flex;
+    align-items: center;
 }

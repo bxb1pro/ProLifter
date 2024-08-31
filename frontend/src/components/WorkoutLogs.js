@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserWorkoutLogs, deleteWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 import { Link } from 'react-router-dom';
+import { Modal, Button } from 'react-bootstrap';
 
 const WorkoutLogs = () => {
   const dispatch = useDispatch();
@@ -9,25 +10,32 @@ const WorkoutLogs = () => {
   const workoutLogStatus = useSelector((state) => state.workoutLogs.status);
   const error = useSelector((state) => state.workoutLogs.error);
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [logToDelete, setLogToDelete] = useState(null);
+
   useEffect(() => {
     dispatch(fetchUserWorkoutLogs());
   }, [dispatch]);
 
-  const handleDeleteWorkoutLog = (workoutLogID) => {
-    const confirmed = window.confirm('Are you sure you want to delete this workout log? This action cannot be undone.');
+  const handleOpenDeleteModal = (workoutLogID) => {
+    setLogToDelete(workoutLogID);
+    setShowDeleteModal(true);
+  };
 
-    if (confirmed) {
-        dispatch(deleteWorkoutLog(workoutLogID))
-            .unwrap()
-            .then(() => {
-                alert('Workout log deleted successfully.');
-            })
-            .catch((error) => {
-                console.error('Error deleting workout log:', error);
-                alert('Failed to delete workout log. Please try again.');
-            });
+  const handleDeleteWorkoutLog = () => {
+    if (logToDelete) {
+      dispatch(deleteWorkoutLog(logToDelete))
+        .unwrap()
+        .then(() => {
+          setShowDeleteModal(false);
+          setLogToDelete(null);
+        })
+        .catch((error) => {
+          console.error('Error deleting workout log:', error);
+          alert('Failed to delete workout log. Please try again.');
+        });
     }
-};
+  };
 
   const startedLogs = workoutLogs.filter(log => !log.workoutLogCompleted);
   const finishedLogs = workoutLogs.filter(log => log.workoutLogCompleted);
@@ -42,16 +50,37 @@ const WorkoutLogs = () => {
         <section>
           <h3>Started Workouts</h3>
           {startedLogs.length > 0 ? (
-            <ul>
+            <ul className="list-group">
               {startedLogs.map((log) => (
-                <li key={log.workoutLogID}>
-                  <Link to={`/workout-logs/${log.workoutLogID}`}>
-                    {log.presetWorkoutID
-                      ? `Preset Workout Log: ${log.presetWorkoutID}`
-                      : `Custom Workout Log: ${log.customWorkoutID}`}
-                  </Link>
-                  <p>Date: {new Date(log.workoutLogDate).toLocaleDateString()}</p>
-                  <button onClick={() => handleDeleteWorkoutLog(log.workoutLogID)}>Delete Workout</button>
+                <li key={log.workoutLogID} className="list-group-item">
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div className="d-flex align-items-start">
+                      <img
+                        src="/images/log.jpg"
+                        alt="Log Image"
+                        className="img-thumbnail me-3"
+                        style={{ width: '100px', height: '100px' }}
+                      />
+                      <div>
+                        <Link to={`/workout-logs/${log.workoutLogID}`} className="text-decoration-none">
+                          <p><strong>Log:</strong> 
+                            {log.presetWorkoutID
+                              ? `Preset Workout Log: ${log.presetWorkoutID}`
+                              : `Custom Workout Log: ${log.customWorkoutID}`}
+                          </p>
+                          <p><strong>Date:</strong> {new Date(log.workoutLogDate).toLocaleDateString()}</p>
+                        </Link>
+                      </div>
+                    </div>
+                    <div>
+                      <button 
+                        className="btn btn-danger btn-sm me-2" 
+                        onClick={() => handleOpenDeleteModal(log.workoutLogID)}
+                      >
+                        Delete Workout
+                      </button>
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -60,19 +89,40 @@ const WorkoutLogs = () => {
           )}
         </section>
 
-        <section>
+        <section className="mt-4">
           <h3>Finished Workouts</h3>
           {finishedLogs.length > 0 ? (
-            <ul>
+            <ul className="list-group">
               {finishedLogs.map((log) => (
-                <li key={log.workoutLogID}>
-                  <Link to={`/workout-logs/${log.workoutLogID}`}>
-                    {log.presetWorkoutID
-                      ? `Preset Workout Log: ${log.presetWorkoutID}`
-                      : `Custom Workout Log: ${log.customWorkoutID}`}
-                  </Link>
-                  <p>Date: {new Date(log.workoutLogDate).toLocaleDateString()}</p>
-                  <button onClick={() => handleDeleteWorkoutLog(log.workoutLogID)}>Delete Workout</button>
+                <li key={log.workoutLogID} className="list-group-item">
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div className="d-flex align-items-start">
+                      <img
+                        src="/images/log.jpg"
+                        alt="Log Image"
+                        className="img-thumbnail me-3"
+                        style={{ width: '100px', height: '100px' }}
+                      />
+                      <div>
+                        <Link to={`/workout-logs/${log.workoutLogID}`} className="text-decoration-none">
+                          <p><strong>Log:</strong> 
+                            {log.presetWorkoutID
+                              ? `Preset Workout Log: ${log.presetWorkoutID}`
+                              : `Custom Workout Log: ${log.customWorkoutID}`}
+                          </p>
+                          <p><strong>Date:</strong> {new Date(log.workoutLogDate).toLocaleDateString()}</p>
+                        </Link>
+                      </div>
+                    </div>
+                    <div>
+                      <button 
+                        className="btn btn-danger btn-sm me-2" 
+                        onClick={() => handleOpenDeleteModal(log.workoutLogID)}
+                      >
+                        Delete Workout
+                      </button>
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -83,13 +133,31 @@ const WorkoutLogs = () => {
       </>
     );
   } else if (workoutLogStatus === 'failed') {
-    content = <p>Error: {error?.message || 'Failed to load workout logs.'}</p>; // Safely display the error message
+    content = <p className="text-danger">{error?.message || 'Failed to load workout logs.'}</p>;
   }
 
   return (
-    <section>
-      <h2>My Workout Logs</h2>
+    <section className="container mt-4">
+      <h2 className="mb-4">My Workout Logs</h2>
       {content}
+
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete Workout Log</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete this workout log? This action cannot be undone.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDeleteWorkoutLog}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </section>
   );
 };

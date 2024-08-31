@@ -32,48 +32,81 @@ const AddPresetWorkoutForm = ({ onClose }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Workout Name:
-        <input
-          type="text"
-          value={presetWorkoutName}
-          onChange={(e) => setPresetWorkoutName(e.target.value)}
-          required
-        />
-      </label>
-      <label>
-        Difficulty:
-        <input
-          type="text"
-          value={presetWorkoutDifficulty}
-          onChange={(e) => setPresetWorkoutDifficulty(e.target.value)}
-          required
-        />
-      </label>
-      <label>
-        Goal:
-        <input
-          type="text"
-          value={presetWorkoutGoal}
-          onChange={(e) => setPresetWorkoutGoal(e.target.value)}
-          required
-        />
-      </label>
-      <label>
-        Location:
-        <input
-          type="text"
-          value={presetWorkoutLocation}
-          onChange={(e) => setPresetWorkoutLocation(e.target.value)}
-          required
-        />
-      </label>
-      <button type="submit">Add Workout</button>
-      <button type="button" onClick={onClose}>
-        Cancel
-      </button>
-    </form>
+    <div className="modal show d-block" role="dialog">
+      <div className="modal-dialog" role="document">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title">Add Preset Workout</h5>
+            <button type="button" className="btn-close" aria-label="Close" onClick={onClose}></button>
+          </div>
+          <div className="modal-body">
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <label htmlFor="presetWorkoutName" className="form-label">Workout Name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="presetWorkoutName"
+                  value={presetWorkoutName}
+                  onChange={(e) => setPresetWorkoutName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="presetWorkoutDifficulty" className="form-label">Difficulty</label>
+                <select
+                  className="form-select"
+                  id="presetWorkoutDifficulty"
+                  value={presetWorkoutDifficulty}
+                  onChange={(e) => setPresetWorkoutDifficulty(e.target.value)}
+                  required
+                >
+                  <option value="">Select Difficulty</option>
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advanced">Advanced</option>
+                </select>
+              </div>
+              <div className="mb-3">
+                <label htmlFor="presetWorkoutGoal" className="form-label">Goal</label>
+                <select
+                  className="form-select"
+                  id="presetWorkoutGoal"
+                  value={presetWorkoutGoal}
+                  onChange={(e) => setPresetWorkoutGoal(e.target.value)}
+                  required
+                >
+                  <option value="">Select Goal</option>
+                  <option value="Size">Size</option>
+                  <option value="Strength">Strength</option>
+                  <option value="Overall">Overall</option>
+                </select>
+              </div>
+              <div className="mb-3">
+                <label htmlFor="presetWorkoutLocation" className="form-label">Location</label>
+                <select
+                  className="form-select"
+                  id="presetWorkoutLocation"
+                  value={presetWorkoutLocation}
+                  onChange={(e) => setPresetWorkoutLocation(e.target.value)}
+                  required
+                >
+                  <option value="">Select Location</option>
+                  <option value="Gym">Gym</option>
+                  <option value="Home">Home</option>
+                </select>
+              </div>
+              <div className="modal-footer">
+                <button type="submit" className="btn btn-primary">Add Workout</button>
+                <button type="button" className="btn btn-secondary" onClick={onClose}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

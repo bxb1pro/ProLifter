@@ -15,7 +15,7 @@ const Exercise = sequelize.define('Exercise', {
         allowNull: false,
     },
     exerciseDescription: {
-        type: DataTypes.TEXT,
+        type: DataTypes.ARRAY(DataTypes.TEXT), // to store in format that can later be split
         allowNull: true,
     },
     exerciseFormGuide: {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser, clearErrors } from '../../features/auth/authSlice';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -28,26 +28,37 @@ const Login = () => {
     };
 
     return (
-        <div>
+        <div className="container mt-5">
             <h2>Login</h2>
-            {error && <p style={{ color: 'red' }}>{typeof error === 'string' ? error : 'An unexpected error occurred'}</p>}
+            {error && <p className="text-danger">{error}</p>} {/* Display the error message */}
             <form onSubmit={handleSubmit}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <button type="submit" disabled={isLoading}>Login</button>
+                <div className="form-group">
+                    <input
+                        type="email"
+                        className="form-control"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                </div>
+                <div className="form-group">
+                    <input
+                        type="password"
+                        className="form-control"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </div>
+                <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                    {isLoading ? 'Loading...' : 'Login'}
+                </button>
             </form>
+            <div className="mt-3">
+                <p>Not registered? <Link to="/signup">Register</Link></p>
+            </div>
         </div>
     );
 };

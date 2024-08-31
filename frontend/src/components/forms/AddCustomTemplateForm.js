@@ -21,30 +21,48 @@ const AddCustomTemplateForm = ({ onClose }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Template Name:
-        <input
-          type="text"
-          value={customTemplateName}
-          onChange={(e) => setCustomTemplateName(e.target.value)}
-          required
-        />
-      </label>
-      <label>
-        Number of Days:
-        <input
-          type="number"
-          value={customTemplateDays}
-          onChange={(e) => setCustomTemplateDays(e.target.value)}
-          required
-        />
-      </label>
-      <button type="submit">Add Template</button>
-      <button type="button" onClick={onClose}>
-        Cancel
-      </button>
-    </form>
+    <div className="modal show d-block" role="dialog">
+      <div className="modal-dialog" role="document">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title">Add Custom Template</h5>
+            <button type="button" className="btn-close" aria-label="Close" onClick={onClose}></button>
+          </div>
+          <div className="modal-body">
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <label htmlFor="customTemplateName" className="form-label">Template Name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="customTemplateName"
+                  value={customTemplateName}
+                  onChange={(e) => setCustomTemplateName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="customTemplateDays" className="form-label">Number of Days</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  id="customTemplateDays"
+                  value={customTemplateDays}
+                  onChange={(e) => setCustomTemplateDays(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="modal-footer">
+                <button type="submit" className="btn btn-primary">Add Template</button>
+                <button type="button" className="btn btn-secondary" onClick={onClose}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

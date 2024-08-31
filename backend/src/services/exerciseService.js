@@ -8,9 +8,9 @@ const exerciseApi = axios.create({
     }
 });
 
-const getAllExercises = async () => {
+const getAllExercises = async (limit = 9999) => { // Limit maximum to get all exercises
     try {
-        const response = await exerciseApi.get('/exercises');
+        const response = await exerciseApi.get(`/exercises?limit=${limit}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching exercises:', error);
@@ -28,9 +28,29 @@ const getExerciseById = async (id) => {
     }
 };
 
-// More functions later, check ExerciseDB endpoints for exact info
+const getExercisesByBodyPart = async (bodyPart, limit = 9999) => {
+    try {
+        const response = await exerciseApi.get(`/exercises/bodyPart/${bodyPart}?limit=${limit}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching exercises for body part ${bodyPart}:`, error);
+        throw new Error(`Could not fetch exercises for body part ${bodyPart}`);
+    }
+};
+
+const getBodyPartList = async () => {
+    try {
+        const response = await exerciseApi.get('/exercises/bodyPartList');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching body part list:', error);
+        throw new Error('Could not fetch body part list');
+    }
+};
 
 module.exports = {
     getAllExercises,
     getExerciseById,
+    getExercisesByBodyPart,
+    getBodyPartList,
 };

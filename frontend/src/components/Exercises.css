@@ -1,19 +1,22 @@
-.exercises-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    padding: 20px;
-}
-
 .exercise-card {
     border: 1px solid #ccc;
     border-radius: 8px;
-    padding: 16px;
-    text-align: center;
+    background-color: #fff;
+    transition: transform 0.2s;
+}
+
+.exercise-card:hover {
+    transform: translateY(-5px);
 }
 
 .exercise-image {
+    height: 200px;
+    object-fit: contain;
     width: 100%;
-    height: auto;
-    border-radius: 8px;
+    border-radius: 8px 8px 0 0;
+}
+
+.exercise-card-link {
+    text-decoration: none;
+    color: inherit;
 }

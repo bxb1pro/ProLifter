@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAccountDetails, deleteAccount } from '../features/auth/authSlice';
+import { Button, Form, Alert, Modal } from 'react-bootstrap';
 
 const Account = () => {
   const dispatch = useDispatch();
   const { user, isLoading, error } = useSelector((state) => state.auth);
   const [password, setPassword] = useState('');
   const [showDeleteForm, setShowDeleteForm] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const role = useSelector((state) => state.auth.role);
 
   useEffect(() => {
@@ -16,12 +18,11 @@ const Account = () => {
   }, [dispatch, user]);
 
   const handleDeleteAccount = () => {
-    const confirmed = window.confirm('Are you sure you want to delete your account? This action cannot be undone.');
-    if (confirmed && password) {
+    if (password) {
       dispatch(deleteAccount(password))
         .unwrap()
         .then(() => {
-          alert('Account deleted successfully.');
+          setShowModal(false);
         })
         .catch((error) => {
           console.error('Error deleting account:', error);
@@ -33,37 +34,51 @@ const Account = () => {
   if (isLoading) return <p>Loading...</p>;
 
   return (
-    <section>
+    <div className="container mt-5">
       <h2>Account Details</h2>
-      {error && <p>{error}</p>}
+      {error && <Alert variant="danger">{error}</Alert>}
       {user ? (
-        <div>
-          <p>Name: {user.userName}</p>
-          <p>Email: {user.userEmail}</p>
+        <div className="mb-4">
+          <p><strong>Name:</strong> {user.userName}</p>
+          <p><strong>Email:</strong> {user.userEmail}</p>
           {(role === 'admin' || role === 'superadmin') && (
-          <p>Role: {user.role}</p>
+            <p><strong>Role:</strong> {user.role}</p>
           )}
-          <p>Account Created: {new Date(user.createdAt).toLocaleDateString()}</p>
+          <p><strong>Account Created:</strong> {new Date(user.createdAt).toLocaleDateString()}</p>
         </div>
       ) : (
-        <p>No user details available.</p>
+        <Alert variant="warning">No user details available.</Alert>
       )}
-      <button onClick={() => setShowDeleteForm(!showDeleteForm)}>
-        {showDeleteForm ? 'Cancel' : 'Delete Account'}
-      </button>
-      {showDeleteForm && (
-        <div>
-          <h3>Confirm Account Deletion</h3>
-          <input
-            type="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button onClick={handleDeleteAccount}>Delete Account</button>
-        </div>
-      )}
-    </section>
+      <Button variant="danger" onClick={() => setShowModal(true)}>
+        Delete Account
+      </Button>
+
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Account Deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+          <Form.Group controlId="password">
+            <Form.Label>Enter your password to confirm:</Form.Label>
+            <Form.Control
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDeleteAccount}>
+            Delete Account
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
   );
 };
 
