@@ -213,7 +213,7 @@ const CustomWorkouts = () => {
 
   return (
     <section className="container mt-4">
-      <h2 className="mb-4">Your Custom Workouts</h2>
+      <h2 className="mb-4">My Custom Workouts</h2>
       <button className="btn btn-primary mb-3" onClick={handleAddWorkout}>Add Custom Workout</button>
       {content}
       {showAddForm && <AddCustomWorkoutForm onClose={() => setShowAddForm(false)} />}

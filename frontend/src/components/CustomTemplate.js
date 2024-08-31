@@ -236,7 +236,7 @@ const CustomTemplate = () => {
 
   return (
     <section className="container mt-4">
-      <h2>Custom Templates</h2>
+      <h2 className="mb-4"> My Custom Templates</h2>
       <button className="btn btn-primary mb-3" onClick={handleAddTemplate}>Add Custom Template</button>
       {content}
       {showAddForm && <AddCustomTemplateForm onClose={() => setShowAddForm(false)} />}
