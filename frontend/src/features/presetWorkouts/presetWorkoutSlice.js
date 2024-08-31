@@ -56,8 +56,8 @@ export const fetchExercisesForPresetWorkout = createAsyncThunk(
       const response = await api.get(`/preset-workout-exercises/${presetWorkoutID}/exercises`);
       const exercises = response.data;
 
-      // Capitalize the necessary fields in each exercise
-      const capitalizedExercises = exercises.map(exercise => ({
+      // Capitalise the necessary fields in each exercise
+      const capitalisedExercises = exercises.map(exercise => ({
         ...exercise,
         Exercise: {
           ...exercise.Exercise,
@@ -66,7 +66,7 @@ export const fetchExercisesForPresetWorkout = createAsyncThunk(
         },
       }));
 
-      return capitalizedExercises;
+      return capitalisedExercises;
     } catch (error) {
       // If no exercises are found, return an empty array instead of rejecting
       if (error.response && error.response.status === 404) {

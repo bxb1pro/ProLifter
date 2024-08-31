@@ -405,7 +405,7 @@ const PresetTemplate = () => {
         <Modal.Header closeButton>
           <Modal.Title>Confirm Delete</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this template? This action cannot be undone.</Modal.Body>
+        <Modal.Body>Delete this template?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteTemplateModal(false)}>Cancel</Button>
           <Button variant="danger" onClick={handleConfirmDeleteTemplate}>Delete</Button>
@@ -417,7 +417,7 @@ const PresetTemplate = () => {
         <Modal.Header closeButton>
           <Modal.Title>Confirm Remove Workout</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to remove this workout from the template? This action cannot be undone.</Modal.Body>
+        <Modal.Body>Remove this workout from the template?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowUnlinkWorkoutModal(false)}>Cancel</Button>
           <Button variant="danger" onClick={handleConfirmUnlinkWorkout}>Remove</Button>
@@ -429,7 +429,7 @@ const PresetTemplate = () => {
         <Modal.Header closeButton>
           <Modal.Title>Confirm Remove Template</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to remove this template from your favourites? This action cannot be undone.</Modal.Body>
+        <Modal.Body>Are you sure you want to remove this template from your favourites?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowUnlinkUserTemplateModal(false)}>Cancel</Button>
           <Button variant="danger" onClick={handleConfirmUnlinkUserTemplate}>Remove</Button>
@@ -439,12 +439,12 @@ const PresetTemplate = () => {
       {/* Link Template Modal */}
       <Modal show={showLinkTemplateModal} onHide={() => setShowLinkTemplateModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Link Template</Modal.Title>
+          <Modal.Title>Confirm Add Template</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to link this template to your account?</Modal.Body>
+        <Modal.Body>Add this template to your favourites?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowLinkTemplateModal(false)}>Cancel</Button>
-          <Button variant="primary" onClick={handleConfirmLinkTemplate}>Confirm</Button>
+          <Button variant="primary" onClick={handleConfirmLinkTemplate}>Add</Button>
         </Modal.Footer>
       </Modal>
 

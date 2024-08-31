@@ -198,7 +198,7 @@ const PresetWorkout = () => {
   const handleLinkWorkoutToTemplate = (presetWorkoutID, presetTemplateID) => {
     if (presetTemplateID) {
       setConfirmModalTitle('Confirm Action');
-      setConfirmModalMessage('Are you sure you want to add this workout to the selected preset template?');
+      setConfirmModalMessage('Add this workout to the selected preset template?');
       setConfirmAction(() => () => {
         dispatch(linkWorkoutToPresetTemplate({ presetTemplateID, presetWorkoutID }))
           .unwrap()
@@ -222,7 +222,7 @@ const PresetWorkout = () => {
   const handleLinkWorkoutToCustomTemplate = (presetWorkoutID, customTemplateID) => {
     if (customTemplateID) {
       setConfirmModalTitle('Confirm Action');
-      setConfirmModalMessage('Are you sure you want to add this workout to the selected custom template?');
+      setConfirmModalMessage('Add this workout to the selected custom template?');
       setConfirmAction(() => () => {
         dispatch(linkWorkoutToCustomTemplate({ id: customTemplateID, presetWorkoutID }))
           .unwrap()
@@ -472,7 +472,7 @@ const PresetWorkout = () => {
         <Modal.Header closeButton>
           <Modal.Title>Confirm Delete</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this workout? This action cannot be undone.</Modal.Body>
+        <Modal.Body>Delete this workout?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>Cancel</Button>
           <Button variant="danger" onClick={handleConfirmDeleteWorkout}>Delete</Button>
@@ -484,7 +484,7 @@ const PresetWorkout = () => {
         <Modal.Header closeButton>
           <Modal.Title>Confirm Remove Exercise</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to remove this exercise from the workout? This action cannot be undone.</Modal.Body>
+        <Modal.Body>Remove this exercise from the workout?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowUnlinkExerciseModal(false)}>Cancel</Button>
           <Button variant="danger" onClick={handleConfirmUnlinkExercise}>Remove</Button>
