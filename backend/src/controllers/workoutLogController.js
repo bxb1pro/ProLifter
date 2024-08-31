@@ -135,7 +135,7 @@ const getWorkoutLogDetails = async (req, res) => {
     try {
         const workoutLogID = req.params.id;
 
-        // Find the workout log by ID and include related ExerciseLogs and SetLogs
+        // Find the workout log by ID and include related ExerciseLogs, Exercises, and SetLogs
         const workoutLog = await WorkoutLog.findByPk(workoutLogID, {
             include: [{
                 model: ExerciseLog,
@@ -146,7 +146,7 @@ const getWorkoutLogDetails = async (req, res) => {
                     },
                     {
                         model: Exercise, // Include exercise details
-                        attributes: ['exerciseName', 'exerciseBodypart']
+                        attributes: ['exerciseName', 'exerciseBodypart', 'exerciseDescription', 'exerciseImageUrl', 'exerciseEquipment', 'exerciseSecondaryBodypart']
                     }
                 ],
                 attributes: ['exerciseLogID', 'exerciseID', 'exerciseLogSets', 'exerciseLogCompleted']

@@ -14,7 +14,7 @@
 .navbar .container {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: center; /* Ensure all items are vertically centered */
     width: 100%;
     max-width: 1200px;
     padding: 0 20px;
@@ -22,6 +22,7 @@
 
 .navbar .nav {
     display: flex;
+    align-items: center; /* Center items vertically */
     justify-content: space-around; /* Spread items evenly across the width */
     flex-grow: 1; /* Allow the nav to grow to take up space */
     padding: 0;
@@ -60,7 +61,7 @@
     padding: 5px;
     position: absolute;
     z-index: 1;
-    bottom: 125%; /* Position above the icon */
+    bottom: 100%; /* Position above the icon */
     left: 50%;
     transform: translateX(-50%);
     opacity: 0;
@@ -80,7 +81,7 @@
 }
 
 .navbar .logo-link .logo-img {
-    width: 40px; /* Adjust the size of the logo as needed */
+    width: 80px; /* Increase the width to make the logo larger */
     height: auto;
     vertical-align: middle;
 }
@@ -94,7 +95,7 @@
     padding: 5px;
     position: absolute;
     z-index: 1;
-    bottom: 125%; /* Position above the logo */
+    bottom: 75%; /* Position above the logo */
     left: 50%;
     transform: translateX(-50%);
     opacity: 0;

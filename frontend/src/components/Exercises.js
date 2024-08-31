@@ -27,7 +27,16 @@ const Exercises = () => {
     };
 
     if (isLoading) return <p>Loading...</p>;
-    if (error) return <p>{error}</p>;
+
+    // Render error message only if it's a string, otherwise provide a fallback message.
+    if (error) {
+        return (
+            <div className="error-container">
+                <p>Something went wrong while fetching exercises. Please check your internet connection or try again later.</p>
+                {typeof error === 'string' ? <p>Error: {error}</p> : <p>An unexpected error occurred.</p>}
+            </div>
+        );
+    }
 
     return (
         <Container>

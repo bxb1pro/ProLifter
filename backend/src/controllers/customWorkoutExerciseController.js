@@ -41,7 +41,7 @@ const linkExercise = async (req, res) => {
                 exerciseID: externalExercise.id,
                 exerciseName: externalExercise.name,
                 exerciseBodypart: externalExercise.bodyPart,
-                exerciseDescription: externalExercise.instructions.join(', '),
+                exerciseDescription: externalExercise.instructions,
                 exerciseFormGuide: externalExercise.instructions.join(', '),
                 exerciseImageUrl: externalExercise.gifUrl,
                 exerciseEquipment: externalExercise.equipment,
