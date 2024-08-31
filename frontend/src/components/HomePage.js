@@ -1,5 +1,3 @@
-// src/components/HomePage.js
-
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -15,10 +13,10 @@ const HomePage = () => {
   };
 
   return (
-    <div>
-      <h1>Welcome to Your Homepage</h1>
-      {user && <p>Hello, {user.userName}!</p>}
-      <button onClick={handleLogout}>Logout</button>
+    <div className="container text-center mt-5">
+      <h1 className="display-4">Welcome to Your Homepage</h1>
+      {user && <p className="lead">Hello, {user.userName}!</p>}
+      <button className="btn btn-primary mt-3" onClick={handleLogout}>Logout</button>
     </div>
   );
 };

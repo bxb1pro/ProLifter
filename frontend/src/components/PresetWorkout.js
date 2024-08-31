@@ -22,6 +22,8 @@ import AddPresetWorkoutForm from './forms/AddPresetWorkoutForm';
 import EditPresetWorkoutForm from './forms/EditPresetWorkoutForm';
 import { fetchAccountDetails } from '../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Modal, Button, Alert } from 'react-bootstrap';
 
 const PresetWorkout = () => {
   const dispatch = useDispatch();
@@ -30,7 +32,7 @@ const PresetWorkout = () => {
   const exercises = useSelector((state) => state.presetWorkouts.exercises);
   const templates = useSelector((state) => state.presetTemplates.templates);
   const customTemplates = useSelector((state) => state.customTemplates.templates);
-  const userPresetWorkouts = useSelector((state) => state.presetWorkouts.userWorkouts); // User's selected preset workouts
+  const userPresetWorkouts = useSelector((state) => state.presetWorkouts.userWorkouts);
   const status = useSelector((state) => state.presetWorkouts.status);
   const userPresetStatus = useSelector((state) => state.presetWorkouts.status);
   const error = useSelector((state) => state.presetWorkouts.error);
@@ -38,15 +40,12 @@ const PresetWorkout = () => {
   const user = useSelector((state) => state.auth.user);
   const userID = user ? user.userID : null;
 
-  const [presetExercises, setPresetExercises] = useState({});
   const [mainSelectedWorkoutID, setMainSelectedWorkoutID] = useState(null);
-  const [selectedWorkoutID, setSelectedWorkoutID] = useState(null);
   const [selectedPresetWorkoutID, setSelectedPresetWorkoutID] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState(null);
   const [selectedPresetTemplateID, setSelectedPresetTemplateID] = useState('');
   const [selectedCustomTemplateID, setSelectedCustomTemplateID] = useState('');
-
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
   // Filters
@@ -54,9 +53,27 @@ const PresetWorkout = () => {
   const [goalFilter, setGoalFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
 
+  // Modal States
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showUnlinkExerciseModal, setShowUnlinkExerciseModal] = useState(false);
+  const [workoutToDelete, setWorkoutToDelete] = useState(null);
+  const [exerciseToUnlink, setExerciseToUnlink] = useState({ presetWorkoutID: null, exerciseID: null });
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmModalMessage, setConfirmModalMessage] = useState('');
+  const [confirmModalTitle, setConfirmModalTitle] = useState(''); 
+
+  const [showUnlinkPresetModal, setShowUnlinkPresetModal] = useState(false);
+  const [presetWorkoutToUnlink, setPresetWorkoutToUnlink] = useState(null);
+
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertVariant, setAlertVariant] = useState(''); 
+
   useEffect(() => {
     if (!user) {
-      dispatch(fetchAccountDetails()).finally(() => setInitialLoadComplete(true)); // Mark initial load complete after fetching user data
+      dispatch(fetchAccountDetails()).finally(() => setInitialLoadComplete(true));
     } else {
       setInitialLoadComplete(true);
     }
@@ -69,84 +86,88 @@ const PresetWorkout = () => {
         dispatch(fetchPresetTemplates());
         if (role === 'user') {
           dispatch(fetchUserCustomTemplates());
-          dispatch(fetchUserPresetWorkouts(userID)); // Fetch user's selected preset workouts
+          dispatch(fetchUserPresetWorkouts(userID));
         }
       }
     }
   }, [status, dispatch, user, userID, role]);
 
   const handleViewMainExercises = (presetWorkoutID) => {
-    setMainSelectedWorkoutID(presetWorkoutID);
+    setMainSelectedWorkoutID(prevID => prevID === presetWorkoutID ? null : presetWorkoutID);
     dispatch(fetchExercisesForPresetWorkout(presetWorkoutID));
   };
 
   const handleViewSelectedExercises = (presetWorkoutID) => {
-    setSelectedPresetWorkoutID(presetWorkoutID);
+    setSelectedPresetWorkoutID(prevID => prevID === presetWorkoutID ? null : presetWorkoutID);
     dispatch(fetchExercisesForPresetWorkout(presetWorkoutID));
   };
 
   const handleLinkWorkoutToUser = (presetWorkoutID) => {
     if (!userID) {
-        console.error('User ID is not defined. Cannot link preset workout to user.');
-        return;
+      console.error('User ID is not defined. Cannot link preset workout to user.');
+      return;
     }
-
-    dispatch(linkPresetWorkoutToUser({ userID, presetWorkoutID }))
+  
+    setConfirmModalTitle('Confirm Action');
+    setConfirmModalMessage('Add this workout to your favourites?');
+    setConfirmAction(() => () => {
+      dispatch(linkPresetWorkoutToUser({ userID, presetWorkoutID }))
         .unwrap()
         .then(() => {
-            alert('Preset workout linked successfully.');
-            dispatch(fetchUserPresetWorkouts(userID)); // Refresh the user's selected preset workouts
+          dispatch(fetchUserPresetWorkouts(userID));
         })
         .catch((error) => {
-            if (error.error === 'Preset workout is already linked to this user') {
-                alert('This workout is already linked to your account.');
-            } else {
-                console.error('Error linking preset workout:', error);
-                alert(`Failed to link preset workout: ${error.message || 'Unknown error'}`);
-            }
+          console.error('Error linking preset workout:', error);
+          if (error.error === 'Preset workout is already linked to this user') {
+            setAlertMessage('This workout is already in your favourites.');
+          } else {
+            setAlertMessage(`Failed to link preset workout: ${error.message || 'Unknown error'}`);
+          }
+          setAlertVariant('danger');
+          setAlertVisible(true);
         });
-};
-
-  const handleStartWorkout = (workoutID) => {
-    const confirmed = window.confirm('Start this workout?');
-  
-    if (confirmed) {
-        dispatch(startWorkoutLog({ presetWorkoutID: workoutID }))
-            .unwrap()
-            .then(() => {
-                navigate('/workout-logs'); // Redirect to the workout logs page after starting the workout
-            })
-            .catch((error) => {
-                console.error('Error starting workout:', error);
-                alert('Failed to start workout. Please try again.');
-            });
-    }
+    });
+    setShowConfirmModal(true);
   };
 
-
+  const handleStartWorkout = (workoutID) => {
+    dispatch(startWorkoutLog({ presetWorkoutID: workoutID }))
+      .unwrap()
+      .then(() => {
+        navigate('/workout-logs');
+      })
+      .catch((error) => {
+        console.error('Error starting workout:', error);
+        alert('Failed to start workout. Please try again.');
+      });
+  };
 
   const handleUnlinkPresetWorkout = (presetWorkoutID) => {
-    const confirmed = window.confirm('Are you sure you want to remove this workout from your favourites?');
-    if (confirmed && userID) {
+    setPresetWorkoutToUnlink(presetWorkoutID);
+    setConfirmModalTitle('Confirm Unlink');
+    setConfirmModalMessage('Are you sure you want to remove this workout from your favourites?');
+    setConfirmAction(() => () => {
       dispatch(unlinkPresetWorkoutFromUser({ userID, presetWorkoutID }))
         .unwrap()
         .then(() => {
-          alert('Workout removed successfully.');
-          dispatch(fetchUserPresetWorkouts(userID)); // Refresh the user's selected preset workouts
+          dispatch(fetchUserPresetWorkouts(userID));
         })
         .catch((error) => {
           console.error('Error removing workout:', error);
-          alert(`Failed to remove workout: ${error.message || 'Unknown error'}`);
         });
-    }
-};
+    });
+    setShowConfirmModal(true);
+  };
 
   const handleUnlinkExercise = (presetWorkoutID, exerciseID) => {
-    const confirmed = window.confirm('Are you sure you want to remove this exercise from the workout? This action cannot be undone.');
+    setExerciseToUnlink({ presetWorkoutID, exerciseID });
+    setShowUnlinkExerciseModal(true);
+  };
 
-    if (confirmed) {
+  const handleConfirmUnlinkExercise = () => {
+    const { presetWorkoutID, exerciseID } = exerciseToUnlink;
     dispatch(unlinkExerciseFromPresetWorkout({ presetWorkoutID, exerciseID }));
-    }
+    setShowUnlinkExerciseModal(false);
   };
 
   const handleAddWorkout = () => {
@@ -158,55 +179,74 @@ const PresetWorkout = () => {
   };
 
   const handleDeleteWorkout = (presetWorkoutID) => {
-    const confirmed = window.confirm('Are you sure you want to delete this workout? This action cannot be undone.');
-    if (confirmed) {
-      dispatch(deletePresetWorkout(presetWorkoutID))
-        .unwrap()
-        .then(() => {
-          alert('Workout deleted successfully.');
-        })
-        .catch((error) => {
-          console.error('Error deleting workout:', error);
-          alert(`Failed to delete workout: ${error.message || 'Unknown error'}`);
-        });
-    }
+    setWorkoutToDelete(presetWorkoutID);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDeleteWorkout = () => {
+    dispatch(deletePresetWorkout(workoutToDelete))
+      .unwrap()
+      .then(() => {
+        setShowDeleteModal(false);
+      })
+      .catch((error) => {
+        console.error('Error deleting workout:', error);
+        alert(`Failed to delete workout: ${error.message || 'Unknown error'}`);
+      });
   };
 
   const handleLinkWorkoutToTemplate = (presetWorkoutID, presetTemplateID) => {
     if (presetTemplateID) {
+      setConfirmModalTitle('Confirm Action');
+      setConfirmModalMessage('Are you sure you want to add this workout to the selected preset template?');
+      setConfirmAction(() => () => {
         dispatch(linkWorkoutToPresetTemplate({ presetTemplateID, presetWorkoutID }))
-            .unwrap()
-            .then(() => {
-                alert('Preset workout linked to template successfully.');
-                setSelectedPresetTemplateID(''); // Reset after linking
-            })
-            .catch((error) => {
-                console.error('Error linking preset workout:', error);
-                alert(`Failed to link preset workout: ${error.error || 'Unknown error'}`);
-            });
+          .unwrap()
+          .then(() => {
+            setSelectedPresetTemplateID('');
+            setAlertMessage('Preset workout linked to template successfully.');
+            setAlertVariant('success');
+            setAlertVisible(true);
+          })
+          .catch((error) => {
+            console.error('Error linking preset workout:', error);
+            setAlertMessage(`Failed to link preset workout: ${error.error || 'Unknown error'}`);
+            setAlertVariant('danger');
+            setAlertVisible(true);
+          });
+      });
+      setShowConfirmModal(true);
     }
   };
 
   const handleLinkWorkoutToCustomTemplate = (presetWorkoutID, customTemplateID) => {
     if (customTemplateID) {
+      setConfirmModalTitle('Confirm Action');
+      setConfirmModalMessage('Are you sure you want to add this workout to the selected custom template?');
+      setConfirmAction(() => () => {
         dispatch(linkWorkoutToCustomTemplate({ id: customTemplateID, presetWorkoutID }))
-            .unwrap()
-            .then(() => {
-                alert('Preset workout linked to custom template successfully.');
-                setSelectedCustomTemplateID(''); // Reset after linking
-            })
-            .catch((error) => {
-                if (error === 'Preset workout is already linked to this custom template') {
-                    alert('This workout is already linked to the selected template.');
-                } else {
-                    console.error('Error linking preset workout:', error);
-                    alert(`Failed to link preset workout: ${error || 'Unknown error'}`);
-                }
-            });
+          .unwrap()
+          .then(() => {
+            setSelectedCustomTemplateID('');
+            setAlertMessage('Preset workout linked to custom template successfully.');
+            setAlertVariant('success');
+            setAlertVisible(true);
+          })
+          .catch((error) => {
+            console.error('Error linking preset workout:', error);
+            if (error === 'Preset workout is already linked to this custom template') {
+              setAlertMessage('This workout is already linked to the selected template.');
+            } else {
+              setAlertMessage(`Failed to link preset workout: ${error.error || 'Unknown error'}`);
+            }
+            setAlertVariant('danger');
+            setAlertVisible(true);
+          });
+      });
+      setShowConfirmModal(true);
     }
-};
+  };
 
-  // Filtered workouts based on the selected filters
   const filteredWorkouts = workouts.filter((workout) => {
     return (
       (difficultyFilter === '' || workout.presetWorkoutDifficulty === difficultyFilter) &&
@@ -222,177 +262,200 @@ const PresetWorkout = () => {
   } else if (status === 'succeeded') {
     content = (
       <>
-        <div>
-          <label>Filter by Difficulty: </label>
-          <select value={difficultyFilter} onChange={(e) => setDifficultyFilter(e.target.value)}>
-            <option value="">All</option>
-            <option value="Beginner">Beginner</option>
-            <option value="Intermediate">Intermediate</option>
-            <option value="Advanced">Advanced</option>
-          </select>
+        <div className="mb-4">
+          <div className="d-flex flex-wrap gap-2 mb-3">
+            <div>
+              <label>Filter by Difficulty: </label>
+              <select className="form-select" value={difficultyFilter} onChange={(e) => setDifficultyFilter(e.target.value)}>
+                <option value="">All</option>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+              </select>
+            </div>
+            <div>
+              <label>Filter by Goal: </label>
+              <select className="form-select" value={goalFilter} onChange={(e) => setGoalFilter(e.target.value)}>
+                <option value="">All</option>
+                <option value="Size">Muscle Size</option>
+                <option value="Strength">Muscle Strength</option>
+                <option value="Overall">Strength & Size</option>
+              </select>
+            </div>
+            <div>
+              <label>Filter by Location: </label>
+              <select className="form-select" value={locationFilter} onChange={(e) => setLocationFilter(e.target.value)}>
+                <option value="">All</option>
+                <option value="Home">Home</option>
+                <option value="Gym">Gym</option>
+              </select>
+            </div>
+          </div>
 
-          <label>Filter by Goal: </label>
-          <select value={goalFilter} onChange={(e) => setGoalFilter(e.target.value)}>
-            <option value="">All</option>
-            <option value="Size">Muscle Size</option>
-            <option value="Strength">Muscle Strength</option>
-            <option value="Overall">Strength & Size</option>
-          </select>
-
-          <label>Filter by Location: </label>
-          <select value={locationFilter} onChange={(e) => setLocationFilter(e.target.value)}>
-            <option value="">All</option>
-            <option value="Home">Home</option>
-            <option value="Gym">Gym</option>
-          </select>
+          <ul className="list-group">
+            {filteredWorkouts.map((workout) => (
+              <li key={workout.presetWorkoutID} className="list-group-item">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="d-flex align-items-start">
+                    <img
+                      src="/images/workout.jpg"
+                      alt="Workout Image"
+                      className="img-thumbnail me-3"
+                      style={{ width: '100px', height: '100px' }}
+                    />
+                    <div>
+                      <p><strong>Name:</strong> {workout.presetWorkoutName}</p>
+                      <p><strong>Difficulty:</strong> {workout.presetWorkoutDifficulty}</p>
+                      <p><strong>Weightlifting Goal:</strong> {workout.presetWorkoutGoal}</p>
+                      <p><strong>Location:</strong> {workout.presetWorkoutLocation}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <button className="btn btn-primary btn-sm me-2" onClick={() => handleViewMainExercises(workout.presetWorkoutID)}>
+                      {mainSelectedWorkoutID === workout.presetWorkoutID ? 'Hide Exercises' : 'View Exercises'}
+                    </button>
+                    {(role === 'admin' || role === 'superadmin') && (
+                      <>
+                        <button className="btn btn-warning btn-sm me-2" onClick={() => handleEditWorkout(workout)}>Edit</button>
+                        <button className="btn btn-danger btn-sm" onClick={() => handleDeleteWorkout(workout.presetWorkoutID)}>Delete</button>
+                        <select
+                          className="form-select mt-2"
+                          value={selectedPresetTemplateID}
+                          onChange={(e) => {
+                            setSelectedPresetTemplateID(e.target.value);
+                            handleLinkWorkoutToTemplate(workout.presetWorkoutID, e.target.value);
+                          }}
+                        >
+                          <option value="">Add To Preset Template</option>
+                          {templates.map((template) => (
+                            <option key={template.presetTemplateID} value={template.presetTemplateID}>
+                              {template.presetTemplateName}
+                            </option>
+                          ))}
+                        </select>
+                      </>
+                    )}
+                    {role === 'user' && (
+                      <button className="btn btn-secondary btn-sm" onClick={() => handleLinkWorkoutToUser(workout.presetWorkoutID)}>
+                        Add to My Workouts
+                      </button>
+                    )}
+                  </div>
+                </div>
+                {mainSelectedWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
+                  <ul className="list-group mt-3">
+                    {exercises[workout.presetWorkoutID].length > 0 ? (
+                      exercises[workout.presetWorkoutID].map((exercise) => (
+                        <li key={exercise.exerciseID} className="list-group-item d-flex justify-content-between align-items-center">
+                          {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
+                          {(role === 'admin' || role === 'superadmin') && (
+                            <button className="btn btn-danger btn-sm" onClick={() => handleUnlinkExercise(workout.presetWorkoutID, exercise.exerciseID)}>
+                              Remove
+                            </button>
+                          )}
+                        </li>
+                      ))
+                    ) : (
+                      <li className="list-group-item">No Exercises Added</li>
+                    )}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
         </div>
 
-        <ul>
-          {filteredWorkouts.map((workout) => (
-            <li key={workout.presetWorkoutID}>
-              <div>
-                {workout.presetWorkoutName} - {workout.presetWorkoutDifficulty} -{' '}
-                {workout.presetWorkoutGoal} - {workout.presetWorkoutLocation}
-                <button onClick={() => handleViewMainExercises(workout.presetWorkoutID)}>
-                  View Exercises
-                </button>
-
-                {/* Conditionally render edit and delete options for admins or superadmins */}
-                {(role === 'admin' || role === 'superadmin') && (
-                  <>
-                    <button onClick={() => handleEditWorkout(workout)}>Edit</button>
-                    <button onClick={() => handleDeleteWorkout(workout.presetWorkoutID)}>
-                      Delete
-                    </button>
-                  </>
-                )}
-
-                {/* Only allow users to link workouts to their account */}
-                {role === 'user' && (
-                  <button onClick={() => handleLinkWorkoutToUser(workout.presetWorkoutID)}>
-                    Add to My Workouts
-                  </button>
-                )}
-
-                {/* Dropdown to select a preset template to link the workout */}
-                {(role === 'admin' || role === 'superadmin') && (
-                  <select
-                    value={selectedPresetTemplateID}
-                    onChange={(e) => {
-                      setSelectedPresetTemplateID(e.target.value);
-                      handleLinkWorkoutToTemplate(workout.presetWorkoutID, e.target.value);
-                    }}
-                  >
-                    <option value="">Select Preset Template</option>
-                    {templates.map((template) => (
-                      <option key={template.presetTemplateID} value={template.presetTemplateID}>
-                        {template.presetTemplateName}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-
-              {mainSelectedWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
-                <ul>
-                  {exercises[workout.presetWorkoutID].length > 0 ? (
-                    exercises[workout.presetWorkoutID].map((exercise) => (
-                      <li key={exercise.exerciseID}>
-                        {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
-                        {(role === 'admin' || role === 'superadmin') && (
-                          <button onClick={() => handleUnlinkExercise(workout.presetWorkoutID, exercise.exerciseID)}>
-                            Remove
-                          </button>
+        {/* My Selected Preset Workouts - Only for user role */}
+        {role === 'user' && (
+          <>
+            <h3>My Selected Preset Workouts</h3>
+            {userPresetStatus === 'loading' ? (
+              <p>Loading your selected workouts...</p>
+            ) : userPresetWorkouts.length > 0 ? (
+              <ul className="list-group">
+                {userPresetWorkouts.map((workout) => (
+                  <li key={workout.presetWorkoutID} className="list-group-item">
+                    <div className="d-flex justify-content-between align-items-center">
+                      <div className="d-flex align-items-start">
+                        <img
+                          src="/images/workout.jpg"
+                          alt="Workout Image"
+                          className="img-thumbnail me-3"
+                          style={{ width: '100px', height: '100px' }}
+                        />
+                        <div>
+                          <p><strong>Name:</strong> {workout.presetWorkoutName}</p>
+                          <p><strong>Difficulty:</strong> {workout.presetWorkoutDifficulty}</p>
+                          <p><strong>Weightlifting Goal:</strong> {workout.presetWorkoutGoal}</p>
+                          <p><strong>Location:</strong> {workout.presetWorkoutLocation}</p>
+                        </div>
+                      </div>
+                      <div>
+                        <button className="btn btn-primary btn-sm me-2" onClick={() => handleViewSelectedExercises(workout.presetWorkoutID)}>
+                          {selectedPresetWorkoutID === workout.presetWorkoutID ? 'Hide Exercises' : 'View Exercises'}
+                        </button>
+                        <button className="btn btn-success btn-sm me-2" onClick={() => handleStartWorkout(workout.presetWorkoutID)}>
+                          Start Workout
+                        </button>
+                        <button className="btn btn-danger btn-sm" onClick={() => handleUnlinkPresetWorkout(workout.presetWorkoutID)}>
+                          Remove
+                        </button>
+                        <select
+                          className="form-select mt-2"
+                          value={selectedCustomTemplateID}
+                          onChange={(e) => {
+                            setSelectedCustomTemplateID(e.target.value);
+                            handleLinkWorkoutToCustomTemplate(workout.presetWorkoutID, e.target.value);
+                          }}
+                        >
+                          <option value="">Select Custom Template</option>
+                          {customTemplates.map((template) => (
+                            <option key={template.customTemplateID} value={template.customTemplateID}>
+                              {template.customTemplateName}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    {selectedPresetWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
+                      <ul className="list-group mt-3">
+                        {exercises[workout.presetWorkoutID].length > 0 ? (
+                          exercises[workout.presetWorkoutID].map((exercise) => (
+                            <li key={exercise.exerciseID} className="list-group-item">
+                              {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
+                            </li>
+                          ))
+                        ) : (
+                          <li className="list-group-item">No Exercises Added</li>
                         )}
-                      </li>
-                    ))
-                  ) : (
-                    <li>No Exercises Added</li>
-                  )}
-                </ul>
-              )}
-            </li>
-          ))}
-        </ul>
-
-      {/* My Selected Preset Workouts - Only for user role */}
-      {role === 'user' && (
-        <>
-          <h3>My Selected Preset Workouts</h3>
-          {userPresetStatus === 'loading' ? (
-            <p>Loading your selected workouts...</p>
-          ) : userPresetWorkouts.length > 0 ? (
-            <ul>
-              {userPresetWorkouts.map((workout) => (
-                <li key={workout.presetWorkoutID}>
-                  <div>
-                    {workout.presetWorkoutName}
-                    <button onClick={() => handleViewSelectedExercises(workout.presetWorkoutID)}>
-                      View Exercises
-                    </button>
-                    <button onClick={() => handleStartWorkout(workout.presetWorkoutID)}>
-                      Start Workout
-                    </button>
-                    <button onClick={() => handleUnlinkPresetWorkout(workout.presetWorkoutID)}>
-                      Delete
-                    </button>
-
-                    {/* Dropdown to select a custom template to link the workout */}
-                    <select
-                      value={selectedCustomTemplateID}
-                      onChange={(e) => {
-                        setSelectedCustomTemplateID(e.target.value);
-                        handleLinkWorkoutToCustomTemplate(workout.presetWorkoutID, e.target.value);
-                      }}
-                    >
-                      <option value="">Select Custom Template</option>
-                      {customTemplates.map((template) => (
-                        <option key={template.customTemplateID} value={template.customTemplateID}>
-                          {template.customTemplateName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  {selectedPresetWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
-                    <ul>
-                      {exercises[workout.presetWorkoutID].length > 0 ? (
-                        exercises[workout.presetWorkoutID].map((exercise) => (
-                          <li key={exercise.exerciseID}>
-                            {exercise.Exercise.exerciseName} - {exercise.Exercise.exerciseBodypart}
-                          </li>
-                        ))
-                      ) : (
-                        <li>No Exercises Added</li>
-                      )}
-                    </ul>
-                  )}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No selected preset workouts found.</p>
-          )}
-        </>
-      )}
-    </>
-  );
-} else if (status === 'failed') {
-  content = (
-    <p>
-      {typeof error === 'string' ? error : error.message || 'An error occurred.'}
-    </p>
-  );
-}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No selected preset workouts found.</p>
+            )}
+          </>
+        )}
+      </>
+    );
+  } else if (status === 'failed') {
+    content = (
+      <p>
+        {typeof error === 'string' ? error : error.message || 'An error occurred.'}
+      </p>
+    );
+  }
 
   return (
-    <section>
+    <section className="container mt-4">
       <h2>Preset Workouts</h2>
 
-      {/* Check if user and role are fully loaded before rendering the content */}
       {user && role && (
         <>
           {(role === 'admin' || role === 'superadmin') && (
-            <button onClick={handleAddWorkout}>Add Preset Workout</button>
+            <button className="btn btn-success mb-4" onClick={handleAddWorkout}>Add Preset Workout</button>
           )}
           {content}
           {showAddForm && <AddPresetWorkoutForm onClose={() => setShowAddForm(false)} />}
@@ -402,8 +465,81 @@ const PresetWorkout = () => {
         </>
       )}
 
-      {/* Optionally, you can add a fallback message or loader if user or role is not yet available */}
       {!user && <p>Loading user data...</p>}
+
+      {/* Delete Workout Modal */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to delete this workout? This action cannot be undone.</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>Cancel</Button>
+          <Button variant="danger" onClick={handleConfirmDeleteWorkout}>Delete</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Unlink Exercise Modal */}
+      <Modal show={showUnlinkExerciseModal} onHide={() => setShowUnlinkExerciseModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Remove Exercise</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to remove this exercise from the workout? This action cannot be undone.</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowUnlinkExerciseModal(false)}>Cancel</Button>
+          <Button variant="danger" onClick={handleConfirmUnlinkExercise}>Remove</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Confirm Action Modal */}
+      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>{confirmModalTitle}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{confirmModalMessage}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>Cancel</Button>
+          <Button variant="primary" onClick={() => { confirmAction(); setShowConfirmModal(false); }}>
+            Confirm
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Confirm Unlink Preset Workout Modal */}
+      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>{confirmModalTitle}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{confirmModalMessage}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>Cancel</Button>
+          <Button variant="primary" onClick={() => { confirmAction(); setShowConfirmModal(false); }}>
+            Confirm
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Confirm Action Modal */}
+      <Modal show={showConfirmModal} onHide={() => setShowConfirmModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>{confirmModalTitle}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{confirmModalMessage}</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowConfirmModal(false)}>Cancel</Button>
+          <Button variant="primary" onClick={() => { confirmAction(); setShowConfirmModal(false); }}>
+            Confirm
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+          {/* Alert Message */}
+          {alertVisible && (
+            <Alert variant={alertVariant} onClose={() => setAlertVisible(false)} dismissible>
+              {alertMessage}
+            </Alert>
+          )}
+
     </section>
   );
 };
