@@ -1,10 +1,11 @@
 const { Exercise } = require('../models');
-const { getAllExercises, getExerciseById } = require('../services/exerciseService');
+const { getAllExercises, getExerciseById, getExercisesByBodyPart, getBodyPartList} = require('../services/exerciseService');
 
-// Fetch all exercises from the API
+// Fetch all exercises from the API (with a limit)
 const fetchAllExercises = async (req, res) => {
     try {
-        const exercises = await getAllExercises();
+        const limit = parseInt(req.query.limit, 10) || 9999;
+        const exercises = await getAllExercises(limit);
         res.status(200).json(exercises);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -24,7 +25,31 @@ const fetchExerciseDetails = async (req, res) => {
     }
 };
 
+// Fetch exercises by body part
+const fetchExercisesByBodyPart = async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit, 10) || 9999;
+        const exercises = await getExercisesByBodyPart(req.params.bodyPart, limit);
+        res.status(200).json(exercises);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Fetch body part list (to use in frontend filter search)
+const fetchBodyPartList = async (req, res) => {
+    try {
+        const bodyParts = await getBodyPartList();
+        res.status(200).json(bodyParts);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
 module.exports = {
     fetchAllExercises,
     fetchExerciseDetails,
+    fetchExercisesByBodyPart,
+    fetchBodyPartList,
 };
