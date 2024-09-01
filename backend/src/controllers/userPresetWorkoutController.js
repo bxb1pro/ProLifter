@@ -1,5 +1,6 @@
 const { UserPresetWorkout, PresetWorkout, User } = require('../models');
 
+// Link a preset workout to a user
 const linkPresetWorkout = async (req, res) => {
     try {
         const { presetWorkoutID } = req.body;
@@ -26,7 +27,7 @@ const linkPresetWorkout = async (req, res) => {
         await UserPresetWorkout.create({
             userID,
             presetWorkoutID,
-            dateSelected: new Date(), // Set the current date and time
+            dateSelected: new Date(),
         });
 
         res.status(200).json({ message: 'Preset workout linked to user successfully' });
@@ -36,6 +37,7 @@ const linkPresetWorkout = async (req, res) => {
     }
 };
 
+// Unlink a preset workout from a user
 const unlinkPresetWorkout = async (req, res) => {
     try {
         const { presetWorkoutID } = req.body;
@@ -51,6 +53,7 @@ const unlinkPresetWorkout = async (req, res) => {
     }
 };
 
+// Get all preset workouts linked to a user
 const getUserPresetWorkouts = async (req, res) => {
     try {
         const userID = req.params.id;

@@ -62,12 +62,13 @@ const deleteSetLog = async (req, res) => {
     }
 };
 
+// Get set logs belonging to an exercise for a user
 const getUserSetLogsByExercise = async (req, res) => {
     try {
         const userID = req.user.userID; // Extract user ID from the JWT token
-        const { exerciseLogID } = req.params; // Get exerciseLogID from the URL parameters
+        const { exerciseLogID } = req.params;
 
-        // Ensure the exercise log belongs to the user
+        // Make sure the exercise log belongs to the user
         const exerciseLog = await ExerciseLog.findOne({
             where: {
                 exerciseLogID,
@@ -83,12 +84,12 @@ const getUserSetLogsByExercise = async (req, res) => {
             return res.status(404).json({ error: 'Exercise log not found or does not belong to the user.' });
         }
 
-        // Fetch all set logs associated with this exercise log
+        // Fetch all set logs associated with the exercise log
         const setLogs = await SetLog.findAll({
             where: {
                 exerciseLogID,
             },
-            order: [['createdAt', 'ASC']], // Optional: order by creation time
+            order: [['createdAt', 'ASC']],
         });
 
         res.status(200).json(setLogs);

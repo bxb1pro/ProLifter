@@ -1,5 +1,6 @@
 const axios = require('axios');
 
+// Details for API keys in .env file
 const exerciseApi = axios.create({
     baseURL: 'https://exercisedb.p.rapidapi.com',
     headers: {
@@ -8,6 +9,7 @@ const exerciseApi = axios.create({
     }
 });
 
+// Get all exercises from API
 const getAllExercises = async (limit = 9999) => { // Limit maximum to get all exercises
     try {
         const response = await exerciseApi.get(`/exercises?limit=${limit}`);
@@ -18,6 +20,7 @@ const getAllExercises = async (limit = 9999) => { // Limit maximum to get all ex
     }
 };
 
+// Get an exercise via ID from API
 const getExerciseById = async (id) => {
     try {
         const response = await exerciseApi.get(`/exercises/exercise/${id}`);
@@ -28,6 +31,7 @@ const getExerciseById = async (id) => {
     }
 };
 
+// Get exercises by bodypart from the API
 const getExercisesByBodyPart = async (bodyPart, limit = 9999) => {
     try {
         const response = await exerciseApi.get(`/exercises/bodyPart/${bodyPart}?limit=${limit}`);
@@ -38,6 +42,7 @@ const getExercisesByBodyPart = async (bodyPart, limit = 9999) => {
     }
 };
 
+// Get a list of bodyparts used from the API
 const getBodyPartList = async () => {
     try {
         const response = await exerciseApi.get('/exercises/bodyPartList');
@@ -48,6 +53,7 @@ const getBodyPartList = async () => {
     }
 };
 
+// Get an exercise by name from the API
 const getExerciseByName = async (name) => {
     try {
         const response = await exerciseApi.get(`/exercises/name/${encodeURIComponent(name)}`);

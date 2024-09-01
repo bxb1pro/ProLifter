@@ -1,13 +1,13 @@
 const express = require('express');
 const { createPresetWorkout, viewDetails, editPresetWorkout, deletePresetWorkout, viewAllPresetWorkouts } = require('../controllers/presetWorkoutController');
-const verifyRole = require('../middleware/roleMiddleware'); // Import middleware
+const verifyRole = require('../middleware/roleMiddleware');
 
 const router = express.Router();
 
-// Route to view all preset workouts
+// View all preset workouts
 router.get('/', viewAllPresetWorkouts);
 
-// Anyone can view preset workouts
+// View a specific preset workout
 router.get('/:id', viewDetails);
 
 // Only admin and superadmin can create, edit, or delete preset workouts

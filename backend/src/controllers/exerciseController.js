@@ -1,5 +1,5 @@
 const { Exercise } = require('../models');
-const { getAllExercises, getExerciseById, getExercisesByBodyPart, getBodyPartList, getExerciseByName } = require('../services/exerciseService');
+const { getAllExercises, getExerciseById, getExercisesByBodyPart, getBodyPartList, getExerciseByName } = require('../services/exerciseService'); // Import the exercise service
 
 // Fetch all exercises from the API (with a limit)
 const fetchAllExercises = async (req, res) => {
@@ -25,7 +25,7 @@ const fetchExerciseDetails = async (req, res) => {
     }
 };
 
-// Fetch exercises by body part
+// Fetch exercises from the API by body part
 const fetchExercisesByBodyPart = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit, 10) || 500;
@@ -36,7 +36,7 @@ const fetchExercisesByBodyPart = async (req, res) => {
     }
 };
 
-// Fetch body part list (to use in frontend filter search)
+// Fetch body part list from the API (to use in frontend filter search)
 const fetchBodyPartList = async (req, res) => {
     try {
         const bodyParts = await getBodyPartList();
@@ -46,7 +46,7 @@ const fetchBodyPartList = async (req, res) => {
     }
 };
 
-// Fetch exercises by name (to load the live exercise image in the WorkoutLogDetails)
+// Fetch exercises by name from the API (to load the live exercise image in the WorkoutLogDetails)
 const fetchExerciseByName = async (req, res) => {
     try {
         const exerciseName = req.params.name;
@@ -54,7 +54,7 @@ const fetchExerciseByName = async (req, res) => {
         if (!exercise || exercise.length === 0) {
             return res.status(404).json({ error: 'Exercise not found' });
         }
-        res.status(200).json({ imageUrl: exercise[0].gifUrl }); // Assuming the first match is the desired one
+        res.status(200).json({ imageUrl: exercise[0].gifUrl });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

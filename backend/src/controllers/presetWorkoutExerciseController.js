@@ -1,9 +1,10 @@
 const { PresetWorkout, PresetWorkoutExercise, Exercise } = require('../models');
 const { getExerciseById } = require('../services/exerciseService');
 
+// Link an exercise to a preset workout
 const linkExercise = async (req, res) => {
     try {
-        const { exerciseID, defaultSets, defaultReps, defaultRPE } = req.body; // Now includes default values
+        const { exerciseID, defaultSets, defaultReps, defaultRPE } = req.body; // Include the default values
         const presetWorkoutID = req.params.id;
 
         console.log(`Linking exercise ID: ${exerciseID} to preset workout ID: ${presetWorkoutID} with default sets: ${defaultSets}, reps: ${defaultReps}, RPE: ${defaultRPE}`);
@@ -48,7 +49,7 @@ const linkExercise = async (req, res) => {
             });
         }
 
-        // Create the link in the PresetWorkoutExercise table with dynamic default values
+        // Create the link in the PresetWorkoutExercise table with the default values
         await PresetWorkoutExercise.create({
             presetWorkoutID,
             exerciseID: exercise.exerciseID,
@@ -64,6 +65,7 @@ const linkExercise = async (req, res) => {
     }
 };
 
+// Unlink an exercise from a preset workout
 const unlinkExercise = async (req, res) => {
     try {
         const { exerciseID } = req.body;
@@ -81,7 +83,7 @@ const unlinkExercise = async (req, res) => {
             return res.status(404).json({ error: 'Exercise not found' });
         }
 
-        // Check if the link exists before attempting to delete it
+        // Check if the link exists before trying to delete it
         const link = await PresetWorkoutExercise.findOne({ where: { presetWorkoutID, exerciseID } });
         if (!link) {
             return res.status(404).json({ error: 'Link between preset workout and exercise not found' });
@@ -97,6 +99,7 @@ const unlinkExercise = async (req, res) => {
     }
 };
 
+// Get all exercises for a preset workout
 const getExercisesForPresetWorkout = async (req, res) => {
     try {
         const presetWorkoutID = req.params.id;

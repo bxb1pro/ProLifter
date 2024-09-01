@@ -4,8 +4,12 @@ const verifyRole = require('../middleware/roleMiddleware');
 
 const router = express.Router();
 
-//router.get('/', getAllUsers);
+//router.get('/', getAllUsers);  --  used for testing
+
+// Get a specific user
 router.get('/:id', getUserById);
+
+// Create a user
 router.post('/', createUser);
 
 //Allow only admins and superadmins to fetch all exercises

@@ -3,18 +3,19 @@ const { fetchAllExercises, fetchExerciseDetails, fetchExercisesByBodyPart, fetch
 
 const router = express.Router();
 
-// Route to get all exercises
+// Get all exercises from the API
 router.get('/', fetchAllExercises);
 
-// Route to get the list of body parts
+// Get a list of bodyparts from the API
 router.get('/bodyPartList', fetchBodyPartList);
 
-// Route to get exercises by body part
+// Get exercises filtered by bodypart from the API
 router.get('/bodyPart/:bodyPart', fetchExercisesByBodyPart);
 
+// Get exercises by their specific name
 router.get('/name/:name', fetchExerciseByName);
 
-// Route to get a specific exercise by ID
+// Get a specific exercise by ID
 router.get('/:id', fetchExerciseDetails);
 
 module.exports = router;

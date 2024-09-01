@@ -79,7 +79,7 @@ const deleteTemplate = async (req, res) => {
     }
 };
 
-// Get all preset templates (for anyone to view)
+// Get all preset templates
 const getPresetTemplates = async (req, res) => {
     try {
         const presetTemplates = await PresetTemplate.findAll({

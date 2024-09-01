@@ -5,7 +5,7 @@ const createWorkout = async (req, res) => {
     try {
         const { customWorkoutName } = req.body;
 
-        // Extract the userID from the authenticated user's request
+        // Extract userID from the authenticated user
         const userID = req.user.userID;
 
         const newWorkout = await CustomWorkout.create({
@@ -20,6 +20,7 @@ const createWorkout = async (req, res) => {
     }
 };
 
+// View custom workout details
 const viewWorkout = async (req, res) => {
     try {
         const workout = await CustomWorkout.findByPk(req.params.id);
@@ -33,6 +34,7 @@ const viewWorkout = async (req, res) => {
     }
 };
 
+// Edit a custom workout
 const editWorkout = async (req, res) => {
     try {
         const { customWorkoutName } = req.body;
@@ -49,6 +51,7 @@ const editWorkout = async (req, res) => {
     }
 };
 
+// Delete a custom workout
 const deleteWorkout = async (req, res) => {
     try {
         const workout = await CustomWorkout.findByPk(req.params.id);
@@ -63,15 +66,16 @@ const deleteWorkout = async (req, res) => {
     }
 };
 
+// Get custom workouts for a user
 const getUserCustomWorkouts = async (req, res) => {
     try {
-        // Extract the userID from the authenticated user's request
+        // Extract the userID from the authenticated user
         const userID = req.user.userID;
 
         // Find all custom workouts associated with this user
         const customWorkouts = await CustomWorkout.findAll({
             where: { userID },
-            order: [['customWorkoutDateCreated', 'DESC']], // Optional: order by creation date
+            order: [['customWorkoutDateCreated', 'DESC']],
         });
 
         res.status(200).json(customWorkouts);

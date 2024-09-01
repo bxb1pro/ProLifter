@@ -1,5 +1,6 @@
 const { User } = require('../models');
 
+// Get all users
 const getAllUsers = async (req, res) => {
     try {
         const users = await User.findAll();
@@ -10,6 +11,7 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+// Get a user by their ID
 const getUserById = async (req, res) => {
     try {
         const user = await User.findByPk(req.params.id);
@@ -23,6 +25,7 @@ const getUserById = async (req, res) => {
     }
 };
 
+// Create a new user
 const createUser = async (req, res) => {
     try {
         const { userName, userEmail, userPasswordHash, userAge, userExperienceLevel, userWeightliftingGoal } = req.body;

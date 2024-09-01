@@ -5,7 +5,7 @@ const startExerciseLog = async (req, res) => {
     try {
         const { userID, workoutLogID, exerciseID } = req.body;
 
-        // Ensure the parent workout log exists
+        // Make sure the parent workout log exists
         const workoutLog = await WorkoutLog.findByPk(workoutLogID);
         if (!workoutLog) {
             return res.status(404).json({ error: 'Workout log not found' });
@@ -70,10 +70,11 @@ const finishExerciseLog = async (req, res) => {
     }
 };
 
+// Get exercise logs for a specific user's specific workout
 const getUserExerciseLogsByWorkout = async (req, res) => {
     try {
         const userID = req.user.userID; // Extract user ID from the JWT token
-        const { workoutLogID } = req.params; // Get workoutLogID from the URL parameters
+        const { workoutLogID } = req.params;
 
         // Ensure the workout log belongs to the user
         const workoutLog = await WorkoutLog.findOne({
@@ -93,7 +94,7 @@ const getUserExerciseLogsByWorkout = async (req, res) => {
                 workoutLogID,
                 userID,
             },
-            order: [['createdAt', 'ASC']], // Optional: order by creation time
+            order: [['createdAt', 'ASC']],
         });
 
         res.status(200).json(exerciseLogs);
@@ -103,6 +104,7 @@ const getUserExerciseLogsByWorkout = async (req, res) => {
     }
 };
 
+// Delete an exercise log
 const deleteExerciseLog = async (req, res) => {
     try {
         const exerciseLog = await ExerciseLog.findByPk(req.params.id);

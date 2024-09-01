@@ -1,6 +1,7 @@
 const { CustomWorkoutExercise, CustomWorkout, Exercise } = require('../models');
-const { getExerciseById } = require('../services/exerciseService');
+const { getExerciseById } = require('../services/exerciseService'); // Import the exercise service
 
+// Link an exercise to a custom workout
 const linkExercise = async (req, res) => {
     try {
         const { exerciseID } = req.body;
@@ -36,7 +37,7 @@ const linkExercise = async (req, res) => {
                 return res.status(404).json({ error: 'Exercise not found' });
             }
 
-            // Store the exercise in the local database
+            // Store the exercise in the local database (reduce API calls)
             exercise = await Exercise.create({
                 exerciseID: externalExercise.id,
                 exerciseName: externalExercise.name,
@@ -59,12 +60,13 @@ const linkExercise = async (req, res) => {
     }
 };
 
+// Unlink an exercise from a custom workout
 const unlinkExercise = async (req, res) => {
     try {
         const { exerciseID } = req.body;
         const customWorkoutID = req.params.id;
 
-        // Find the link before attempting to delete it
+        // Find the link before trying to delete it
         const link = await CustomWorkoutExercise.findOne({ where: { customWorkoutID, exerciseID } });
 
         if (!link) {
@@ -81,6 +83,7 @@ const unlinkExercise = async (req, res) => {
     }
 };
 
+// Get all exercises linked to a specific custom workout
 const getExercisesForCustomWorkout = async (req, res) => {
     try {
         const customWorkoutID = req.params.id;
@@ -88,7 +91,7 @@ const getExercisesForCustomWorkout = async (req, res) => {
         // Find all exercises linked to this custom workout
         const exercises = await CustomWorkoutExercise.findAll({
             where: { customWorkoutID },
-            include: [Exercise], // Include the Exercise details
+            include: [Exercise], // Include the exercise details
         });
 
         if (!exercises || exercises.length === 0) {
