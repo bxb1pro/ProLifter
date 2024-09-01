@@ -9,7 +9,7 @@ const capitaliseWords = (str) => {
 // Thunk to fetch all exercises
 export const fetchExercises = createAsyncThunk(
     'exercises/fetchAll',
-    async ({ limit = 9999 } = {}, { rejectWithValue }) => {
+    async ({ limit = 500 } = {}, { rejectWithValue }) => {
         try {
             const response = await api.get(`/exercises?limit=${limit}`);
             const exercises = response.data.map(exercise => ({
@@ -54,7 +54,7 @@ export const fetchExerciseById = createAsyncThunk(
 // Thunk to fetch exercises by bodypart
 export const fetchExercisesByBodyPart = createAsyncThunk(
     'exercises/fetchByBodyPart',
-    async ({ bodyPart, limit = 9999 } = {}, { rejectWithValue }) => {
+    async ({ bodyPart, limit = 500 } = {}, { rejectWithValue }) => {
         try {
             const response = await api.get(`/exercises/bodyPart/${bodyPart}?limit=${limit}`);
             const exercises = response.data.map(exercise => ({
@@ -83,6 +83,20 @@ export const fetchBodyPartList = createAsyncThunk(
         } catch (error) {
             console.error('Fetch body part list error:', error.response ? error.response.data : error.message);
             return rejectWithValue(error.response.data || 'Failed to fetch body part list');
+        }
+    }
+);
+
+// Thunk to fetch exercise by name
+export const fetchExerciseByName = createAsyncThunk(
+    'exercises/fetchByName',
+    async (name, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/exercises/name/${name}`);
+            return response.data;
+        } catch (error) {
+            console.error('Fetch exercise by name error:', error.response ? error.response.data : error.message);
+            return rejectWithValue(error.response.data || 'Failed to fetch exercise');
         }
     }
 );
@@ -144,6 +158,18 @@ const exerciseSlice = createSlice({
                 state.isLoading = false;
             })
             .addCase(fetchExercisesByBodyPart.rejected, (state, action) => {
+                state.error = action.payload;
+                state.isLoading = false;
+            })
+            .addCase(fetchExerciseByName.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(fetchExerciseByName.fulfilled, (state, action) => {
+                state.selectedExercise = action.payload;
+                state.isLoading = false;
+            })
+            .addCase(fetchExerciseByName.rejected, (state, action) => {
                 state.error = action.payload;
                 state.isLoading = false;
             });

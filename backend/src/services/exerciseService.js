@@ -48,9 +48,20 @@ const getBodyPartList = async () => {
     }
 };
 
+const getExerciseByName = async (name) => {
+    try {
+        const response = await exerciseApi.get(`/exercises/name/${encodeURIComponent(name)}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching exercise with name ${name}:`, error);
+        throw new Error(`Could not fetch exercise with name ${name}`);
+    }
+};
+
 module.exports = {
     getAllExercises,
     getExerciseById,
     getExercisesByBodyPart,
     getBodyPartList,
+    getExerciseByName,
 };

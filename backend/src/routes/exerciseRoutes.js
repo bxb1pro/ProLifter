@@ -1,5 +1,5 @@
 const express = require('express');
-const { fetchAllExercises, fetchExerciseDetails, fetchExercisesByBodyPart, fetchBodyPartList } = require('../controllers/exerciseController');
+const { fetchAllExercises, fetchExerciseDetails, fetchExercisesByBodyPart, fetchBodyPartList, fetchExerciseByName } = require('../controllers/exerciseController');
 
 const router = express.Router();
 
@@ -11,6 +11,8 @@ router.get('/bodyPartList', fetchBodyPartList);
 
 // Route to get exercises by body part
 router.get('/bodyPart/:bodyPart', fetchExercisesByBodyPart);
+
+router.get('/name/:name', fetchExerciseByName);
 
 // Route to get a specific exercise by ID
 router.get('/:id', fetchExerciseDetails);

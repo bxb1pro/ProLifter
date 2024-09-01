@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchWorkoutLogDetails, finishWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 import { editExerciseLog, deleteExerciseLog } from '../features/exerciseLogs/exerciseLogSlice';
 import { addSetLog, deleteSetLog, editSetLog } from '../features/setLogs/setLogSlice'; 
+import { fetchExerciseByName } from '../features/exercises/exerciseSlice';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, ListGroup, Form, InputGroup, Card, Modal, Row, Col } from 'react-bootstrap';
 import './WorkoutLogDetails.css';
@@ -18,6 +19,9 @@ const WorkoutLogDetails = () => {
   const workoutLog = useSelector((state) => state.workoutLogs.currentLog);
   const status = useSelector((state) => state.workoutLogs.status);
   const error = useSelector((state) => state.workoutLogs.error);
+  
+  // State to track fetched exercise images
+  const [exerciseImages, setExerciseImages] = useState({});
 
   const [newSetData, setNewSetData] = useState({}); 
   const [editMode, setEditMode] = useState(null); 
@@ -42,10 +46,15 @@ const WorkoutLogDetails = () => {
   useEffect(() => {
     if (workoutLogID) {
       dispatch(fetchWorkoutLogDetails(workoutLogID)).then((response) => {
-        console.log('Workout Log Details:', response.payload); // Debugging line
         const exerciseLogs = response.payload.ExerciseLogs;
-        exerciseLogs.forEach(log => {
-          console.log('Exercise Image URL:', log.Exercise.exerciseImageUrl); // Debugging line
+        exerciseLogs.forEach((log) => {
+          const encodedName = encodeURIComponent(log.Exercise.exerciseName);
+          dispatch(fetchExerciseByName(encodedName)).then((action) => {
+            setExerciseImages((prev) => ({
+              ...prev,
+              [log.Exercise.exerciseName]: action.payload.imageUrl,
+            }));
+          });
         });
       });
     }
@@ -183,9 +192,25 @@ const WorkoutLogDetails = () => {
 
   return (
     <section className="container mt-4 workout-log-details">
-      <h2 className="mb-4">Workout Log Details</h2>
-      <p><strong>Date:</strong> {new Date(workoutLog.workoutLogDate).toLocaleDateString()}</p>
-      <p><strong>Completed:</strong> {workoutLog.workoutLogCompleted ? 'Yes' : 'No'}</p>
+      <Row className="mb-4">
+        <Col md={6}>
+          <h2>Workout Log Details</h2>
+          <p><strong>Date:</strong> {new Date(workoutLog.workoutLogDate).toLocaleDateString()}</p>
+          <p><strong>Completed:</strong> {workoutLog.workoutLogCompleted ? 'Yes' : 'No'}</p>
+        </Col>
+        <Col md={6} className="text-end">
+        <h3>Definitions</h3>
+          <div className="definition">
+            <p><strong>RPE: Rate of Perceived Exertion</strong></p>
+            <p className="definition-description">1 being minimum, 10 being maximum</p>
+          </div>
+          <div className="definition">
+            <p><strong>1RM: One Rep Max</strong></p>
+            <p className="definition-description">The maximum weight lifted for one successful repetition</p>
+          </div>
+        </Col>
+      </Row>
+
       <h3>Exercises:</h3>
       <ListGroup as="ul">
         {workoutLog.ExerciseLogs && workoutLog.ExerciseLogs.length > 0 ? (
@@ -193,10 +218,10 @@ const WorkoutLogDetails = () => {
             <ListGroup.Item as="li" key={exerciseLog.exerciseLogID}>
               <Card className="mb-3 exercise-card">
                 <Card.Img 
-                  src={exerciseLog.Exercise.exerciseImageUrl} 
+                  src={exerciseImages?.[exerciseLog.Exercise.exerciseName]} 
                   alt={exerciseLog.Exercise.exerciseName}
                   onError={(e) => { 
-                    console.error('Failed to load image:', exerciseLog.Exercise.exerciseImageUrl); // Debugging line
+                    console.error('Failed to load image:', exerciseImages?.[exerciseLog.Exercise.exerciseName]); 
                     e.target.onerror = null; 
                     e.target.src = "/images/placeholder.jpg"; 
                   }} 
@@ -208,11 +233,11 @@ const WorkoutLogDetails = () => {
                     <p className="mb-1"><strong>Equipment:</strong> {capitaliseWords(exerciseLog.Exercise.exerciseEquipment)}</p>
                   </div>
                   <Card.Text className="mt-2">
-                  <ol>
-                    {exerciseLog.Exercise.exerciseDescription.map((instruction, index) => (
-                      <li key={index}>{instruction}</li>
-                    ))}
-                  </ol>
+                    <ol>
+                      {exerciseLog.Exercise.exerciseDescription.map((instruction, index) => (
+                        <li key={index}>{instruction}</li>
+                      ))}
+                    </ol>
                   </Card.Text>
                   <Card.Text>Status: {exerciseLog.exerciseLogCompleted ? 'Completed' : 'Incomplete'}</Card.Text>
                   {!exerciseLog.exerciseLogCompleted && (
