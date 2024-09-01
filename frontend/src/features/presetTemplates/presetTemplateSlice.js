@@ -151,7 +151,7 @@ const presetTemplateSlice = createSlice({
         userTemplates: [],
         templateDetails: null,
         presetWorkouts: [],
-        status: 'idle', // idle, loading, succeeded, failed
+        status: 'idle',
         error: null,
     },
     extraReducers: (builder) => {
@@ -211,8 +211,8 @@ const presetTemplateSlice = createSlice({
             })
             .addCase(linkPresetTemplate.rejected, (state, action) => {
                 if (action.payload?.error === 'Preset template is already linked to this user') {
-                    state.status = 'succeeded'; // Treat this as a successful state to fix bug
-                    state.error = action.payload?.error; // Store the specific error message
+                    state.status = 'succeeded'; // Bug fix to prevent the page from getting stuck in a 'failed' state
+                    state.error = action.payload?.error;
                 } else {
                     state.status = 'failed';
                     state.error = action.payload;
@@ -230,13 +230,12 @@ const presetTemplateSlice = createSlice({
             })
             .addCase(fetchUserPresetTemplates.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.userTemplates = action.payload; // Store user templates separately
+                state.userTemplates = action.payload;
             })
             .addCase(fetchUserPresetTemplates.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.payload;
             })
-            // Handle linking preset workout to template
             .addCase(linkPresetWorkoutToTemplate.fulfilled, (state, action) => {
                 state.status = 'succeeded';
             })
@@ -244,8 +243,6 @@ const presetTemplateSlice = createSlice({
                 state.status = 'failed';
                 state.error = action.payload;
             })
-
-            // Handle unlinking preset workout from template
             .addCase(unlinkPresetWorkoutFromTemplate.fulfilled, (state, action) => {
                 state.status = 'succeeded';
             })
@@ -253,8 +250,6 @@ const presetTemplateSlice = createSlice({
                 state.status = 'failed';
                 state.error = action.payload;
             })
-
-            // Handle fetching preset workouts linked to a template
             .addCase(fetchPresetWorkoutsForTemplate.pending, (state) => {
                 state.status = 'loading';
             })

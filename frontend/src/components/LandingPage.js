@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
+// Basic landing page with links to login and signup
 const LandingPage = () => {
   const navigate = useNavigate();
 
@@ -14,7 +15,6 @@ const LandingPage = () => {
 
   return (
     <div className="container-fluid p-0">
-      {/* Full-width image at the top */}
       <div className="mb-4">
         <img 
           src="/images/landingpage.jpg" 
@@ -24,7 +24,6 @@ const LandingPage = () => {
         />
       </div>
 
-      {/* Content section */}
       <div className="container text-center mt-5">
         <h1 className="mb-4">Welcome to ProLifter</h1>
 

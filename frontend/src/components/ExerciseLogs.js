@@ -3,13 +3,16 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchExerciseLogsByWorkout } from '../features/exerciseLogs/exerciseLogSlice';
 import { useParams, Link } from 'react-router-dom';
 
+// Component not currently used in app
+
 const ExerciseLogs = () => {
   const dispatch = useDispatch();
-  const { workoutLogID } = useParams(); // Get workoutLogID from the URL
+  const { workoutLogID } = useParams(); // Get workoutLogID from the URL parameters
   const logs = useSelector((state) => state.exerciseLogs.logs);
   const status = useSelector((state) => state.exerciseLogs.status);
   const error = useSelector((state) => state.exerciseLogs.error);
 
+  // Fetch exercise logs when component mounts or when workoutLogID changes
   useEffect(() => {
     if (status === 'idle' && workoutLogID) {
       dispatch(fetchExerciseLogsByWorkout(workoutLogID));
@@ -38,7 +41,7 @@ const ExerciseLogs = () => {
   return (
     <section>
       <h2>Exercise Logs</h2>
-      {content}
+      {content} {/* Render the appropriate content based on status */}
     </section>
   );
 };

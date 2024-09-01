@@ -3,13 +3,16 @@ import { useDispatch } from 'react-redux';
 import { createPresetTemplate } from '../../features/presetTemplates/presetTemplateSlice';
 
 const AddPresetTemplateForm = ({ onClose }) => {
+  // State variables for form inputs
   const [presetTemplateName, setPresetTemplateName] = useState('');
   const [presetTemplateDays, setPresetTemplateDays] = useState('');
   const [presetTemplateDifficulty, setPresetTemplateDifficulty] = useState('');
   const [presetTemplateGoal, setPresetTemplateGoal] = useState('');
   const [presetTemplateLocation, setPresetTemplateLocation] = useState('');
+  
   const dispatch = useDispatch();
 
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     if (
@@ -19,6 +22,7 @@ const AddPresetTemplateForm = ({ onClose }) => {
       presetTemplateGoal &&
       presetTemplateLocation
     ) {
+      // Dispatch action to create new preset template
       dispatch(
         createPresetTemplate({
           presetTemplateName,
@@ -42,6 +46,7 @@ const AddPresetTemplateForm = ({ onClose }) => {
           </div>
           <div className="modal-body">
             <form onSubmit={handleSubmit}>
+              {/* Template Name Input */}
               <div className="mb-3">
                 <label htmlFor="presetTemplateName" className="form-label">Template Name</label>
                 <input
@@ -53,25 +58,25 @@ const AddPresetTemplateForm = ({ onClose }) => {
                   required
                 />
               </div>
+              
+              {/* Number of Days Select - Restricted Input*/}
               <div className="mb-3">
                 <label htmlFor="presetTemplateDays" className="form-label">Number of Days</label>
                 <select
                   className="form-control"
                   id="presetTemplateDays"
                   value={presetTemplateDays}
-                  onChange={(e) => setPresetTemplateDays(Number(e.target.value))} // Convert string to number
+                  onChange={(e) => setPresetTemplateDays(Number(e.target.value))}
                   required
                 >
                   <option value="">Select Days</option>
-                  <option value={1}>1</option>
-                  <option value={2}>2</option>
-                  <option value={3}>3</option>
-                  <option value={4}>4</option>   
-                  <option value={5}>5</option>   
-                  <option value={6}>6</option>   
-                  <option value={7}>7</option>      
+                  {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                    <option key={day} value={day}>{day}</option>
+                  ))}
                 </select>
               </div>
+              
+              {/* Difficulty Select - Restricted Input */}
               <div className="mb-3">
                 <label htmlFor="presetTemplateDifficulty" className="form-label">Difficulty</label>
                 <select
@@ -87,6 +92,8 @@ const AddPresetTemplateForm = ({ onClose }) => {
                   <option value="Advanced">Advanced</option>
                 </select>
               </div>
+
+              {/* Goal Select - Restricted Input */}
               <div className="mb-3">
                 <label htmlFor="presetTemplateGoal" className="form-label">Goal</label>
                 <select
@@ -102,6 +109,8 @@ const AddPresetTemplateForm = ({ onClose }) => {
                   <option value="Overall">Overall</option>
                 </select>
               </div>
+              
+              {/* Location Select - Restricted Input*/}
               <div className="mb-3">
                 <label htmlFor="presetTemplateLocation" className="form-label">Location</label>
                 <select
@@ -116,6 +125,8 @@ const AddPresetTemplateForm = ({ onClose }) => {
                   <option value="Home">Home</option>
                 </select>
               </div>
+
+              {/* Form Buttons */}
               <div className="modal-footer">
                 <button type="submit" className="btn btn-primary">Add Template</button>
                 <button type="button" className="btn btn-secondary" onClick={onClose}>

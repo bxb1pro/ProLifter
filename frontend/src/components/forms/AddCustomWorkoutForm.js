@@ -6,10 +6,12 @@ const AddCustomWorkoutForm = ({ onClose }) => {
   const [customWorkoutName, setCustomWorkoutName] = useState('');
   const dispatch = useDispatch();
 
+    // Handle form submission to create new custom workout
   const handleSubmit = (e) => {
     e.preventDefault();
     if (customWorkoutName) {
       dispatch(createCustomWorkout({ customWorkoutName })).then(() => {
+        // Refetch the workouts after they're added to update state
         dispatch(fetchUserCustomWorkouts());
       });
       onClose();
@@ -26,6 +28,7 @@ const AddCustomWorkoutForm = ({ onClose }) => {
           </div>
           <div className="modal-body">
             <form onSubmit={handleSubmit}>
+              {/* Input for workout name */}
               <div className="mb-3">
                 <label htmlFor="customWorkoutName" className="form-label">Workout Name</label>
                 <input

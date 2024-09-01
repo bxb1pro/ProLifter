@@ -3,20 +3,24 @@ import { useDispatch } from 'react-redux';
 import { editPresetWorkout, fetchPresetWorkouts } from '../../features/presetWorkouts/presetWorkoutSlice';
 
 const EditPresetWorkoutForm = ({ workout, onClose }) => {
+  // Initialise state with existing workout data
   const [presetWorkoutName, setPresetWorkoutName] = useState(workout.presetWorkoutName);
   const [presetWorkoutDifficulty, setPresetWorkoutDifficulty] = useState(workout.presetWorkoutDifficulty);
   const [presetWorkoutGoal, setPresetWorkoutGoal] = useState(workout.presetWorkoutGoal);
   const [presetWorkoutLocation, setPresetWorkoutLocation] = useState(workout.presetWorkoutLocation);
   const dispatch = useDispatch();
 
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (
       presetWorkoutName &&
       presetWorkoutDifficulty &&
       presetWorkoutGoal &&
       presetWorkoutLocation
     ) {
+      // Dispatch action to edit preset workout with updated data
       dispatch(
         editPresetWorkout({
           id: workout.presetWorkoutID,
@@ -26,8 +30,10 @@ const EditPresetWorkoutForm = ({ workout, onClose }) => {
           presetWorkoutLocation,
         })
       ).then(() => {
+        // Refetch preset workouts to update the state
         dispatch(fetchPresetWorkouts());
       });
+
       onClose();
     }
   };
@@ -42,6 +48,7 @@ const EditPresetWorkoutForm = ({ workout, onClose }) => {
           </div>
           <div className="modal-body">
             <form onSubmit={handleSubmit}>
+              {/* Input for workout name */}
               <div className="mb-3">
                 <label htmlFor="presetWorkoutName" className="form-label">Workout Name</label>
                 <input
@@ -53,6 +60,7 @@ const EditPresetWorkoutForm = ({ workout, onClose }) => {
                   required
                 />
               </div>
+              {/* Dropdown for difficulty level - Restricted input */}
               <div className="mb-3">
                 <label htmlFor="presetWorkoutDifficulty" className="form-label">Difficulty</label>
                 <select
@@ -68,6 +76,7 @@ const EditPresetWorkoutForm = ({ workout, onClose }) => {
                   <option value="Advanced">Advanced</option>
                 </select>
               </div>
+              {/* Dropdown for workout goal - Restricted input */}
               <div className="mb-3">
                 <label htmlFor="presetWorkoutGoal" className="form-label">Goal</label>
                 <select
@@ -83,6 +92,7 @@ const EditPresetWorkoutForm = ({ workout, onClose }) => {
                   <option value="Overall">Overall</option>
                 </select>
               </div>
+              {/* Dropdown for workout location - Restricted input */}
               <div className="mb-3">
                 <label htmlFor="presetWorkoutLocation" className="form-label">Location</label>
                 <select
@@ -97,6 +107,7 @@ const EditPresetWorkoutForm = ({ workout, onClose }) => {
                   <option value="Home">Home</option>
                 </select>
               </div>
+              {/* Form buttons */}
               <div className="modal-footer">
                 <button type="submit" className="btn btn-primary">Save Changes</button>
                 <button type="button" className="btn btn-secondary" onClick={onClose}>

@@ -11,19 +11,21 @@ const WorkoutLogs = () => {
   const workoutLogs = useSelector((state) => state.workoutLogs.logs);
   const workoutLogStatus = useSelector((state) => state.workoutLogs.status);
   const error = useSelector((state) => state.workoutLogs.error);
-  
+
   const customWorkouts = useSelector((state) => state.customWorkouts.workouts); // Access custom workouts
   const presetWorkouts = useSelector((state) => state.presetWorkouts.workouts); // Access preset workouts
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [logToDelete, setLogToDelete] = useState(null);
 
+  // Fetch workout logs, custom workouts, and preset workouts on component mount
   useEffect(() => {
     dispatch(fetchUserWorkoutLogs());
-    dispatch(fetchUserCustomWorkouts()); // Fetch custom workouts
-    dispatch(fetchPresetWorkouts()); // Fetch preset workouts
+    dispatch(fetchUserCustomWorkouts());
+    dispatch(fetchPresetWorkouts());
   }, [dispatch]);
 
+  // Open and handle deleting of workout log
   const handleOpenDeleteModal = (workoutLogID) => {
     setLogToDelete(workoutLogID);
     setShowDeleteModal(true);
@@ -44,6 +46,7 @@ const WorkoutLogs = () => {
     }
   };
 
+  // Get workout name based on either preset or custom workout ID
   const getWorkoutName = (presetWorkoutID, customWorkoutID) => {
     if (customWorkoutID) {
       const workout = customWorkouts.find(workout => workout.customWorkoutID === customWorkoutID);
@@ -55,6 +58,7 @@ const WorkoutLogs = () => {
     return 'Workout';
   };
 
+  // Filter workout logs based on completion bool
   const startedLogs = workoutLogs.filter(log => !log.workoutLogCompleted);
   const finishedLogs = workoutLogs.filter(log => log.workoutLogCompleted);
 
@@ -67,6 +71,7 @@ const WorkoutLogs = () => {
       <>
         <section>
           <h3>Started Workouts</h3>
+          {/* Show started set logs for a user */}
           {startedLogs.length > 0 ? (
             <ul className="list-group">
               {startedLogs.map((log) => (
@@ -108,6 +113,7 @@ const WorkoutLogs = () => {
 
         <section className="mt-4">
           <h3>Finished Workouts</h3>
+          {/* Show finished set logs for a user */}
           {finishedLogs.length > 0 ? (
             <ul className="list-group">
               {finishedLogs.map((log) => (

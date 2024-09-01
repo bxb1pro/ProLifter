@@ -56,7 +56,6 @@ export const fetchExercisesForPresetWorkout = createAsyncThunk(
       const response = await api.get(`/preset-workout-exercises/${presetWorkoutID}/exercises`);
       const exercises = response.data;
 
-      // Capitalise the necessary fields in each exercise
       const capitalisedExercises = exercises.map(exercise => ({
         ...exercise,
         Exercise: {
@@ -68,9 +67,8 @@ export const fetchExercisesForPresetWorkout = createAsyncThunk(
 
       return capitalisedExercises;
     } catch (error) {
-      // If no exercises are found, return an empty array instead of rejecting
       if (error.response && error.response.status === 404) {
-        return []; // Return an empty array when no exercises are found
+        return []; // Return an empty array if no exercises, bug fix
       }
       return rejectWithValue(error.response?.data || 'Failed to fetch exercises');
     }
@@ -165,8 +163,8 @@ export const fetchUserPresetWorkouts = createAsyncThunk(
     initialState: {
       workouts: [],
       userWorkouts: [], 
-      exercises: {},  // Store exercises for each preset workout
-      status: 'idle', // idle, loading, succeeded, failed
+      exercises: {},
+      status: 'idle',
       error: null,
     },
     reducers: {},

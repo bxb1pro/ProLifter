@@ -74,7 +74,7 @@ const workoutLogSlice = createSlice({
   initialState: {
     logs: [],
     currentLog: null,
-    status: 'idle', // idle, loading, succeeded, failed
+    status: 'idle',
     error: null,
   },
   reducers: {},
@@ -93,7 +93,7 @@ const workoutLogSlice = createSlice({
       })
       .addCase(startWorkoutLog.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.logs.unshift(action.payload); // Add the new workout log to the list
+        state.logs.unshift(action.payload);
       })
       .addCase(startWorkoutLog.rejected, (state, action) => {
         state.status = 'failed';

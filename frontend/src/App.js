@@ -37,8 +37,10 @@ function App() {
         }
     }, [dispatch, token]);
 
+    // Routing for the application
     return (
         <>
+            {/* Ensure Navbar always loads at top of page */}
             {!hideNavBar && <NavBar />}
             <div className={!hideNavBar ? 'content-with-navbar' : ''}>
                 <Routes>

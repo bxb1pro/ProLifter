@@ -8,12 +8,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button, ListGroup, Form, InputGroup, Card, Modal, Row, Col } from 'react-bootstrap';
 import './WorkoutLogDetails.css';
 
+// Function to capitalise words from exercise database
 const capitaliseWords = (str) => {
   return str.replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
 const WorkoutLogDetails = () => {
-  const { workoutLogID } = useParams();
+  const { workoutLogID } = useParams(); // Get workoutLogID from URL
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const workoutLog = useSelector((state) => state.workoutLogs.currentLog);
@@ -23,6 +24,7 @@ const WorkoutLogDetails = () => {
   // State to track fetched exercise images
   const [exerciseImages, setExerciseImages] = useState({});
 
+  // States for new and edited set logs
   const [newSetData, setNewSetData] = useState({}); 
   const [editMode, setEditMode] = useState(null); 
   const [editSetData, setEditSetData] = useState({
@@ -43,6 +45,7 @@ const WorkoutLogDetails = () => {
 
   const [showFinishWorkoutModal, setShowFinishWorkoutModal] = useState(false);
 
+  // Fetch workout log details and related exercise images on component mount
   useEffect(() => {
     if (workoutLogID) {
       dispatch(fetchWorkoutLogDetails(workoutLogID)).then((response) => {
@@ -60,6 +63,7 @@ const WorkoutLogDetails = () => {
     }
   }, [dispatch, workoutLogID]);
 
+  // Open and handle finish workout
   const handleOpenFinishWorkoutModal = () => {
     setShowFinishWorkoutModal(true);
   };
@@ -77,6 +81,7 @@ const WorkoutLogDetails = () => {
       });
   };
 
+  // Open and handle finish exercise
   const handleOpenFinishExerciseModal = (exerciseLogID) => {
     setExerciseLogToFinish(exerciseLogID);
     setShowFinishExerciseModal(true);
@@ -91,6 +96,7 @@ const WorkoutLogDetails = () => {
     }
   };
 
+  // Open and handle deleting a set
   const handleOpenDeleteSetModal = (setLogID) => {
     setSetLogToDelete(setLogID);
     setShowDeleteSetModal(true);
@@ -98,11 +104,11 @@ const WorkoutLogDetails = () => {
 
   const handleDeleteSetLog = () => {
     if (setLogToDelete) {
-      // Capture the current scroll position before deleting the set
+      // Capture current scroll position before deleting set
       const currentScrollPosition = window.scrollY;
   
       dispatch(deleteSetLog(setLogToDelete)).then(() => {
-        // After deleting the set, restore the scroll position
+        // After deleting set restore scroll position
         dispatch(fetchWorkoutLogDetails(workoutLogID)).then(() => {
           window.scrollTo(0, currentScrollPosition);
         });
@@ -111,6 +117,7 @@ const WorkoutLogDetails = () => {
     }
   };
 
+  // Open and handle deleting an exercise
   const handleOpenDeleteExerciseModal = (exerciseLogID) => {
     setExerciseLogToDelete(exerciseLogID);
     setShowDeleteExerciseModal(true);
@@ -118,11 +125,9 @@ const WorkoutLogDetails = () => {
 
   const handleDeleteExercise = () => {
     if (exerciseLogToDelete) {
-      // Capture the current scroll position before deleting the exercise
       const currentScrollPosition = window.scrollY;
   
       dispatch(deleteExerciseLog(exerciseLogToDelete)).then(() => {
-        // After deleting the exercise, restore the scroll position
         dispatch(fetchWorkoutLogDetails(workoutLogID)).then(() => {
           window.scrollTo(0, currentScrollPosition);
         });
@@ -131,13 +136,14 @@ const WorkoutLogDetails = () => {
     }
   };
 
+  // Handle adding a set log
   const handleAddSetLog = (exerciseLogID) => {
-    // Capture the current scroll position before adding the set
     const currentScrollPosition = window.scrollY;
   
     const setData = newSetData[exerciseLogID] || {}; 
     const { setLogWeight, setLogReps, setLogRPE, setLog1RM } = setData;
   
+    // Restrict user input to required data types
     if (!setLogWeight || !setLogReps || isNaN(setLogWeight) || isNaN(setLogReps) || setLogWeight <= 0 || setLogReps <= 0) {
       alert('Please enter valid numeric values for both weight and reps, and ensure they are greater than 0.');
       return;
@@ -158,7 +164,6 @@ const WorkoutLogDetails = () => {
           ...prevData,
           [exerciseLogID]: { setLogWeight: '', setLogReps: '', setLogRPE: '', setLog1RM: '' },
         }));
-        // After adding the set, restore the scroll position
         dispatch(fetchWorkoutLogDetails(workoutLogID)).then(() => {
           window.scrollTo(0, currentScrollPosition);
         });
@@ -169,6 +174,7 @@ const WorkoutLogDetails = () => {
       });
   };
 
+  // Handle editing a set log
   const handleEditSetLog = (setLog) => {
     setEditMode(setLog.setLogID);
     setEditSetData({
@@ -179,6 +185,7 @@ const WorkoutLogDetails = () => {
     });
   };
 
+  // Saving a set log
   const handleSaveSetLog = (setLogID) => {
     const currentScrollPosition = window.scrollY;
   
@@ -190,6 +197,7 @@ const WorkoutLogDetails = () => {
     });
   };
 
+  // Handle changes in new set data input fields
   const handleChangeNewSetData = (exerciseLogID, field, value) => {
     setNewSetData((prevData) => ({
       ...prevData,
@@ -215,6 +223,7 @@ const WorkoutLogDetails = () => {
   return (
     <section className="container mt-4 workout-log-details">
       <Row className="mb-4">
+        {/* Header information for workout log details*/}
         <Col md={6}>
           <h2>Workout Log Details</h2>
           <p><strong>Date:</strong> {new Date(workoutLog.workoutLogDate).toLocaleDateString()}</p>
@@ -233,6 +242,7 @@ const WorkoutLogDetails = () => {
         </Col>
       </Row>
 
+      {/* List of exercises for workout for user */}
       <h3>Exercises:</h3>
       <ListGroup as="ul">
         {workoutLog.ExerciseLogs && workoutLog.ExerciseLogs.length > 0 ? (
@@ -240,6 +250,7 @@ const WorkoutLogDetails = () => {
             <ListGroup.Item as="li" key={exerciseLog.exerciseLogID}>
               <Card className="mb-3 exercise-card">
                 <Card.Img 
+                // Exercise image called directly from API due to constantly refreshing image links
                   src={exerciseImages?.[exerciseLog.Exercise.exerciseName]} 
                   alt={exerciseLog.Exercise.exerciseName}
                   onError={(e) => { 
@@ -279,7 +290,8 @@ const WorkoutLogDetails = () => {
                   >
                     Delete Exercise
                   </Button>
-
+                  
+                  {/* Display set logs for each exercise log in the workout log */}
                   <ListGroup as="ul" className="mt-3">
                     {exerciseLog.SetLogs && exerciseLog.SetLogs.length > 0 ? (
                       exerciseLog.SetLogs
@@ -364,6 +376,7 @@ const WorkoutLogDetails = () => {
                   </ListGroup>
 
                   <div className="mt-3">
+                    {/* Form to add a new set log */}
                     <h5>Add Set Log</h5>
                     <InputGroup className="mb-2">
                       <Form.Control

@@ -139,13 +139,12 @@ const customTemplateSlice = createSlice({
       templateDetails: null,
       customWorkouts: [],
       presetWorkouts: [],
-      status: 'idle', // idle, loading, succeeded, failed
+      status: 'idle',
       error: null,
     },
     reducers: {},
     extraReducers: (builder) => {
       builder
-        // Fetch all custom templates
         .addCase(fetchUserCustomTemplates.pending, (state) => {
           state.status = 'loading';
         })
@@ -157,7 +156,6 @@ const customTemplateSlice = createSlice({
           state.status = 'failed';
           state.error = action.payload;
         })
-        // Create a new custom template
         .addCase(createCustomTemplate.fulfilled, (state, action) => {
           state.status = 'succeeded';
           state.templates.push(action.payload);
@@ -166,7 +164,6 @@ const customTemplateSlice = createSlice({
           state.status = 'failed';
           state.error = action.payload;
         })
-        // Edit a custom template
         .addCase(editCustomTemplate.fulfilled, (state, action) => {
           state.status = 'succeeded';
           const index = state.templates.findIndex(template => template.customTemplateID === action.payload.customTemplateID);
@@ -178,7 +175,6 @@ const customTemplateSlice = createSlice({
           state.status = 'failed';
           state.error = action.payload;
         })
-        // Delete a custom template
         .addCase(deleteCustomTemplate.fulfilled, (state, action) => {
           state.status = 'succeeded';
           state.templates = state.templates.filter(template => template.customTemplateID !== action.payload);
@@ -187,7 +183,6 @@ const customTemplateSlice = createSlice({
           state.status = 'failed';
           state.error = action.payload;
         })
-        // Fetch custom workouts linked to a custom template
         .addCase(fetchCustomWorkoutsForTemplate.pending, (state) => {
           state.status = 'loading';
         })
@@ -199,7 +194,6 @@ const customTemplateSlice = createSlice({
           state.status = 'failed';
           state.error = action.payload;
         })
-        // Fetch preset workouts linked to a custom template
         .addCase(fetchPresetWorkoutsForTemplate.pending, (state) => {
           state.status = 'loading';
         })
@@ -211,20 +205,18 @@ const customTemplateSlice = createSlice({
           state.status = 'failed';
           state.error = action.payload;
         })
-        // Link a custom workout to a custom template
         .addCase(linkCustomWorkoutToTemplate.fulfilled, (state) => {
           state.status = 'succeeded';
         })
         .addCase(linkCustomWorkoutToTemplate.rejected, (state, action) => {
           if (action.payload?.error === 'Custom workout is already linked to this template') {
-            state.status = 'succeeded'; // Prevent the page from getting stuck in a 'failed' state
+            state.status = 'succeeded'; // Bug fix to prevent the page from getting stuck in a 'failed' state
             state.error = action.payload?.error;
           } else {
             state.status = 'failed';
             state.error = action.payload;
           }
         })
-        // Unlink a custom workout from a custom template
         .addCase(unlinkCustomWorkoutFromTemplate.fulfilled, (state) => {
           state.status = 'succeeded';
         })
@@ -232,19 +224,17 @@ const customTemplateSlice = createSlice({
           state.status = 'failed';
           state.error = action.payload;
         })
-        // Link a preset workout to a custom template
         .addCase(linkPresetWorkoutToTemplate.fulfilled, (state) => {
             state.status = 'succeeded';
         })
         .addCase(linkPresetWorkoutToTemplate.rejected, (state, action) => {
           if (action.payload === 'Preset workout is already linked to this custom template') {
-              state.status = 'succeeded'; // Fix bug with state staying in failed
+              state.status = 'succeeded'; // Bug fix to prevent the page from getting stuck in a 'failed' state
           } else {
               state.status = 'failed';
           }
           state.error = action.payload;
         })
-        // Unlink a preset workout from a custom template
         .addCase(unlinkPresetWorkoutFromTemplate.fulfilled, (state) => {
           state.status = 'succeeded';
         })

@@ -36,7 +36,7 @@ export const fetchExerciseById = createAsyncThunk(
             const response = await api.get(`/exercises/${id}`);
             const exercise = response.data;
 
-            // Capitalise the necessary fields in the exercise
+            // Capitalise the necessary exercise attributes
             exercise.name = capitaliseWords(exercise.name);
             exercise.bodyPart = capitaliseWords(exercise.bodyPart);
             exercise.equipment = capitaliseWords(exercise.equipment);

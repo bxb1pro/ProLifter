@@ -1,5 +1,3 @@
-// src/features/setLogs/setLogSlice.js
-
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
 
@@ -29,7 +27,7 @@ export const addSetLog = createAsyncThunk(
     'setLogs/deleteSetLog',
     async (setLogID, { rejectWithValue }) => {
       try {
-        console.log("Deleting set log with ID:", setLogID); // Ensure this is not undefined
+        console.log("Deleting set log with ID:", setLogID);
         await api.delete(`/set-logs/${setLogID}/delete`);
         return setLogID;
       } catch (error) {
@@ -56,12 +54,11 @@ export const editSetLog = createAsyncThunk(
     }
   );
 
-
   const setLogSlice = createSlice({
     name: 'setLogs',
     initialState: {
       logs: [],
-      status: 'idle', // idle, loading, succeeded, failed
+      status: 'idle',
       error: null,
     },
     reducers: {},
@@ -79,7 +76,7 @@ export const editSetLog = createAsyncThunk(
           state.error = action.error.message;
         })
         .addCase(addSetLog.fulfilled, (state, action) => {
-          state.logs.push(action.payload); // Add the new set log to the list
+          state.logs.push(action.payload);
           state.status = 'succeeded';
         })
         .addCase(addSetLog.rejected, (state, action) => {
@@ -87,7 +84,7 @@ export const editSetLog = createAsyncThunk(
           state.error = action.payload;
         })
         .addCase(deleteSetLog.fulfilled, (state, action) => {
-          state.logs = state.logs.filter(log => log.setLogID !== action.payload); // Remove the deleted set log from the list
+          state.logs = state.logs.filter(log => log.setLogID !== action.payload);
           state.status = 'succeeded';
         })
         .addCase(deleteSetLog.rejected, (state, action) => {

@@ -64,9 +64,8 @@ export const fetchExercisesForCustomWorkout = createAsyncThunk(
 
       return capitalisedExercises;
     } catch (error) {
-      // If no exercises are found, return an empty array instead of rejecting
       if (error.response && error.response.status === 404) {
-        return []; // Return an empty array when no exercises are found
+        return []; // Return an empty array when no exercises are found, bug fix
       }
       return rejectWithValue(error.response?.data || 'Failed to fetch exercises');
     }
@@ -107,7 +106,7 @@ export const createCustomWorkout = createAsyncThunk(
     async (id, { rejectWithValue }) => {
       try {
         const response = await api.delete(`/custom-workouts/${id}/delete`);
-        return id; // Return the id to remove it from the state
+        return id;
       } catch (error) {
         console.error('Delete custom workout error:', error.response ? error.response.data : error.message);
         return rejectWithValue(error.response.data || 'Failed to delete custom workout');
@@ -119,7 +118,7 @@ export const createCustomWorkout = createAsyncThunk(
     name: 'customWorkouts',
     initialState: {
       workouts: [],
-      exercises: {},  // Store exercises for each custom workout
+      exercises: {},
       status: 'idle',
       error: null,
     },
@@ -158,7 +157,7 @@ export const createCustomWorkout = createAsyncThunk(
         })
         .addCase(fetchExercisesForCustomWorkout.fulfilled, (state, action) => {
           state.status = 'succeeded';
-          state.exercises[action.meta.arg] = action.payload; // Store exercises by workout ID
+          state.exercises[action.meta.arg] = action.payload;
         })
         .addCase(fetchExercisesForCustomWorkout.rejected, (state, action) => {
           state.status = 'failed';

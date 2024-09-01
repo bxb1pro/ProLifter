@@ -3,12 +3,14 @@ import { useDispatch } from 'react-redux';
 import { createPresetWorkout, fetchPresetWorkouts } from '../../features/presetWorkouts/presetWorkoutSlice';
 
 const AddPresetWorkoutForm = ({ onClose }) => {
+  // State variables for form inputs
   const [presetWorkoutName, setPresetWorkoutName] = useState('');
   const [presetWorkoutDifficulty, setPresetWorkoutDifficulty] = useState('');
   const [presetWorkoutGoal, setPresetWorkoutGoal] = useState('');
   const [presetWorkoutLocation, setPresetWorkoutLocation] = useState('');
   const dispatch = useDispatch();
 
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     if (
@@ -17,13 +19,14 @@ const AddPresetWorkoutForm = ({ onClose }) => {
       presetWorkoutGoal &&
       presetWorkoutLocation
     ) {
+      // Dispatch action to create new preset workout
       dispatch(createPresetWorkout({
         presetWorkoutName,
         presetWorkoutDifficulty,
         presetWorkoutGoal,
         presetWorkoutLocation,
       })).then(() => {
-        // Refetch the workouts after they're added
+        // Refetch the workouts after they're added to update state
         dispatch(fetchPresetWorkouts());
       });
   
@@ -41,6 +44,7 @@ const AddPresetWorkoutForm = ({ onClose }) => {
           </div>
           <div className="modal-body">
             <form onSubmit={handleSubmit}>
+              {/* Workout Name Input */}
               <div className="mb-3">
                 <label htmlFor="presetWorkoutName" className="form-label">Workout Name</label>
                 <input
@@ -52,6 +56,7 @@ const AddPresetWorkoutForm = ({ onClose }) => {
                   required
                 />
               </div>
+              {/* Difficulty Input - Restricted Input*/}
               <div className="mb-3">
                 <label htmlFor="presetWorkoutDifficulty" className="form-label">Difficulty</label>
                 <select
@@ -67,6 +72,7 @@ const AddPresetWorkoutForm = ({ onClose }) => {
                   <option value="Advanced">Advanced</option>
                 </select>
               </div>
+              {/* Goal Input - Restricted Input*/}
               <div className="mb-3">
                 <label htmlFor="presetWorkoutGoal" className="form-label">Goal</label>
                 <select
@@ -82,6 +88,7 @@ const AddPresetWorkoutForm = ({ onClose }) => {
                   <option value="Overall">Overall</option>
                 </select>
               </div>
+              {/* Location Input - Restricted Input*/}
               <div className="mb-3">
                 <label htmlFor="presetWorkoutLocation" className="form-label">Location</label>
                 <select

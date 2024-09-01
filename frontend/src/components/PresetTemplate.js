@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  fetchPresetTemplates,
-  deletePresetTemplate,
-  linkPresetTemplate,
-  fetchPresetWorkoutsForTemplate,
-  unlinkPresetWorkoutFromTemplate,
-  fetchUserPresetTemplates,
-  unlinkPresetTemplate as unlinkUserPresetTemplate,
-} from '../features/presetTemplates/presetTemplateSlice';
+import { fetchPresetTemplates, deletePresetTemplate, linkPresetTemplate, fetchPresetWorkoutsForTemplate, unlinkPresetWorkoutFromTemplate,
+  fetchUserPresetTemplates, unlinkPresetTemplate as unlinkUserPresetTemplate, } from '../features/presetTemplates/presetTemplateSlice';
 import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 import AddPresetTemplateForm from './forms/AddPresetTemplateForm';
 import EditPresetTemplateForm from './forms/EditPresetTemplateForm';
@@ -60,6 +53,7 @@ const PresetTemplate = () => {
     }
   }, [dispatch, token, user]);
 
+  // Fetch account details if token is available but user details are not (bug fix)
   useEffect(() => {
       if (isAuthenticated && userID && status === 'idle') {
           console.log('Fetching templates for user:', userID);
@@ -69,7 +63,7 @@ const PresetTemplate = () => {
       }
   }, [dispatch, isAuthenticated, userID, status]);
 
-  // Reload data if status changes to idle after an error
+  // Reload data if status changes to idle after an error (bug fix)
   useEffect(() => {
       if (status === 'idle' && userID) {
           dispatch(fetchPresetTemplates());
@@ -77,21 +71,21 @@ const PresetTemplate = () => {
       }
   }, [status, userID, dispatch]);
 
-  // Loading state
   if (!isAuthenticated || status === 'loading') {
     return <div>Loading...</div>;
   }
 
+  // Link preset template to user
   const handleLinkTemplateToUser = (presetTemplateID) => {
     if (!userID) {
       console.error('User ID is not defined. Cannot link preset template to user.');
       return;
     }
-
     setTemplateToLink(presetTemplateID);
     setShowLinkTemplateModal(true);
   };
 
+  // Confirm linking template to user and handle if already linked
   const handleConfirmLinkTemplate = () => {
     if (!templateToLink) return;
 
@@ -113,11 +107,12 @@ const PresetTemplate = () => {
     setShowLinkTemplateModal(false);
   };
 
+  // Handle starting workout, re-direct to workout logs page
   const handleStartWorkout = (workoutID) => {
     dispatch(startWorkoutLog({ presetWorkoutID: workoutID }))
         .unwrap()
         .then(() => {
-            navigate('/workout-logs'); // Redirect to the workout logs page after starting the workout
+            navigate('/workout-logs');
         })
         .catch((error) => {
             console.error('Error starting workout:', error);
@@ -125,29 +120,33 @@ const PresetTemplate = () => {
         });
 };
 
+  // Toggle viewing of workouts for a preset template
   const handleViewWorkouts = (presetTemplateID) => {
     if (viewingWorkouts === presetTemplateID) {
-      setViewingWorkouts(null); // Toggle off if already viewing
+      setViewingWorkouts(null);
     } else {
       setViewingWorkouts(presetTemplateID);
       dispatch(fetchPresetWorkoutsForTemplate(presetTemplateID));
     }
   };
 
+  // View user selected preset templates
   const handleViewUserWorkouts = (presetTemplateID) => {
     if (selectedUserTemplateID === presetTemplateID) {
-      setSelectedUserTemplateID(null); // Toggle off if already viewing
+      setSelectedUserTemplateID(null);
     } else {
       setSelectedUserTemplateID(presetTemplateID);
       dispatch(fetchPresetWorkoutsForTemplate(presetTemplateID));
     }
   };
 
+  // Unlink workout for preset template
   const handleUnlinkWorkout = (presetTemplateID, presetWorkoutID) => {
     setWorkoutToUnlink({ presetTemplateID, presetWorkoutID });
     setShowUnlinkWorkoutModal(true);
   };
 
+  // Confirm unlinking workout for preset template
   const handleConfirmUnlinkWorkout = () => {
     const { presetTemplateID, presetWorkoutID } = workoutToUnlink;
     dispatch(unlinkPresetWorkoutFromTemplate({ presetTemplateID, presetWorkoutID }))
@@ -157,33 +156,38 @@ const PresetTemplate = () => {
     setShowUnlinkWorkoutModal(false);
   };
 
+  // Unlink preset template from user
   const handleUnlinkUserTemplate = (presetTemplateID) => {
     setTemplateToDelete(presetTemplateID);
     setShowUnlinkUserTemplateModal(true);
   };
 
+  // Confirm unlinking preset template from user
   const handleConfirmUnlinkUserTemplate = () => {
     dispatch(unlinkUserPresetTemplate({ userID, presetTemplateID: templateToDelete }))
       .unwrap()
       .then(() => {
-        dispatch(fetchUserPresetTemplates(userID)); // Refresh the user's selected preset templates
-        setShowUnlinkUserTemplateModal(false); // Close the modal after unlinking
+        dispatch(fetchUserPresetTemplates(userID)); // Refresh user's selected preset templates to update state
+        setShowUnlinkUserTemplateModal(false);
       })
       .catch((error) => {
         console.error('Error removing template:', error);
-        setShowUnlinkUserTemplateModal(false); // Close the modal even on error
+        setShowUnlinkUserTemplateModal(false);
       });
   };
 
+  // Handle editing a template
   const handleEditTemplate = (template) => {
     setEditingTemplate(template);
   };
 
+  // Handle deleting a template
   const handleDeleteTemplate = (presetTemplateID) => {
     setTemplateToDelete(presetTemplateID);
     setShowDeleteTemplateModal(true);
   };
 
+  // Confirm deleting a template
   const handleConfirmDeleteTemplate = () => {
     dispatch(deletePresetTemplate(templateToDelete))
       .unwrap()
@@ -196,10 +200,12 @@ const PresetTemplate = () => {
       });
   };
 
+  // Handle adding a template
   const handleAddTemplate = () => {
     setShowAddForm(true);
   };
 
+  // Render list of workouts associated with a specific preset workout
   const renderPresetWorkouts = () => (
     <ul className="list-group">
       {presetWorkouts.map((workout) => (
@@ -237,6 +243,7 @@ const PresetTemplate = () => {
     content = (
       <>
         <div className="mb-4">
+           {/* Filters for preset tempaltes - days, difficulty, goal, location */}
           <div className="d-flex flex-wrap gap-2 mb-3">
             <div>
               <label>Filter by Days: </label>
@@ -279,6 +286,7 @@ const PresetTemplate = () => {
             </div>
           </div>
 
+          {/* Display preset templates */}
           <ul className="list-group">
             {filteredTemplates.map((template) => (
               <li key={template.presetTemplateID} className="list-group-item">
@@ -315,6 +323,7 @@ const PresetTemplate = () => {
                     )}
                   </div>
                 </div>
+                {/* Display workouts for preset templates */}
                 {viewingWorkouts === template.presetTemplateID && presetWorkouts.length > 0 && (
                   <ul className="list-group mt-3">
                     {presetWorkouts.map((workout) => (
@@ -396,7 +405,6 @@ const PresetTemplate = () => {
   return (
     <section className="container mt-4">
 
-      {/* Error Alert */}
       {alertVisible && (
     <Alert variant="danger" onClose={() => setAlertVisible(false)} dismissible>
       {alertMessage}

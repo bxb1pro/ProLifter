@@ -1,22 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  fetchPresetWorkouts,
-  fetchExercisesForPresetWorkout,
-  unlinkExerciseFromPresetWorkout,
-  deletePresetWorkout,
-  linkPresetWorkoutToUser,
-  fetchUserPresetWorkouts,
-  unlinkPresetWorkoutFromUser,
-} from '../features/presetWorkouts/presetWorkoutSlice';
-import {
-  fetchPresetTemplates,
-  linkPresetWorkoutToTemplate as linkWorkoutToPresetTemplate,
-} from '../features/presetTemplates/presetTemplateSlice';
-import {
-  fetchUserCustomTemplates,
-  linkPresetWorkoutToTemplate as linkWorkoutToCustomTemplate,
-} from '../features/customTemplates/customTemplateSlice';
+import { fetchPresetWorkouts, fetchExercisesForPresetWorkout, unlinkExerciseFromPresetWorkout, deletePresetWorkout,
+  linkPresetWorkoutToUser, fetchUserPresetWorkouts, unlinkPresetWorkoutFromUser, } from '../features/presetWorkouts/presetWorkoutSlice';
+import { fetchPresetTemplates, linkPresetWorkoutToTemplate as linkWorkoutToPresetTemplate, } from '../features/presetTemplates/presetTemplateSlice';
+import { fetchUserCustomTemplates, linkPresetWorkoutToTemplate as linkWorkoutToCustomTemplate, } from '../features/customTemplates/customTemplateSlice';
 import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 import AddPresetWorkoutForm from './forms/AddPresetWorkoutForm';
 import EditPresetWorkoutForm from './forms/EditPresetWorkoutForm';
@@ -58,12 +45,10 @@ const PresetWorkout = () => {
   const [showUnlinkExerciseModal, setShowUnlinkExerciseModal] = useState(false);
   const [workoutToDelete, setWorkoutToDelete] = useState(null);
   const [exerciseToUnlink, setExerciseToUnlink] = useState({ presetWorkoutID: null, exerciseID: null });
-
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
   const [confirmModalMessage, setConfirmModalMessage] = useState('');
   const [confirmModalTitle, setConfirmModalTitle] = useState(''); 
-
   const [showUnlinkPresetModal, setShowUnlinkPresetModal] = useState(false);
   const [presetWorkoutToUnlink, setPresetWorkoutToUnlink] = useState(null);
 
@@ -71,6 +56,7 @@ const PresetWorkout = () => {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertVariant, setAlertVariant] = useState(''); 
 
+  // Fetch account details if not already loaded
   useEffect(() => {
     if (!user) {
       dispatch(fetchAccountDetails()).finally(() => setInitialLoadComplete(true));
@@ -79,6 +65,7 @@ const PresetWorkout = () => {
     }
   }, [user, dispatch]);
 
+  // Fetch workouts and templates only after user information is available (bug fix)
   useEffect(() => {
     if (user && userID) {
       if (status === 'idle') {
@@ -92,22 +79,24 @@ const PresetWorkout = () => {
     }
   }, [status, dispatch, user, userID, role]);
 
+  // Toggle viewing exercises for main selected workout
   const handleViewMainExercises = (presetWorkoutID) => {
     setMainSelectedWorkoutID(prevID => prevID === presetWorkoutID ? null : presetWorkoutID);
     dispatch(fetchExercisesForPresetWorkout(presetWorkoutID));
   };
 
+  // Toggle viewing exercises for secondary selected workout
   const handleViewSelectedExercises = (presetWorkoutID) => {
     setSelectedPresetWorkoutID(prevID => prevID === presetWorkoutID ? null : presetWorkoutID);
     dispatch(fetchExercisesForPresetWorkout(presetWorkoutID));
   };
 
+   // Link preset workout to user's account (with confirmation)
   const handleLinkWorkoutToUser = (presetWorkoutID) => {
     if (!userID) {
       console.error('User ID is not defined. Cannot link preset workout to user.');
       return;
     }
-  
     setConfirmModalTitle('Confirm Action');
     setConfirmModalMessage('Add this workout to your favourites?');
     setConfirmAction(() => () => {
@@ -130,6 +119,7 @@ const PresetWorkout = () => {
     setShowConfirmModal(true);
   };
 
+  // Start workout and navigate to workout logs page
   const handleStartWorkout = (workoutID) => {
     dispatch(startWorkoutLog({ presetWorkoutID: workoutID }))
       .unwrap()
@@ -142,6 +132,7 @@ const PresetWorkout = () => {
       });
   };
 
+  // Unlink preset workout from user's account with confirmation
   const handleUnlinkPresetWorkout = (presetWorkoutID) => {
     setPresetWorkoutToUnlink(presetWorkoutID);
     setConfirmModalTitle('Confirm Unlink');
@@ -159,6 +150,7 @@ const PresetWorkout = () => {
     setShowConfirmModal(true);
   };
 
+  // Unlink exercise from preset workout (with confirmation)
   const handleUnlinkExercise = (presetWorkoutID, exerciseID) => {
     setExerciseToUnlink({ presetWorkoutID, exerciseID });
     setShowUnlinkExerciseModal(true);
@@ -170,14 +162,17 @@ const PresetWorkout = () => {
     setShowUnlinkExerciseModal(false);
   };
 
+  // Handle adding workout
   const handleAddWorkout = () => {
     setShowAddForm(true);
   };
 
+  // Handle editing workout
   const handleEditWorkout = (workout) => {
     setEditingWorkout(workout);
   };
 
+  // Handle deleting workout (with confirmation)
   const handleDeleteWorkout = (presetWorkoutID) => {
     setWorkoutToDelete(presetWorkoutID);
     setShowDeleteModal(true);
@@ -195,6 +190,7 @@ const PresetWorkout = () => {
       });
   };
 
+  // Handling linking a workout to a preset template (with confirmation)
   const handleLinkWorkoutToTemplate = (presetWorkoutID, presetTemplateID) => {
     if (presetTemplateID) {
       setConfirmModalTitle('Confirm Action');
@@ -219,6 +215,7 @@ const PresetWorkout = () => {
     }
   };
 
+  // Handle linking a workout to a custom template (with confirmation)
   const handleLinkWorkoutToCustomTemplate = (presetWorkoutID, customTemplateID) => {
     if (customTemplateID) {
       setConfirmModalTitle('Confirm Action');
@@ -247,6 +244,7 @@ const PresetWorkout = () => {
     }
   };
 
+  // Apply filters to workouts
   const filteredWorkouts = workouts.filter((workout) => {
     return (
       (difficultyFilter === '' || workout.presetWorkoutDifficulty === difficultyFilter) &&
@@ -263,6 +261,7 @@ const PresetWorkout = () => {
     content = (
       <>
         <div className="mb-4">
+          {/* Filter for preset workouts - difficulty, goal, location */}
           <div className="d-flex flex-wrap gap-2 mb-3">
             <div>
               <label>Filter by Difficulty: </label>
@@ -293,6 +292,7 @@ const PresetWorkout = () => {
           </div>
 
           <ul className="list-group">
+            {/* Display preset workouts */}
             {filteredWorkouts.map((workout) => (
               <li key={workout.presetWorkoutID} className="list-group-item">
                 <div className="d-flex justify-content-between align-items-center">
@@ -342,6 +342,7 @@ const PresetWorkout = () => {
                     )}
                   </div>
                 </div>
+                {/* Show exercises for selected preset workout */}
                 {mainSelectedWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
                   <ul className="list-group mt-3">
                     {exercises[workout.presetWorkoutID].length > 0 ? (
@@ -417,6 +418,7 @@ const PresetWorkout = () => {
                         </select>
                       </div>
                     </div>
+                    {/* Show exercises for selected preset workout */}
                     {selectedPresetWorkoutID === workout.presetWorkoutID && exercises[workout.presetWorkoutID] && (
                       <ul className="list-group mt-3">
                         {exercises[workout.presetWorkoutID].length > 0 ? (
@@ -533,7 +535,6 @@ const PresetWorkout = () => {
         </Modal.Footer>
       </Modal>
 
-          {/* Alert Message */}
           {alertVisible && (
             <Alert variant={alertVariant} onClose={() => setAlertVisible(false)} dismissible>
               {alertMessage}

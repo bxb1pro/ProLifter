@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { editPresetTemplate } from '../../features/presetTemplates/presetTemplateSlice';
 
 const EditPresetTemplateForm = ({ template, onClose }) => {
+  // Initialise state with existing template data
   const [presetTemplateName, setPresetTemplateName] = useState(template.presetTemplateName);
   const [presetTemplateDays, setPresetTemplateDays] = useState(template.presetTemplateDays);
   const [presetTemplateDifficulty, setPresetTemplateDifficulty] = useState(template.presetTemplateDifficulty);
@@ -10,6 +11,7 @@ const EditPresetTemplateForm = ({ template, onClose }) => {
   const [presetTemplateLocation, setPresetTemplateLocation] = useState(template.presetTemplateLocation);
   const dispatch = useDispatch();
 
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     if (
@@ -19,6 +21,7 @@ const EditPresetTemplateForm = ({ template, onClose }) => {
       presetTemplateGoal &&
       presetTemplateLocation
     ) {
+      // Dispatch action to edit preset template with updated data
       dispatch(
         editPresetTemplate({
           id: template.presetTemplateID,
@@ -45,6 +48,7 @@ const EditPresetTemplateForm = ({ template, onClose }) => {
           </div>
           <div className="modal-body">
             <form onSubmit={handleSubmit}>
+              {/* Input for template name */}
               <div className="mb-3">
                 <label htmlFor="presetTemplateName" className="form-label">Template Name</label>
                 <input
@@ -56,6 +60,7 @@ const EditPresetTemplateForm = ({ template, onClose }) => {
                   required
                 />
               </div>
+              {/* Dropdown for number of days - Restricted Input */}
               <div className="mb-3">
                 <label htmlFor="presetTemplateDays" className="form-label">Number of Days</label>
                 <select
@@ -75,6 +80,7 @@ const EditPresetTemplateForm = ({ template, onClose }) => {
                   <option value={7}>7</option>      
                 </select>
               </div>
+              {/* Dropdown for difficulty level - Restricted Input */}
               <div className="mb-3">
                 <label htmlFor="presetTemplateDifficulty" className="form-label">Difficulty</label>
                 <select
@@ -90,6 +96,7 @@ const EditPresetTemplateForm = ({ template, onClose }) => {
                   <option value="Advanced">Advanced</option>
                 </select>
               </div>
+              {/* Dropdown for goal - Restricted Input*/}
               <div className="mb-3">
                 <label htmlFor="presetTemplateGoal" className="form-label">Goal</label>
                 <select
@@ -105,6 +112,7 @@ const EditPresetTemplateForm = ({ template, onClose }) => {
                   <option value="Overall">Overall</option>
                 </select>
               </div>
+              {/* Dropdown for location - Restricted Input */}
               <div className="mb-3">
                 <label htmlFor="presetTemplateLocation" className="form-label">Location</label>
                 <select
@@ -119,6 +127,7 @@ const EditPresetTemplateForm = ({ template, onClose }) => {
                   <option value="Home">Home</option>
                 </select>
               </div>
+              {/* Form buttons */}
               <div className="modal-footer">
                 <button type="submit" className="btn btn-primary">Save Changes</button>
                 <button type="button" className="btn btn-secondary" onClick={onClose}>

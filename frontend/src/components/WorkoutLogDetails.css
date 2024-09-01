@@ -22,7 +22,7 @@
 
 .set-log-info {
   padding: 10px;
-  background-color: #f8f9fa; /* Light grey background for each set */
+  background-color: #f8f9fa;
   border-radius: 5px;
   margin-bottom: 10px;
 }
@@ -30,17 +30,17 @@
 .set-log-title {
   font-size: 1.1rem;
   margin-right: 15px;
-  color: #343a40; /* Darker color for emphasis */
+  color: #343a40;
 }
 
 .set-log-item {
   margin-right: 15px;
   font-size: 1rem;
-  color: #495057; /* Slightly muted color for details */
+  color: #495057;
 }
 
 .set-log-item strong {
-  color: #212529; /* Stronger color for labels */
+  color: #212529;
 }
 
 .workout-log-details .text-end {
@@ -52,11 +52,11 @@
 }
 
 .definition p {
-  margin: 0; /* Remove default margins for tight spacing */
+  margin: 0;
 }
 
 .definition-description {
-  margin-left: 20px; /* Indent description text slightly */
-  font-size: 0.9rem; /* Slightly smaller font size for descriptions */
-  color: #495057; /* Muted text color for descriptions */
+  margin-left: 20px;
+  font-size: 0.9rem;
+  color: #495057;
 }

@@ -5,9 +5,10 @@ import { BsPerson } from 'react-icons/bs';
 import './HomePage.css';
 
 const HomePage = () => {
-  const user = useSelector((state) => state.auth.user);
+  const user = useSelector((state) => state.auth.user); // Get user role from Redux state
   const role = user?.role || '';
 
+  // Provide picture links to various components
   return (
     <div className="container text-center mt-5">
       {user && <h2>Hello, {user.userName}! Welcome to Your ProLifter Account</h2>}
@@ -30,6 +31,7 @@ const HomePage = () => {
             <h5 className="mt-2">Preset Workouts</h5>
           </Link>
         </div>
+        {/* If role is user then provide these extra picture links */}
         {role === 'user' && (
           <>
             <div className="col-md-4 mb-4 d-flex justify-content-center">

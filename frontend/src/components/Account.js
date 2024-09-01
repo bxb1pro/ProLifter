@@ -6,17 +6,19 @@ import { Button, Form, Alert, Modal } from 'react-bootstrap';
 const Account = () => {
   const dispatch = useDispatch();
   const { user, isLoading, error } = useSelector((state) => state.auth);
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState(''); // State to store user password for confirmation
   const [showDeleteForm, setShowDeleteForm] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const role = useSelector((state) => state.auth.role);
+  const [showModal, setShowModal] = useState(false); // Controls visibility of confirmation modal
+  const role = useSelector((state) => state.auth.role); // Get's user role from Redux state
 
+  // Fetch account details if not loaded on component mount
   useEffect(() => {
     if (!user) {
       dispatch(fetchAccountDetails());
     }
   }, [dispatch, user]);
 
+  // Handle account deletion with confirmation
   const handleDeleteAccount = () => {
     if (password) {
       dispatch(deleteAccount(password))
@@ -39,6 +41,7 @@ const Account = () => {
       {error && <Alert variant="danger">{error}</Alert>}
       {user ? (
         <div className="mb-4">
+          {/* Display user's account details */}
           <p><strong>Name:</strong> {user.userName}</p>
           <p><strong>Email:</strong> {user.userEmail}</p>
           {(role === 'admin' || role === 'superadmin') && (
@@ -52,13 +55,14 @@ const Account = () => {
       <Button variant="danger" onClick={() => setShowModal(true)}>
         Delete Account
       </Button>
-
+      {/* Confirm Account Deletion Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Account Deletion</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+          {/* Input for password confirmation */}
           <Form.Group controlId="password">
             <Form.Label>Enter your password to confirm:</Form.Label>
             <Form.Control

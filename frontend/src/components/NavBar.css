@@ -7,14 +7,14 @@
     z-index: 1000;
     display: flex;
     justify-content: center;
-    min-height: 100px; /* Modify navbar height/thickness */
+    min-height: 100px;
     box-sizing: border-box;
 }
 
 .navbar .container {
     display: flex;
     justify-content: space-between;
-    align-items: center; /* Ensure all items are vertically centered */
+    align-items: center;
     width: 100%;
     max-width: 1200px;
     padding: 0 20px;
@@ -22,43 +22,42 @@
 
 .navbar .nav {
     display: flex;
-    align-items: center; /* Center items vertically */
-    justify-content: space-around; /* Spread items evenly across the width */
-    flex-grow: 1; /* Allow the nav to grow to take up space */
+    align-items: center;
+    justify-content: space-around;
+    flex-grow: 1;
     padding: 0;
-    list-style: none; /* Remove default list styling */
+    list-style: none;
     margin: 0;
 }
 
 .navbar .nav-link {
-    color: #fff; /* White text */
-    transition: color 0.3s ease; /* Smooth transition for hover */
-    position: relative; /* Necessary for the tooltip */
-    padding: 0 10px; /* Add padding to the links */
-    white-space: nowrap; /* Prevent text from wrapping */
-    text-decoration: none; /* Remove underline from links */
-    outline: none; /* Remove the default outline on focus */
+    color: #fff;
+    transition: color 0.3s ease;
+    position: relative;
+    padding: 0 10px;
+    white-space: nowrap;
+    text-decoration: none;
+    outline: none;
 }
 
-/* Ensure link doesn't stay blue after being clicked */
 .navbar .nav-link:focus,
 .navbar .nav-link:active {
-    color: #fff; /* Ensure color stays white when focused or active */
-    outline: none; /* Remove the default focus outline */
+    color: #fff;
+    outline: none;
 }
 
 .navbar .nav-link:hover {
-    color: #ddd; /* Light grey on hover */
+    color: #ddd;
 }
 
 .navbar .nav-item {
-    margin: 0; /* Remove any additional margin between nav items */
-    flex-shrink: 0; /* Prevent items from shrinking when window resizes */
+    margin: 0;
+    flex-shrink: 0;
 }
 
 .navbar .account-link {
     display: inline-block;
-    font-size: 1.5rem; /* Adjust size as needed */
+    font-size: 1.5rem;
 }
 
 .navbar .account-link .tooltip-text {
@@ -70,12 +69,12 @@
     padding: 5px;
     position: absolute;
     z-index: 1;
-    bottom: 100%; /* Position above the icon */
+    bottom: 100%;
     left: 50%;
     transform: translateX(-50%);
     opacity: 0;
     transition: opacity 0.3s;
-    font-size: 0.75rem; /* Adjust tooltip font size */
+    font-size: 0.75rem;
     white-space: nowrap;
 }
 
@@ -90,7 +89,7 @@
 }
 
 .navbar .logo-link .logo-img {
-    width: 80px; /* Increase the width to make the logo larger */
+    width: 80px;
     height: auto;
     vertical-align: middle;
 }
@@ -104,7 +103,7 @@
     padding: 5px;
     position: absolute;
     z-index: 1;
-    bottom: 75%; /* Position above the logo */
+    bottom: 75%;
     left: 50%;
     transform: translateX(-50%);
     opacity: 0;
@@ -119,5 +118,5 @@
 }
 
 .navbar .logo-link:hover .logo-img {
-    opacity: 0.8; /* Optional: slightly fade the logo on hover */
+    opacity: 0.8;
 }

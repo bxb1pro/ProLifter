@@ -10,10 +10,12 @@ const Exercises = () => {
     const { exercises, bodyPartList, isLoading, error } = useSelector((state) => state.exercises);
     const [bodyPart, setBodyPart] = useState('');
 
+    // Fetch list of body parts from API when the component mounts
     useEffect(() => {
         dispatch(fetchBodyPartList());
     }, [dispatch]);
 
+    // Fetch exercises based on selected body part (or all exercises if none selected)
     useEffect(() => {
         if (bodyPart) {
             dispatch(fetchExercisesByBodyPart({ bodyPart }));
@@ -22,13 +24,13 @@ const Exercises = () => {
         }
     }, [dispatch, bodyPart]);
 
+    // Handle changes in the body part selection
     const handleBodyPartChange = (event) => {
         setBodyPart(event.target.value);
     };
 
     if (isLoading) return <p>Loading...</p>;
 
-    // Render error message only if it's a string, otherwise provide a fallback message.
     if (error) {
         return (
             <div className="error-container">
@@ -38,6 +40,7 @@ const Exercises = () => {
         );
     }
 
+    // Display list of exercises in grid layout
     return (
         <Container>
             <Row className="mb-4">

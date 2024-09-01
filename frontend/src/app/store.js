@@ -9,6 +9,7 @@ import customWorkoutReducer from '../features/customWorkouts/customWorkoutSlice'
 import presetTemplateReducer from '../features/presetTemplates/presetTemplateSlice';
 import customTemplateReducer from '../features/customTemplates/customTemplateSlice';
 
+// Configures Redux store, holds global state of application
 const store = configureStore({
     reducer: {
         auth: authReducer,
