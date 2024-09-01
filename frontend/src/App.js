@@ -26,6 +26,7 @@ function App() {
     const location = useLocation();
     const dispatch = useDispatch();
     const token = useSelector((state) => state.auth.token);
+    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
     const hideNavBar = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/signup';
 
@@ -43,7 +44,7 @@ function App() {
                 <Routes>
                     {/* Public routes */}
                     <Route path="/" element={<LandingPage />} />
-                    <Route path="/login" element={<Login />} />
+                    <Route path="/login" element={isAuthenticated ? <Navigate to="/home" /> : <Login />} />
                     <Route path="/signup" element={<Signup />} />
 
                     {/* Protected routes */}

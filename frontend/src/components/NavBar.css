@@ -36,6 +36,15 @@
     position: relative; /* Necessary for the tooltip */
     padding: 0 10px; /* Add padding to the links */
     white-space: nowrap; /* Prevent text from wrapping */
+    text-decoration: none; /* Remove underline from links */
+    outline: none; /* Remove the default outline on focus */
+}
+
+/* Ensure link doesn't stay blue after being clicked */
+.navbar .nav-link:focus,
+.navbar .nav-link:active {
+    color: #fff; /* Ensure color stays white when focused or active */
+    outline: none; /* Remove the default focus outline */
 }
 
 .navbar .nav-link:hover {

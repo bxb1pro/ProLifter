@@ -45,8 +45,14 @@ const CustomWorkouts = () => {
   }, [status, dispatch]);
 
   const handleViewExercises = (customWorkoutID) => {
-    setSelectedWorkoutID(customWorkoutID);
-    dispatch(fetchExercisesForCustomWorkout(customWorkoutID));
+    if (selectedWorkoutID === customWorkoutID) {
+      // If the clicked workout is already selected, hide the exercises by resetting the selectedWorkoutID
+      setSelectedWorkoutID(null);
+    } else {
+      // Otherwise, fetch and display the exercises for the clicked workout
+      setSelectedWorkoutID(customWorkoutID);
+      dispatch(fetchExercisesForCustomWorkout(customWorkoutID));
+    }
   };
 
   const handleOpenUnlinkModal = (exerciseID) => {

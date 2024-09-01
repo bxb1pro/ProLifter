@@ -12,15 +12,9 @@ const Login = () => {
 
     useEffect(() => {
         if (isAuthenticated) {
-            navigate('/home');  // Redirect to a dashboard or home page
+            navigate('/home');  // Redirect to a dashboard or home page upon successful login
         }
     }, [isAuthenticated, navigate]);
-
-    useEffect(() => {
-        return () => {
-            dispatch(clearErrors());
-        };
-    }, [dispatch]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -30,7 +24,7 @@ const Login = () => {
     return (
         <div className="container mt-5">
             <h2>Login</h2>
-            {error && <p className="text-danger">{error}</p>} {/* Display the error message */}
+            {error && <p className="text-danger">{error}</p>}
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <input

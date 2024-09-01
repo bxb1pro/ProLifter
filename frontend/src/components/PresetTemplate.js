@@ -27,6 +27,8 @@ const PresetTemplate = () => {
   const error = useSelector((state) => state.presetTemplates.error);
   const role = useSelector((state) => state.auth.role);
   const user = useSelector((state) => state.auth.user);
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const token = useSelector((state) => state.auth.token);
   const [showLinkTemplateModal, setShowLinkTemplateModal] = useState(false);
   const [templateToLink, setTemplateToLink] = useState(null);
   const [alertVisible, setAlertVisible] = useState(false);
@@ -52,19 +54,33 @@ const PresetTemplate = () => {
   const [locationFilter, setLocationFilter] = useState('');
 
   useEffect(() => {
-    if (!user) {
-      dispatch(fetchAccountDetails());
+    if (token && !user) {
+        console.log('Token available, fetching account details...');
+        dispatch(fetchAccountDetails());
     }
-  }, [user, dispatch]);
+  }, [dispatch, token, user]);
 
   useEffect(() => {
-    if (user && userID) {
-      if (status === 'idle') {
-        dispatch(fetchPresetTemplates());
-        dispatch(fetchUserPresetTemplates(userID)); // Fetch user's selected preset templates
+      if (isAuthenticated && userID && status === 'idle') {
+          console.log('Fetching templates for user:', userID);
+          dispatch(fetchPresetTemplates())
+            .unwrap()
+            .then(() => dispatch(fetchUserPresetTemplates(userID)));
       }
-    }
-  }, [status, dispatch, user, userID]);
+  }, [dispatch, isAuthenticated, userID, status]);
+
+  // Reload data if status changes to idle after an error
+  useEffect(() => {
+      if (status === 'idle' && userID) {
+          dispatch(fetchPresetTemplates());
+          dispatch(fetchUserPresetTemplates(userID));
+      }
+  }, [status, userID, dispatch]);
+
+  // Loading state
+  if (!isAuthenticated || status === 'loading') {
+    return <div>Loading...</div>;
+  }
 
   const handleLinkTemplateToUser = (presetTemplateID) => {
     if (!userID) {

@@ -7,12 +7,11 @@ const PrivateRoute = ({ children }) => {
   const isLoading = useSelector((state) => state.auth.isLoading);
 
   if (isLoading) {
-    // You can render a loading spinner or nothing while fetching account details
     return <div>Loading...</div>;
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/" />;
+    return <Navigate to="/login" />;
   }
 
   return children;
