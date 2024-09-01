@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserWorkoutLogs, deleteWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
+import { fetchUserCustomWorkouts } from '../features/customWorkouts/customWorkoutSlice';
+import { fetchPresetWorkouts } from '../features/presetWorkouts/presetWorkoutSlice';
 import { Link } from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 
@@ -9,12 +11,17 @@ const WorkoutLogs = () => {
   const workoutLogs = useSelector((state) => state.workoutLogs.logs);
   const workoutLogStatus = useSelector((state) => state.workoutLogs.status);
   const error = useSelector((state) => state.workoutLogs.error);
+  
+  const customWorkouts = useSelector((state) => state.customWorkouts.workouts); // Access custom workouts
+  const presetWorkouts = useSelector((state) => state.presetWorkouts.workouts); // Access preset workouts
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [logToDelete, setLogToDelete] = useState(null);
 
   useEffect(() => {
     dispatch(fetchUserWorkoutLogs());
+    dispatch(fetchUserCustomWorkouts()); // Fetch custom workouts
+    dispatch(fetchPresetWorkouts()); // Fetch preset workouts
   }, [dispatch]);
 
   const handleOpenDeleteModal = (workoutLogID) => {
@@ -35,6 +42,17 @@ const WorkoutLogs = () => {
           alert('Failed to delete workout log. Please try again.');
         });
     }
+  };
+
+  const getWorkoutName = (presetWorkoutID, customWorkoutID) => {
+    if (customWorkoutID) {
+      const workout = customWorkouts.find(workout => workout.customWorkoutID === customWorkoutID);
+      return workout ? workout.customWorkoutName : 'Custom Workout';
+    } else if (presetWorkoutID) {
+      const workout = presetWorkouts.find(workout => workout.presetWorkoutID === presetWorkoutID);
+      return workout ? workout.presetWorkoutName : 'Preset Workout';
+    }
+    return 'Workout';
   };
 
   const startedLogs = workoutLogs.filter(log => !log.workoutLogCompleted);
@@ -62,12 +80,11 @@ const WorkoutLogs = () => {
                         style={{ width: '100px', height: '100px' }}
                       />
                       <div>
-                        <Link to={`/workout-logs/${log.workoutLogID}`} className="text-decoration-none">
-                          <p><strong>Log:</strong> 
-                            {log.presetWorkoutID
-                              ? `Preset Workout Log: ${log.presetWorkoutID}`
-                              : `Custom Workout Log: ${log.customWorkoutID}`}
-                          </p>
+                        <Link 
+                          to={`/workout-logs/${log.workoutLogID}`} 
+                          style={{ textDecoration: 'none', color: 'inherit' }}
+                        >
+                          <p><strong>Log:</strong> {getWorkoutName(log.presetWorkoutID, log.customWorkoutID)}</p>
                           <p><strong>Date:</strong> {new Date(log.workoutLogDate).toLocaleDateString()}</p>
                         </Link>
                       </div>
@@ -104,12 +121,11 @@ const WorkoutLogs = () => {
                         style={{ width: '100px', height: '100px' }}
                       />
                       <div>
-                        <Link to={`/workout-logs/${log.workoutLogID}`} className="text-decoration-none">
-                          <p><strong>Log:</strong> 
-                            {log.presetWorkoutID
-                              ? `Preset Workout Log: ${log.presetWorkoutID}`
-                              : `Custom Workout Log: ${log.customWorkoutID}`}
-                          </p>
+                        <Link 
+                          to={`/workout-logs/${log.workoutLogID}`} 
+                          style={{ textDecoration: 'none', color: 'inherit' }}
+                        >
+                          <p><strong>Log:</strong> {getWorkoutName(log.presetWorkoutID, log.customWorkoutID)}</p>
                           <p><strong>Date:</strong> {new Date(log.workoutLogDate).toLocaleDateString()}</p>
                         </Link>
                       </div>

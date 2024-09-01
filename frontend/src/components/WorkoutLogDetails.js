@@ -98,8 +98,14 @@ const WorkoutLogDetails = () => {
 
   const handleDeleteSetLog = () => {
     if (setLogToDelete) {
+      // Capture the current scroll position before deleting the set
+      const currentScrollPosition = window.scrollY;
+  
       dispatch(deleteSetLog(setLogToDelete)).then(() => {
-        dispatch(fetchWorkoutLogDetails(workoutLogID));
+        // After deleting the set, restore the scroll position
+        dispatch(fetchWorkoutLogDetails(workoutLogID)).then(() => {
+          window.scrollTo(0, currentScrollPosition);
+        });
         setShowDeleteSetModal(false);
       });
     }
@@ -112,14 +118,23 @@ const WorkoutLogDetails = () => {
 
   const handleDeleteExercise = () => {
     if (exerciseLogToDelete) {
+      // Capture the current scroll position before deleting the exercise
+      const currentScrollPosition = window.scrollY;
+  
       dispatch(deleteExerciseLog(exerciseLogToDelete)).then(() => {
-        dispatch(fetchWorkoutLogDetails(workoutLogID));
+        // After deleting the exercise, restore the scroll position
+        dispatch(fetchWorkoutLogDetails(workoutLogID)).then(() => {
+          window.scrollTo(0, currentScrollPosition);
+        });
         setShowDeleteExerciseModal(false);
       });
     }
   };
 
   const handleAddSetLog = (exerciseLogID) => {
+    // Capture the current scroll position before adding the set
+    const currentScrollPosition = window.scrollY;
+  
     const setData = newSetData[exerciseLogID] || {}; 
     const { setLogWeight, setLogReps, setLogRPE, setLog1RM } = setData;
   
@@ -143,7 +158,10 @@ const WorkoutLogDetails = () => {
           ...prevData,
           [exerciseLogID]: { setLogWeight: '', setLogReps: '', setLogRPE: '', setLog1RM: '' },
         }));
-        dispatch(fetchWorkoutLogDetails(workoutLogID));
+        // After adding the set, restore the scroll position
+        dispatch(fetchWorkoutLogDetails(workoutLogID)).then(() => {
+          window.scrollTo(0, currentScrollPosition);
+        });
       })
       .catch((error) => {
         console.error('Error adding set:', error);
@@ -162,9 +180,13 @@ const WorkoutLogDetails = () => {
   };
 
   const handleSaveSetLog = (setLogID) => {
+    const currentScrollPosition = window.scrollY;
+  
     dispatch(editSetLog({ ...editSetData, id: setLogID })).then(() => {
       setEditMode(null);
-      dispatch(fetchWorkoutLogDetails(workoutLogID));
+      dispatch(fetchWorkoutLogDetails(workoutLogID)).then(() => {
+        window.scrollTo(0, currentScrollPosition);
+      });
     });
   };
 

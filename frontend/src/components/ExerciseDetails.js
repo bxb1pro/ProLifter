@@ -86,10 +86,10 @@ const ExerciseDetails = () => {
                     <p><strong>Body Part:</strong> {selectedExercise.bodyPart}</p>
                     <p><strong>Equipment:</strong> {selectedExercise.equipment}</p>
                     <p><strong>Target Muscle:</strong> {selectedExercise.target}</p>
-                    <p><strong>Secondary Muscles:</strong> {selectedExercise.secondaryMuscles.join(', ')}</p>
+                    <p><strong>Secondary Muscles:</strong> {(selectedExercise.secondaryMuscles || []).join(', ')}</p>
                     <h4 className="mt-4">Instructions:</h4>
                     <ol>
-                        {selectedExercise.instructions.map((instruction, index) => (
+                        {(selectedExercise.instructions || []).map((instruction, index) => (
                             <li key={index}>{instruction}</li>
                         ))}
                     </ol>
