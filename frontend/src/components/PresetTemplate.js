@@ -55,21 +55,30 @@ const PresetTemplate = () => {
 
   // Fetch account details if token is available but user details are not (bug fix)
   useEffect(() => {
-      if (isAuthenticated && userID && status === 'idle') {
-          console.log('Fetching templates for user:', userID);
-          dispatch(fetchPresetTemplates())
+    if (isAuthenticated && userID && status === 'idle') {
+        console.log('Fetching templates for user:', userID);
+        dispatch(fetchPresetTemplates())
             .unwrap()
-            .then(() => dispatch(fetchUserPresetTemplates(userID)));
-      }
-  }, [dispatch, isAuthenticated, userID, status]);
+            .then(() => {
+                // Only fetch user preset templates if the role is 'user'
+                if (role === 'user') {
+                    dispatch(fetchUserPresetTemplates(userID));
+                }
+            });
+    }
+}, [dispatch, isAuthenticated, userID, status, role]);
 
-  // Reload data if status changes to idle after an error (bug fix)
-  useEffect(() => {
-      if (status === 'idle' && userID) {
-          dispatch(fetchPresetTemplates());
+// Reload data if status changes to idle after an error (bug fix)
+useEffect(() => {
+  if (status === 'idle' && userID) {
+      dispatch(fetchPresetTemplates());
+
+      // Only fetch user preset templates if the role is 'user'
+      if (role === 'user') {
           dispatch(fetchUserPresetTemplates(userID));
       }
-  }, [status, userID, dispatch]);
+  }
+}, [status, userID, dispatch, role]);
 
   if (!isAuthenticated || status === 'loading') {
     return <div>Loading...</div>;

@@ -7,7 +7,7 @@ const startServer = async () => {
     try {
         await sequelize.authenticate();
         console.log('Database connected successfully.');
-        await sequelize.sync({ force: true }); // sync models with the database
+        await sequelize.sync({ alter: true }); // sync models with the database
         console.log('Database synced successfully.');
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
