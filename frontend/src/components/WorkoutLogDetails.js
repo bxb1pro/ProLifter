@@ -3,22 +3,28 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchWorkoutLogDetails, finishWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 import { editExerciseLog, deleteExerciseLog } from '../features/exerciseLogs/exerciseLogSlice';
 import { addSetLog, deleteSetLog, editSetLog } from '../features/setLogs/setLogSlice'; 
+import { fetchExerciseByName } from '../features/exercises/exerciseSlice';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, ListGroup, Form, InputGroup, Card, Modal, Row, Col } from 'react-bootstrap';
 import './WorkoutLogDetails.css';
 
+// Function to capitalise words from exercise database
 const capitaliseWords = (str) => {
   return str.replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
 const WorkoutLogDetails = () => {
-  const { workoutLogID } = useParams();
+  const { workoutLogID } = useParams(); // Get workoutLogID from URL
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const workoutLog = useSelector((state) => state.workoutLogs.currentLog);
   const status = useSelector((state) => state.workoutLogs.status);
   const error = useSelector((state) => state.workoutLogs.error);
+  
+  // State to track fetched exercise images
+  const [exerciseImages, setExerciseImages] = useState({});
 
+  // States for new and edited set logs
   const [newSetData, setNewSetData] = useState({}); 
   const [editMode, setEditMode] = useState(null); 
   const [editSetData, setEditSetData] = useState({
@@ -39,18 +45,25 @@ const WorkoutLogDetails = () => {
 
   const [showFinishWorkoutModal, setShowFinishWorkoutModal] = useState(false);
 
+  // Fetch workout log details and related exercise images on component mount
   useEffect(() => {
     if (workoutLogID) {
       dispatch(fetchWorkoutLogDetails(workoutLogID)).then((response) => {
-        console.log('Workout Log Details:', response.payload); // Debugging line
         const exerciseLogs = response.payload.ExerciseLogs;
-        exerciseLogs.forEach(log => {
-          console.log('Exercise Image URL:', log.Exercise.exerciseImageUrl); // Debugging line
+        exerciseLogs.forEach((log) => {
+          const encodedName = encodeURIComponent(log.Exercise.exerciseName);
+          dispatch(fetchExerciseByName(encodedName)).then((action) => {
+            setExerciseImages((prev) => ({
+              ...prev,
+              [log.Exercise.exerciseName]: action.payload.imageUrl,
+            }));
+          });
         });
       });
     }
   }, [dispatch, workoutLogID]);
 
+  // Open and handle finish workout
   const handleOpenFinishWorkoutModal = () => {
     setShowFinishWorkoutModal(true);
   };
@@ -68,6 +81,7 @@ const WorkoutLogDetails = () => {
       });
   };
 
+  // Open and handle finish exercise
   const handleOpenFinishExerciseModal = (exerciseLogID) => {
     setExerciseLogToFinish(exerciseLogID);
     setShowFinishExerciseModal(true);
@@ -82,6 +96,7 @@ const WorkoutLogDetails = () => {
     }
   };
 
+  // Open and handle deleting a set
   const handleOpenDeleteSetModal = (setLogID) => {
     setSetLogToDelete(setLogID);
     setShowDeleteSetModal(true);
@@ -89,13 +104,20 @@ const WorkoutLogDetails = () => {
 
   const handleDeleteSetLog = () => {
     if (setLogToDelete) {
+      // Capture current scroll position before deleting set
+      const currentScrollPosition = window.scrollY;
+  
       dispatch(deleteSetLog(setLogToDelete)).then(() => {
-        dispatch(fetchWorkoutLogDetails(workoutLogID));
+        // After deleting set restore scroll position
+        dispatch(fetchWorkoutLogDetails(workoutLogID)).then(() => {
+          window.scrollTo(0, currentScrollPosition);
+        });
         setShowDeleteSetModal(false);
       });
     }
   };
 
+  // Open and handle deleting an exercise
   const handleOpenDeleteExerciseModal = (exerciseLogID) => {
     setExerciseLogToDelete(exerciseLogID);
     setShowDeleteExerciseModal(true);
@@ -103,17 +125,25 @@ const WorkoutLogDetails = () => {
 
   const handleDeleteExercise = () => {
     if (exerciseLogToDelete) {
+      const currentScrollPosition = window.scrollY;
+  
       dispatch(deleteExerciseLog(exerciseLogToDelete)).then(() => {
-        dispatch(fetchWorkoutLogDetails(workoutLogID));
+        dispatch(fetchWorkoutLogDetails(workoutLogID)).then(() => {
+          window.scrollTo(0, currentScrollPosition);
+        });
         setShowDeleteExerciseModal(false);
       });
     }
   };
 
+  // Handle adding a set log
   const handleAddSetLog = (exerciseLogID) => {
+    const currentScrollPosition = window.scrollY;
+  
     const setData = newSetData[exerciseLogID] || {}; 
     const { setLogWeight, setLogReps, setLogRPE, setLog1RM } = setData;
   
+    // Restrict user input to required data types
     if (!setLogWeight || !setLogReps || isNaN(setLogWeight) || isNaN(setLogReps) || setLogWeight <= 0 || setLogReps <= 0) {
       alert('Please enter valid numeric values for both weight and reps, and ensure they are greater than 0.');
       return;
@@ -134,7 +164,9 @@ const WorkoutLogDetails = () => {
           ...prevData,
           [exerciseLogID]: { setLogWeight: '', setLogReps: '', setLogRPE: '', setLog1RM: '' },
         }));
-        dispatch(fetchWorkoutLogDetails(workoutLogID));
+        dispatch(fetchWorkoutLogDetails(workoutLogID)).then(() => {
+          window.scrollTo(0, currentScrollPosition);
+        });
       })
       .catch((error) => {
         console.error('Error adding set:', error);
@@ -142,6 +174,7 @@ const WorkoutLogDetails = () => {
       });
   };
 
+  // Handle editing a set log
   const handleEditSetLog = (setLog) => {
     setEditMode(setLog.setLogID);
     setEditSetData({
@@ -152,13 +185,19 @@ const WorkoutLogDetails = () => {
     });
   };
 
+  // Saving a set log
   const handleSaveSetLog = (setLogID) => {
+    const currentScrollPosition = window.scrollY;
+  
     dispatch(editSetLog({ ...editSetData, id: setLogID })).then(() => {
       setEditMode(null);
-      dispatch(fetchWorkoutLogDetails(workoutLogID));
+      dispatch(fetchWorkoutLogDetails(workoutLogID)).then(() => {
+        window.scrollTo(0, currentScrollPosition);
+      });
     });
   };
 
+  // Handle changes in new set data input fields
   const handleChangeNewSetData = (exerciseLogID, field, value) => {
     setNewSetData((prevData) => ({
       ...prevData,
@@ -183,9 +222,27 @@ const WorkoutLogDetails = () => {
 
   return (
     <section className="container mt-4 workout-log-details">
-      <h2 className="mb-4">Workout Log Details</h2>
-      <p><strong>Date:</strong> {new Date(workoutLog.workoutLogDate).toLocaleDateString()}</p>
-      <p><strong>Completed:</strong> {workoutLog.workoutLogCompleted ? 'Yes' : 'No'}</p>
+      <Row className="mb-4">
+        {/* Header information for workout log details*/}
+        <Col md={6}>
+          <h2>Workout Log Details</h2>
+          <p><strong>Date:</strong> {new Date(workoutLog.workoutLogDate).toLocaleDateString()}</p>
+          <p><strong>Completed:</strong> {workoutLog.workoutLogCompleted ? 'Yes' : 'No'}</p>
+        </Col>
+        <Col md={6} className="text-end">
+        <h3>Definitions</h3>
+          <div className="definition">
+            <p><strong>RPE: Rate of Perceived Exertion</strong></p>
+            <p className="definition-description">1 being minimum, 10 being maximum</p>
+          </div>
+          <div className="definition">
+            <p><strong>1RM: One Rep Max</strong></p>
+            <p className="definition-description">The maximum weight lifted for one successful repetition</p>
+          </div>
+        </Col>
+      </Row>
+
+      {/* List of exercises for workout for user */}
       <h3>Exercises:</h3>
       <ListGroup as="ul">
         {workoutLog.ExerciseLogs && workoutLog.ExerciseLogs.length > 0 ? (
@@ -193,10 +250,11 @@ const WorkoutLogDetails = () => {
             <ListGroup.Item as="li" key={exerciseLog.exerciseLogID}>
               <Card className="mb-3 exercise-card">
                 <Card.Img 
-                  src={exerciseLog.Exercise.exerciseImageUrl} 
+                // Exercise image called directly from API due to constantly refreshing image links
+                  src={exerciseImages?.[exerciseLog.Exercise.exerciseName]} 
                   alt={exerciseLog.Exercise.exerciseName}
                   onError={(e) => { 
-                    console.error('Failed to load image:', exerciseLog.Exercise.exerciseImageUrl); // Debugging line
+                    console.error('Failed to load image:', exerciseImages?.[exerciseLog.Exercise.exerciseName]); 
                     e.target.onerror = null; 
                     e.target.src = "/images/placeholder.jpg"; 
                   }} 
@@ -208,11 +266,11 @@ const WorkoutLogDetails = () => {
                     <p className="mb-1"><strong>Equipment:</strong> {capitaliseWords(exerciseLog.Exercise.exerciseEquipment)}</p>
                   </div>
                   <Card.Text className="mt-2">
-                  <ol>
-                    {exerciseLog.Exercise.exerciseDescription.map((instruction, index) => (
-                      <li key={index}>{instruction}</li>
-                    ))}
-                  </ol>
+                    <ol>
+                      {exerciseLog.Exercise.exerciseDescription.map((instruction, index) => (
+                        <li key={index}>{instruction}</li>
+                      ))}
+                    </ol>
                   </Card.Text>
                   <Card.Text>Status: {exerciseLog.exerciseLogCompleted ? 'Completed' : 'Incomplete'}</Card.Text>
                   {!exerciseLog.exerciseLogCompleted && (
@@ -232,7 +290,8 @@ const WorkoutLogDetails = () => {
                   >
                     Delete Exercise
                   </Button>
-
+                  
+                  {/* Display set logs for each exercise log in the workout log */}
                   <ListGroup as="ul" className="mt-3">
                     {exerciseLog.SetLogs && exerciseLog.SetLogs.length > 0 ? (
                       exerciseLog.SetLogs
@@ -317,6 +376,7 @@ const WorkoutLogDetails = () => {
                   </ListGroup>
 
                   <div className="mt-3">
+                    {/* Form to add a new set log */}
                     <h5>Add Set Log</h5>
                     <InputGroup className="mb-2">
                       <Form.Control

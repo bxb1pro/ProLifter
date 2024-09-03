@@ -1,5 +1,6 @@
 const { PresetWorkout } = require('../models');
 
+// Create a preset workout
 const createPresetWorkout = async (req, res) => {
     try {
         const { presetWorkoutName, presetWorkoutDifficulty, presetWorkoutGoal, presetWorkoutLocation } = req.body;
@@ -18,6 +19,7 @@ const createPresetWorkout = async (req, res) => {
     }
 };
 
+// View the details of a preset workout
 const viewDetails = async (req, res) => {
     try {
         const workout = await PresetWorkout.findByPk(req.params.id);
@@ -31,6 +33,7 @@ const viewDetails = async (req, res) => {
     }
 };
 
+// Edit a preset workout
 const editPresetWorkout = async (req, res) => {
     try {
         const presetWorkoutID = req.params.id;
@@ -55,6 +58,7 @@ const editPresetWorkout = async (req, res) => {
     }
 };
 
+// Delete a preset workout
 const deletePresetWorkout = async (req, res) => {
     try {
         const presetWorkoutID = req.params.id;
@@ -73,9 +77,10 @@ const deletePresetWorkout = async (req, res) => {
     }
 };
 
+// View all preset workouts
 const viewAllPresetWorkouts = async (req, res) => {
     try {
-        const workouts = await PresetWorkout.findAll();  // Retrieve all preset workouts from the database
+        const workouts = await PresetWorkout.findAll();
         res.status(200).json(workouts);
     } catch (error) {
         console.error(error);

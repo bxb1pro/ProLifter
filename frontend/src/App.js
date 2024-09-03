@@ -26,6 +26,7 @@ function App() {
     const location = useLocation();
     const dispatch = useDispatch();
     const token = useSelector((state) => state.auth.token);
+    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
     const hideNavBar = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/signup';
 
@@ -36,14 +37,16 @@ function App() {
         }
     }, [dispatch, token]);
 
+    // Routing for the application
     return (
         <>
+            {/* Ensure Navbar always loads at top of page */}
             {!hideNavBar && <NavBar />}
             <div className={!hideNavBar ? 'content-with-navbar' : ''}>
                 <Routes>
                     {/* Public routes */}
                     <Route path="/" element={<LandingPage />} />
-                    <Route path="/login" element={<Login />} />
+                    <Route path="/login" element={isAuthenticated ? <Navigate to="/home" /> : <Login />} />
                     <Route path="/signup" element={<Signup />} />
 
                     {/* Protected routes */}

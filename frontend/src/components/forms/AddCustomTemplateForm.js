@@ -7,15 +7,11 @@ const AddCustomTemplateForm = ({ onClose }) => {
   const [customTemplateDays, setCustomTemplateDays] = useState('');
   const dispatch = useDispatch();
 
+  // Handle form submission to create new custom template
   const handleSubmit = (e) => {
     e.preventDefault();
     if (customTemplateName && customTemplateDays) {
-      dispatch(
-        createCustomTemplate({
-          customTemplateName,
-          customTemplateDays,
-        })
-      );
+      dispatch(createCustomTemplate({ customTemplateName, customTemplateDays }));
       onClose();
     }
   };
@@ -30,6 +26,7 @@ const AddCustomTemplateForm = ({ onClose }) => {
           </div>
           <div className="modal-body">
             <form onSubmit={handleSubmit}>
+              {/* Input for template name */}
               <div className="mb-3">
                 <label htmlFor="customTemplateName" className="form-label">Template Name</label>
                 <input
@@ -41,6 +38,7 @@ const AddCustomTemplateForm = ({ onClose }) => {
                   required
                 />
               </div>
+              {/* Input for number of days */}
               <div className="mb-3">
                 <label htmlFor="customTemplateDays" className="form-label">Number of Days</label>
                 <input

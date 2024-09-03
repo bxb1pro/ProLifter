@@ -1,5 +1,6 @@
 const { WorkoutLog, PresetWorkoutExercise, CustomWorkoutExercise, ExerciseLog, SetLog, Exercise } = require('../models');
 
+// Start a workout
 const startWorkout = async (req, res) => {
     try {
         const userID = req.user.userID;  // Extract userID from the authenticated user's JWT
@@ -47,16 +48,13 @@ const startWorkout = async (req, res) => {
             });
 
             for (const customExercise of customExercises) {
-                // Create an exercise log for each exercise of the custom workout
-                // Note: The user is expected to provide the sets, reps, and RPE later
+                // Create an exercise log for each exercise of the custom workout (no defaults because user fills data for custom later)
                 await ExerciseLog.create({
                     userID,
                     workoutLogID: newWorkoutLog.workoutLogID,
                     exerciseID: customExercise.exerciseID,
-                    exerciseLogSets: null // Sets will be added by the user later
+                    exerciseLogSets: null // Null sets to leave for user to fill
                 });
-
-                // No SetLogs are created here because the user will set these manually
             }
         }
 
@@ -67,6 +65,7 @@ const startWorkout = async (req, res) => {
     }
 };
 
+// Finish a workout
 const finishWorkout = async (req, res) => {
     try {
         const workoutLog = await WorkoutLog.findByPk(req.params.id);
@@ -82,6 +81,7 @@ const finishWorkout = async (req, res) => {
     }
 };
 
+// Edit a workout log
 const editWorkoutLog = async (req, res) => {
     try {
         const { workoutLogDate, workoutLogCompleted } = req.body;
@@ -99,6 +99,7 @@ const editWorkoutLog = async (req, res) => {
     }
 };
 
+// Delete a workout log
 const deleteWorkoutLog = async (req, res) => {
     try {
         const workoutLog = await WorkoutLog.findByPk(req.params.id);
@@ -113,15 +114,16 @@ const deleteWorkoutLog = async (req, res) => {
     }
 };
 
+// Get workout logs for a user
 const getUserWorkoutLogs = async (req, res) => {
     try {
-        // Extract the userID from the authenticated user's request
+        // Extract the userID from authenticated user
         const userID = req.user.userID;
 
-        // Find all workout logs associated with this user
+        // Find all workout logs associated with the user
         const workoutLogs = await WorkoutLog.findAll({
             where: { userID },
-            order: [['workoutLogDate', 'DESC']], // Optional: order by date
+            order: [['workoutLogDate', 'DESC']],
         });
 
         res.status(200).json(workoutLogs);
@@ -131,6 +133,7 @@ const getUserWorkoutLogs = async (req, res) => {
     }
 };
 
+// Get workout log details
 const getWorkoutLogDetails = async (req, res) => {
     try {
         const workoutLogID = req.params.id;
@@ -142,10 +145,10 @@ const getWorkoutLogDetails = async (req, res) => {
                 include: [
                     {
                         model: SetLog,
-                        attributes: ['setLogID', 'setLogWeight', 'setLogReps', 'setLogRPE', 'setLog1RM'] // Include setLogID and other necessary attributes
+                        attributes: ['setLogID', 'setLogWeight', 'setLogReps', 'setLogRPE', 'setLog1RM']
                     },
                     {
-                        model: Exercise, // Include exercise details
+                        model: Exercise,
                         attributes: ['exerciseName', 'exerciseBodypart', 'exerciseDescription', 'exerciseImageUrl', 'exerciseEquipment', 'exerciseSecondaryBodypart']
                     }
                 ],

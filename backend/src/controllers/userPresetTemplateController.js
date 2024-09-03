@@ -27,7 +27,7 @@ const linkPresetTemplate = async (req, res) => {
         await UserPresetTemplate.create({
             userID,
             presetTemplateID,
-            dateSelected: new Date(), // Set the current date and time
+            dateSelected: new Date(),
         });
 
         res.status(200).json({ message: 'Preset template linked to user successfully' });
@@ -64,9 +64,9 @@ const getUserPresetTemplates = async (req, res) => {
             include: [{ model: PresetTemplate }] // Include the PresetTemplate model to get template details
         });
 
-        // Instead of 404, return an empty array
+        // Return empty array instead of 404 (bug fix for frontend)
         if (!userPresetTemplates || userPresetTemplates.length === 0) {
-            return res.status(200).json([]); // Return an empty array instead of 404
+            return res.status(200).json([]);
         }
 
         // Extract the preset templates from the linked data

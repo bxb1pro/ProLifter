@@ -1,18 +1,21 @@
 const express = require('express');
-const { fetchAllExercises, fetchExerciseDetails, fetchExercisesByBodyPart, fetchBodyPartList } = require('../controllers/exerciseController');
+const { fetchAllExercises, fetchExerciseDetails, fetchExercisesByBodyPart, fetchBodyPartList, fetchExerciseByName } = require('../controllers/exerciseController');
 
 const router = express.Router();
 
-// Route to get all exercises
+// Get all exercises from the API
 router.get('/', fetchAllExercises);
 
-// Route to get the list of body parts
+// Get a list of bodyparts from the API
 router.get('/bodyPartList', fetchBodyPartList);
 
-// Route to get exercises by body part
+// Get exercises filtered by bodypart from the API
 router.get('/bodyPart/:bodyPart', fetchExercisesByBodyPart);
 
-// Route to get a specific exercise by ID
+// Get exercises by their specific name
+router.get('/name/:name', fetchExerciseByName);
+
+// Get a specific exercise by ID
 router.get('/:id', fetchExerciseDetails);
 
 module.exports = router;

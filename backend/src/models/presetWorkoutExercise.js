@@ -15,7 +15,7 @@ const PresetWorkoutExercise = sequelize.define('PresetWorkoutExercise', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    // Attributes for preset workout exercises to be set by admins/other
+    // Default values introduced to be filled by admins on creation later
     defaultSets: {
         type: DataTypes.INTEGER,
         allowNull: false,

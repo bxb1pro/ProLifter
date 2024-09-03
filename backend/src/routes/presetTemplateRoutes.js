@@ -4,10 +4,10 @@ const verifyRole = require('../middleware/roleMiddleware');
 
 const router = express.Router();
 
-// Route to view all preset templates
+// View all preset templates
 router.get('/', getPresetTemplates);
 
-// Anyone can view preset template details
+// View a specific preset template
 router.get('/:id', viewPresetTemplateDetails);
 
 // Only admin and superadmin can create, edit, or delete preset templates

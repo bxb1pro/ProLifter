@@ -1,10 +1,10 @@
 const { Exercise } = require('../models');
-const { getAllExercises, getExerciseById, getExercisesByBodyPart, getBodyPartList} = require('../services/exerciseService');
+const { getAllExercises, getExerciseById, getExercisesByBodyPart, getBodyPartList, getExerciseByName } = require('../services/exerciseService'); // Import the exercise service
 
 // Fetch all exercises from the API (with a limit)
 const fetchAllExercises = async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit, 10) || 9999;
+        const limit = parseInt(req.query.limit, 10) || 500;
         const exercises = await getAllExercises(limit);
         res.status(200).json(exercises);
     } catch (error) {
@@ -25,10 +25,10 @@ const fetchExerciseDetails = async (req, res) => {
     }
 };
 
-// Fetch exercises by body part
+// Fetch exercises from the API by body part
 const fetchExercisesByBodyPart = async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit, 10) || 9999;
+        const limit = parseInt(req.query.limit, 10) || 500;
         const exercises = await getExercisesByBodyPart(req.params.bodyPart, limit);
         res.status(200).json(exercises);
     } catch (error) {
@@ -36,11 +36,25 @@ const fetchExercisesByBodyPart = async (req, res) => {
     }
 };
 
-// Fetch body part list (to use in frontend filter search)
+// Fetch body part list from the API (to use in frontend filter search)
 const fetchBodyPartList = async (req, res) => {
     try {
         const bodyParts = await getBodyPartList();
         res.status(200).json(bodyParts);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Fetch exercises by name from the API (to load the live exercise image in the WorkoutLogDetails)
+const fetchExerciseByName = async (req, res) => {
+    try {
+        const exerciseName = req.params.name;
+        const exercise = await getExerciseByName(exerciseName);
+        if (!exercise || exercise.length === 0) {
+            return res.status(404).json({ error: 'Exercise not found' });
+        }
+        res.status(200).json({ imageUrl: exercise[0].gifUrl });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -52,4 +66,5 @@ module.exports = {
     fetchExerciseDetails,
     fetchExercisesByBodyPart,
     fetchBodyPartList,
+    fetchExerciseByName,
 };

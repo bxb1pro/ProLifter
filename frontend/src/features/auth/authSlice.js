@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import api from '../../services/api';
 
+// Thunk to log user in
 export const loginUser = createAsyncThunk(
   'auth/login',
   async (userData, { dispatch, rejectWithValue }) => {
@@ -20,6 +21,7 @@ export const loginUser = createAsyncThunk(
   }
 );
   
+  // Thunk to sign user up
   export const signupUser = createAsyncThunk(
     'auth/signup',
     async (userData, { dispatch, rejectWithValue }) => {
@@ -44,7 +46,7 @@ export const loginUser = createAsyncThunk(
     async (_, { rejectWithValue }) => {
       try {
         const response = await api.get('/auth/account');
-        console.log('Account Details:', response.data); // Log the response data
+        console.log('Account Details:', response.data);
         return response.data;
       } catch (error) {
         console.error('Error fetching account details:', error.response ? error.response.data : error.message);

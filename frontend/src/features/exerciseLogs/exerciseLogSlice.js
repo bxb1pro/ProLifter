@@ -45,7 +45,7 @@ export const deleteExerciseLog = createAsyncThunk(
     name: 'exerciseLogs',
     initialState: {
       logs: [],
-      status: 'idle', // idle, loading, succeeded, failed
+      status: 'idle',
       error: null,
     },
     reducers: {},

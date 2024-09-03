@@ -1,4 +1,4 @@
-/* Padding to ensure navbar doesn't hide other components */
+/* Padding to make sure navbar doesn't hide other components */
 .content-with-navbar {
   padding-top: 20px;
 }
@@ -17,6 +17,7 @@ body {
     box-sizing: border-box;
 }
 
+/*Added padding to bottom of page for more natural scroll*/
 body {
-  padding-bottom: 50px; /* Add padding to the bottom of the body */
+  padding-bottom: 50px;
 }

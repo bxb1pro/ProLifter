@@ -1,46 +1,62 @@
-/* WorkoutLogDetails.css */
-
 .workout-log-details .exercise-card {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-  }
-  
-  .workout-log-details .exercise-card img {
-    width: 250px;
-    height: 250px;
-    object-fit: cover;
-    margin-right: 20px;
-  }
-  
-  .workout-log-details .exercise-card-title {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .workout-log-details .exercise-card-body {
-    flex: 1;
-  }
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
 
-  .set-log-info {
-    padding: 10px;
-    background-color: #f8f9fa; /* Light grey background for each set */
-    border-radius: 5px;
-    margin-bottom: 10px;
-  }
-  
-  .set-log-title {
-    font-size: 1.1rem;
-    margin-right: 15px;
-    color: #343a40; /* Darker color for emphasis */
-  }
-  
-  .set-log-item {
-    margin-right: 15px;
-    font-size: 1rem;
-    color: #495057; /* Slightly muted color for details */
-  }
-  
-  .set-log-item strong {
-    color: #212529; /* Stronger color for labels */
-  }
+.workout-log-details .exercise-card img {
+  width: 250px;
+  height: 250px;
+  object-fit: cover;
+  margin-right: 20px;
+}
+
+.workout-log-details .exercise-card-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.workout-log-details .exercise-card-body {
+  flex: 1;
+}
+
+.set-log-info {
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.set-log-title {
+  font-size: 1.1rem;
+  margin-right: 15px;
+  color: #343a40;
+}
+
+.set-log-item {
+  margin-right: 15px;
+  font-size: 1rem;
+  color: #495057;
+}
+
+.set-log-item strong {
+  color: #212529;
+}
+
+.workout-log-details .text-end {
+  text-align: right;
+}
+
+.definition {
+  margin-bottom: 10px;
+}
+
+.definition p {
+  margin: 0;
+}
+
+.definition-description {
+  margin-left: 20px;
+  font-size: 0.9rem;
+  color: #495057;
+}

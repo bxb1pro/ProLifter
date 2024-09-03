@@ -1,27 +1,27 @@
 .exercise-image {
-    border-radius: 8px; /* Optional: adds rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow to the image */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .exercise-details h2 {
-    font-size: 2rem; /* Adjusted size for heading */
-    color: #333; /* Dark color for better contrast */
+    font-size: 2rem;
+    color: #333;
 }
 
 .exercise-details p {
-    font-size: 1.1rem; /* Slightly larger font for better readability */
-    color: #555; /* A softer color for the text */
+    font-size: 1.1rem;
+    color: #555;
 }
 
 .exercise-details ol {
-    padding-left: 20px; /* Ensure list items are properly indented */
-    font-size: 1rem; /* Adjust list font size */
-    color: #666; /* Softer color for instructions */
+    padding-left: 20px;
+    font-size: 1rem;
+    color: #666;
 }
 
 .exercise-details .form-select {
-    width: auto; /* Make the select dropdown fit its content */
-    margin-right: 10px; /* Add space between the select and the button */
+    width: auto;
+    margin-right: 10px;
 }
 
 .input-group.mb-3 {

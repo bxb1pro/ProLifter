@@ -1,20 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import {
-  fetchUserCustomWorkouts,
-  fetchExercisesForCustomWorkout,
-  unlinkExerciseFromCustomWorkout,
-  deleteCustomWorkout,
-} from '../features/customWorkouts/customWorkoutSlice';
-import {
-  fetchUserCustomTemplates,
-  linkCustomWorkoutToTemplate,
-} from '../features/customTemplates/customTemplateSlice';
+import {fetchUserCustomWorkouts, fetchExercisesForCustomWorkout, unlinkExerciseFromCustomWorkout, 
+  deleteCustomWorkout, } from '../features/customWorkouts/customWorkoutSlice';
+import {fetchUserCustomTemplates, linkCustomWorkoutToTemplate, } from '../features/customTemplates/customTemplateSlice';
 import AddCustomWorkoutForm from './forms/AddCustomWorkoutForm';
 import EditCustomWorkoutForm from './forms/EditCustomWorkoutForm';
 import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 import { useNavigate } from 'react-router-dom';
-import { Modal, Button, Alert } from 'react-bootstrap'; // Import Bootstrap components
+import { Modal, Button, Alert } from 'react-bootstrap';
 
 const CustomWorkouts = () => {
   const dispatch = useDispatch();
@@ -25,18 +18,20 @@ const CustomWorkouts = () => {
   const status = useSelector((state) => state.customWorkouts.status);
   const error = useSelector((state) => state.customWorkouts.error);
 
+  // State variables for modals workout selection
   const [selectedWorkoutID, setSelectedWorkoutID] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingWorkout, setEditingWorkout] = useState(null);
   const [selectedTemplateID, setSelectedTemplateID] = useState('');
-  const [showUnlinkModal, setShowUnlinkModal] = useState(false); // Modal state
-  const [exerciseToUnlink, setExerciseToUnlink] = useState(null); // Exercise to unlink
-  const [showDeleteModal, setShowDeleteModal] = useState(false); // Modal state
+  const [showUnlinkModal, setShowUnlinkModal] = useState(false); // Modal state for removing exercise
+  const [exerciseToUnlink, setExerciseToUnlink] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [workoutToDelete, setWorkoutToDelete] = useState(null); 
-  const [showLinkModal, setShowLinkModal] = useState(false); // Modal state for linking
-  const [workoutToLink, setWorkoutToLink] = useState(null); // Workout ID to link
-  const [linkResult, setLinkResult] = useState(null); // Link result status (success or failure)
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [workoutToLink, setWorkoutToLink] = useState(null);
+  const [linkResult, setLinkResult] = useState(null);
 
+  // Fetch workouts and templates on component mount if status is idle
   useEffect(() => {
     if (status === 'idle') {
       dispatch(fetchUserCustomWorkouts());
@@ -44,33 +39,42 @@ const CustomWorkouts = () => {
     }
   }, [status, dispatch]);
 
+  // Toggle viewing exercises for a selected workout
   const handleViewExercises = (customWorkoutID) => {
-    setSelectedWorkoutID(customWorkoutID);
-    dispatch(fetchExercisesForCustomWorkout(customWorkoutID));
+    if (selectedWorkoutID === customWorkoutID) {
+      setSelectedWorkoutID(null); // Hide exercises if already selected
+    } else {
+      setSelectedWorkoutID(customWorkoutID);
+      dispatch(fetchExercisesForCustomWorkout(customWorkoutID));
+    }
   };
 
+  // Open modal for unlinking an exercise
   const handleOpenUnlinkModal = (exerciseID) => {
     setExerciseToUnlink(exerciseID);
     setShowUnlinkModal(true);
   };
 
+  // Handle unlinking an exercise from the workout
   const handleUnlinkExercise = () => {
     dispatch(unlinkExerciseFromCustomWorkout({ customWorkoutID: selectedWorkoutID, exerciseID: exerciseToUnlink }));
     setShowUnlinkModal(false);
   };
 
+  // Open the modal for deleting a workout
   const handleOpenDeleteModal = (customWorkoutID) => {
     setWorkoutToDelete(customWorkoutID);
     setShowDeleteModal(true);
   };
 
+  // Handle deleting a workout
   const handleDeleteWorkout = () => {
     if (workoutToDelete) {
       dispatch(deleteCustomWorkout(workoutToDelete))
         .unwrap()
         .then(() => {
-          setShowDeleteModal(false); // Close the modal after successful deletion
-          setWorkoutToDelete(null); // Clear the workout ID to avoid accidental re-use
+          setShowDeleteModal(false);
+          setWorkoutToDelete(null);
         })
         .catch((error) => {
           console.error('Error deleting workout:', error);
@@ -79,36 +83,43 @@ const CustomWorkouts = () => {
     }
   };
 
+  // Handle showing the form for adding a new workout
   const handleAddWorkout = () => {
     setShowAddForm(true);
   };
 
+  // Handle editing a workout
   const handleEditWorkout = (workout) => {
     setEditingWorkout(workout);
   };
 
+  // Open modal for linking a workout to a template
   const handleOpenLinkModal = (customWorkoutID, templateID) => {
     setWorkoutToLink({ customWorkoutID, templateID });
     setShowLinkModal(true);
   };
 
+  // Handle linking a workout to a template
   const handleLinkWorkoutToTemplate = () => {
     if (workoutToLink) {
       const { customWorkoutID, templateID } = workoutToLink;
       dispatch(linkCustomWorkoutToTemplate({ id: templateID, customWorkoutID }))
         .unwrap()
         .then(() => {
-          setShowLinkModal(false); // Close the modal after successful link
+          setShowLinkModal(false);
           setLinkResult({ success: true, message: 'Custom workout linked to template successfully.' });
           setSelectedTemplateID('');
         })
         .catch((error) => {
-          setLinkResult({ success: false, message: error.error === 'Custom workout is already linked to this template' ? 'This workout is already linked to the selected template.' : `Failed to link custom workout: ${error || 'Unknown error'}` });
+          setLinkResult({ success: false, message: error.error === 'Custom workout is already linked to this template' 
+          ? 'This workout is already linked to the selected template.' 
+          : `Failed to link custom workout: ${error || 'Unknown error'}` });
           setShowLinkModal(false);
         });
     }
   };
 
+  // Handle starting a workout and navigating to the workout logs page
   const handleStartWorkout = (workoutID) => {
     dispatch(startWorkoutLog({ customWorkoutID: workoutID }))
       .unwrap()
@@ -128,6 +139,7 @@ const CustomWorkouts = () => {
   } else if (status === 'succeeded') {
     content = (
       <ul className="list-group">
+        {/*List workouts for a user*/}
         {workouts.map((workout) => (
           <li key={workout.customWorkoutID} className="list-group-item">
             <div className="d-flex justify-content-between align-items-center">
@@ -184,6 +196,7 @@ const CustomWorkouts = () => {
                 </select>
               </div>
             </div>
+            {/*List exercises for workouts for a user*/}
             {selectedWorkoutID === workout.customWorkoutID && exercises[workout.customWorkoutID] && (
               <ul className="list-group mt-3">
                 {exercises[workout.customWorkoutID].length > 0 ? (
@@ -239,7 +252,7 @@ const CustomWorkouts = () => {
         </Modal.Footer>
       </Modal>
       
-      {/* Delete Confirmation Modal */}
+      {/* Delete Workout Confirmation Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>

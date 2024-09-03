@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
-const cors = require('cors'); // Import the CORS package
+const cors = require('cors');
 
 // Create the Express app
 const app = express();
@@ -11,6 +11,7 @@ app.use(cors());
 
 app.use(express.json());
 
+// Link routes
 const userRoutes = require('./routes/userRoutes');
 const exerciseRoutes = require('./routes/exerciseRoutes');
 const presetWorkoutRoutes = require('./routes/presetWorkoutRoutes');
@@ -29,6 +30,7 @@ const presetTemplateRoutes = require('./routes/presetTemplateRoutes');
 const presetTemplatePresetWorkoutRoutes = require('./routes/presetTemplatePresetWorkoutRoutes');
 const userPresetTemplateRoutes = require('./routes/userPresetTemplateRoutes');
 
+// Set endpoints
 app.use('/api/users', userRoutes);
 app.use('/api/exercises', exerciseRoutes);
 app.use('/api/preset-workouts', presetWorkoutRoutes);

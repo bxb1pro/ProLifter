@@ -5,28 +5,30 @@ import { fetchUserCustomWorkouts, linkExerciseToCustomWorkout } from '../feature
 import { fetchPresetWorkouts, linkExerciseToPresetWorkout } from '../features/presetWorkouts/presetWorkoutSlice';
 import { useParams } from 'react-router-dom';
 import './ExerciseDetails.css';
-import 'bootstrap/dist/css/bootstrap.min.css';  // Make sure Bootstrap CSS is imported
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const ExerciseDetails = () => {
-    const { id } = useParams();  // Get the exercise ID from the URL
+    const { id } = useParams(); // Extract exercise ID from route parameters
     const dispatch = useDispatch();
     const { selectedExercise, isLoading, error } = useSelector((state) => state.exercises);
-    const customWorkouts = useSelector((state) => state.customWorkouts.workouts); // Fetch custom workouts
-    const presetWorkouts = useSelector((state) => state.presetWorkouts.workouts); // Fetch preset workouts
-    const [selectedCustomWorkout, setSelectedCustomWorkout] = useState(''); // State to manage selected custom workout
-    const [selectedPresetWorkout, setSelectedPresetWorkout] = useState(''); // State to manage selected preset workout
-    const [defaultSets, setDefaultSets] = useState(''); // State to manage default sets
-    const [defaultReps, setDefaultReps] = useState(''); // State to manage default reps
-    const [defaultRPE, setDefaultRPE] = useState(''); // State to manage default RPE
-    const [modal, setModal] = useState({ show: false, message: '', type: '' }); // State to manage modal visibility
-    const role = useSelector((state) => state.auth.role); 
+    const customWorkouts = useSelector((state) => state.customWorkouts.workouts);
+    const presetWorkouts = useSelector((state) => state.presetWorkouts.workouts);
+    const [selectedCustomWorkout, setSelectedCustomWorkout] = useState('');
+    const [selectedPresetWorkout, setSelectedPresetWorkout] = useState('');
+    const [defaultSets, setDefaultSets] = useState('');
+    const [defaultReps, setDefaultReps] = useState('');
+    const [defaultRPE, setDefaultRPE] = useState('');
+    const [modal, setModal] = useState({ show: false, message: '', type: '' });
+    const role = useSelector((state) => state.auth.role); // Get user role from the Redux state
 
+    // Fetch exercise details, custom workouts, and preset workouts when component mounts
     useEffect(() => {
         dispatch(fetchExerciseById(id));
-        dispatch(fetchUserCustomWorkouts()); // Fetch user's custom workouts
-        dispatch(fetchPresetWorkouts()); // Fetch all preset workouts
+        dispatch(fetchUserCustomWorkouts());
+        dispatch(fetchPresetWorkouts());
     }, [dispatch, id]);
 
+    // Handle linking exercise to a custom workout
     const handleLinkExerciseToCustomWorkout = () => {
         if (selectedCustomWorkout) {
             dispatch(linkExerciseToCustomWorkout({ customWorkoutID: selectedCustomWorkout, exerciseID: id }))
@@ -41,6 +43,7 @@ const ExerciseDetails = () => {
         }
     };
 
+    // Handle linking exercise to a preset workout
     const handleLinkExerciseToPresetWorkout = () => {
         if (selectedPresetWorkout && defaultSets && defaultReps) {
             dispatch(linkExerciseToPresetWorkout({ 
@@ -86,16 +89,17 @@ const ExerciseDetails = () => {
                     <p><strong>Body Part:</strong> {selectedExercise.bodyPart}</p>
                     <p><strong>Equipment:</strong> {selectedExercise.equipment}</p>
                     <p><strong>Target Muscle:</strong> {selectedExercise.target}</p>
-                    <p><strong>Secondary Muscles:</strong> {selectedExercise.secondaryMuscles.join(', ')}</p>
+                    <p><strong>Secondary Muscles:</strong> {(selectedExercise.secondaryMuscles || []).join(', ')}</p>
                     <h4 className="mt-4">Instructions:</h4>
                     <ol>
-                        {selectedExercise.instructions.map((instruction, index) => (
+                        {(selectedExercise.instructions || []).map((instruction, index) => (
                             <li key={index}>{instruction}</li>
                         ))}
                     </ol>
                 </div>
             </div>
 
+            {/* Display custom workout options if user role is 'user' */}
             {role === 'user' && (
                 <div className="mt-5">
                     <h3>Add to Custom Workout</h3>
@@ -123,6 +127,7 @@ const ExerciseDetails = () => {
                 </div>
             )}
 
+            {/* Display preset workout options if user role is 'admin' or 'superadmin' */}
             {(role === 'admin' || role === 'superadmin') && (
                 <div className="mt-5">
                     <h3>Add to Preset Workout</h3>
@@ -184,7 +189,7 @@ const ExerciseDetails = () => {
                 className={`modal fade ${modal.show ? 'show d-block' : ''}`} 
                 tabIndex="-1" 
                 role="dialog" 
-                style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}  // optional: to darken the background
+                style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}  //darkens background
             >
                 <div className="modal-dialog" role="document">
                     <div className="modal-content">

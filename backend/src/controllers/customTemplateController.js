@@ -31,7 +31,7 @@ const editTemplate = async (req, res) => {
             return res.status(404).json({ error: 'Template not found' });
         }
 
-        // Ensure the template belongs to the user
+        // Make sure the template belongs to the user
         if (template.userID !== req.user.userID) {
             return res.status(403).json({ error: 'Unauthorized' });
         }
@@ -59,7 +59,7 @@ const deleteTemplate = async (req, res) => {
             return res.status(404).json({ error: 'Template not found' });
         }
 
-        // Ensure the template belongs to the user
+        // Make sure the template belongs to the user
         if (template.userID !== req.user.userID) {
             return res.status(403).json({ error: 'Unauthorized' });
         }

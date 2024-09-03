@@ -3,10 +3,12 @@ import { useDispatch } from 'react-redux';
 import { editCustomTemplate } from '../../features/customTemplates/customTemplateSlice';
 
 const EditCustomTemplateForm = ({ template, onClose }) => {
+  // Initialise state with current template's data
   const [customTemplateName, setCustomTemplateName] = useState(template.customTemplateName);
   const [customTemplateDays, setCustomTemplateDays] = useState(template.customTemplateDays);
   const dispatch = useDispatch();
 
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     if (customTemplateName && customTemplateDays) {
@@ -33,6 +35,7 @@ const EditCustomTemplateForm = ({ template, onClose }) => {
           </div>
           <div className="modal-body">
             <form onSubmit={handleSubmit}>
+              {/* Template Name Input */}
               <div className="mb-3">
                 <label htmlFor="customTemplateName" className="form-label">Template Name</label>
                 <input
@@ -40,10 +43,11 @@ const EditCustomTemplateForm = ({ template, onClose }) => {
                   className="form-control"
                   id="customTemplateName"
                   value={customTemplateName}
-                  onChange={(e) => setCustomTemplateName(e.target.value)}
+                  onChange={(e) => setCustomTemplateName(e.target.value)} // Update state with new value
                   required
                 />
               </div>
+              {/* Number of Days Input */}
               <div className="mb-3">
                 <label htmlFor="customTemplateDays" className="form-label">Number of Days</label>
                 <input
@@ -51,10 +55,11 @@ const EditCustomTemplateForm = ({ template, onClose }) => {
                   className="form-control"
                   id="customTemplateDays"
                   value={customTemplateDays}
-                  onChange={(e) => setCustomTemplateDays(e.target.value)}
+                  onChange={(e) => setCustomTemplateDays(e.target.value)} // Update state with new value
                   required
                 />
               </div>
+              {/* Form Buttons */}
               <div className="modal-footer">
                 <button type="submit" className="btn btn-primary">Save Changes</button>
                 <button type="button" className="btn btn-secondary" onClick={onClose}>

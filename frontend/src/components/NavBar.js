@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import './NavBar.css'; // Import the CSS file
-import { BsPerson } from 'react-icons/bs'; // Import the person icon from react-icons
+import './NavBar.css';
+import { BsPerson } from 'react-icons/bs';
 
 const NavBar = () => {
-    const role = useSelector((state) => state.auth.role); // Get the role from the Redux state
+    const role = useSelector((state) => state.auth.role); // Get user role from Redux state
 
+    // Place links to various components in Navbar
     return (
         <nav className="navbar">
             <div className="container">
@@ -26,7 +27,7 @@ const NavBar = () => {
                     <li className="nav-item">
                         <Link className="nav-link" to="/preset-workouts">Preset Workouts</Link>
                     </li>
-                    {/* Conditionally render links based on the user's role */}
+                    {/* Conditional links to show based on user role */}
                     {role === 'user' && (
                         <>
                             <li className="nav-item">
