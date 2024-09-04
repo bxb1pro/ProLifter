@@ -154,6 +154,12 @@ const presetTemplateSlice = createSlice({
         status: 'idle',
         error: null,
     },
+    reducers: {
+        clearError: (state) => {
+          state.error = null; // Reset the error state (bug fix)
+          state.status = 'idle'; 
+        }
+      },
     extraReducers: (builder) => {
         builder
             .addCase(fetchPresetTemplates.pending, (state) => {
@@ -264,4 +270,5 @@ const presetTemplateSlice = createSlice({
     },
 });
 
+export const { clearError } = presetTemplateSlice.actions;
 export default presetTemplateSlice.reducer;

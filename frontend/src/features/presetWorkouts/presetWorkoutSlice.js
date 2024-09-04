@@ -167,7 +167,12 @@ export const fetchUserPresetWorkouts = createAsyncThunk(
       status: 'idle',
       error: null,
     },
-    reducers: {},
+    reducers: {
+      clearError: (state) => {
+        state.error = null; // Reset the error state (bug fix)
+        state.status = 'idle'; 
+      }
+    },
     extraReducers: (builder) => {
       builder
         .addCase(fetchPresetWorkouts.pending, (state) => {
@@ -270,4 +275,5 @@ export const fetchUserPresetWorkouts = createAsyncThunk(
     },
   });
   
+  export const { clearError } = presetWorkoutSlice.actions;
   export default presetWorkoutSlice.reducer;

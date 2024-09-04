@@ -122,7 +122,12 @@ export const createCustomWorkout = createAsyncThunk(
       status: 'idle',
       error: null,
     },
-    reducers: {},
+    reducers: {
+      clearError: (state) => {
+        state.error = null; // Reset the error state (bug fix)
+        state.status = 'idle'; 
+      }
+    },
     extraReducers: (builder) => {
       builder
         .addCase(fetchUserCustomWorkouts.pending, (state) => {
@@ -174,4 +179,5 @@ export const createCustomWorkout = createAsyncThunk(
     },
   });
   
+  export const { clearError } = customWorkoutSlice.actions;
   export default customWorkoutSlice.reducer;

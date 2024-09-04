@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {fetchUserCustomWorkouts, fetchExercisesForCustomWorkout, unlinkExerciseFromCustomWorkout, 
-  deleteCustomWorkout, } from '../features/customWorkouts/customWorkoutSlice';
+  deleteCustomWorkout, clearError } from '../features/customWorkouts/customWorkoutSlice';
 import {fetchUserCustomTemplates, linkCustomWorkoutToTemplate, } from '../features/customTemplates/customTemplateSlice';
 import AddCustomWorkoutForm from './forms/AddCustomWorkoutForm';
 import EditCustomWorkoutForm from './forms/EditCustomWorkoutForm';
@@ -220,9 +220,9 @@ const CustomWorkouts = () => {
         ))}
       </ul>
     );
-  } else if (status === 'failed') {
-    content = <p className="text-danger">{error || 'An error occurred'}</p>;
-  }
+  } else if (status === 'failed' && error) {
+    content = <p className="text-danger">{typeof error === 'object' ? JSON.stringify(error) : error}</p>;
+}
 
   return (
     <section className="container mt-4">

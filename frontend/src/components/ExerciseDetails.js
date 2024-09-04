@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchExerciseById } from '../features/exercises/exerciseSlice';
-import { fetchUserCustomWorkouts, linkExerciseToCustomWorkout } from '../features/customWorkouts/customWorkoutSlice';
-import { fetchPresetWorkouts, linkExerciseToPresetWorkout } from '../features/presetWorkouts/presetWorkoutSlice';
+import { fetchUserCustomWorkouts, linkExerciseToCustomWorkout, clearError as clearCustomWorkoutError } from '../features/customWorkouts/customWorkoutSlice';
+import { fetchPresetWorkouts, linkExerciseToPresetWorkout, clearError as clearPresetWorkoutError } from '../features/presetWorkouts/presetWorkoutSlice';
 import { useParams } from 'react-router-dom';
 import './ExerciseDetails.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -28,7 +28,6 @@ const ExerciseDetails = () => {
         dispatch(fetchPresetWorkouts());
     }, [dispatch, id]);
 
-    // Handle linking exercise to a custom workout
     const handleLinkExerciseToCustomWorkout = () => {
         if (selectedCustomWorkout) {
             dispatch(linkExerciseToCustomWorkout({ customWorkoutID: selectedCustomWorkout, exerciseID: id }))
@@ -38,7 +37,8 @@ const ExerciseDetails = () => {
                 })
                 .catch((error) => {
                     console.error('Error adding exercise to custom workout:', error);
-                    setModal({ show: true, message: `Failed to add exercise to custom workout: ${error.error || 'Unknown error'}`, type: 'danger' });
+                    const errorMessage = typeof error.error === 'object' ? JSON.stringify(error.error) : error.error || 'Unknown error';
+                    setModal({ show: true, message: `Failed to add exercise to custom workout: ${errorMessage}`, type: 'danger' });
                 });
         }
     };
@@ -63,7 +63,11 @@ const ExerciseDetails = () => {
         }
     };
 
-    const handleCloseModal = () => setModal({ ...modal, show: false });
+    const handleCloseModal = () => {
+        setModal({ ...modal, show: false });
+        dispatch(clearCustomWorkoutError());
+        dispatch(clearPresetWorkoutError());
+    };
 
     if (isLoading) return <p>Loading...</p>;
     if (error) return <p>{error}</p>;

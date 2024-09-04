@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchPresetTemplates, deletePresetTemplate, linkPresetTemplate, fetchPresetWorkoutsForTemplate, unlinkPresetWorkoutFromTemplate,
-  fetchUserPresetTemplates, unlinkPresetTemplate as unlinkUserPresetTemplate, } from '../features/presetTemplates/presetTemplateSlice';
+  fetchUserPresetTemplates, unlinkPresetTemplate as unlinkUserPresetTemplate, clearError } from '../features/presetTemplates/presetTemplateSlice';
 import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
 import AddPresetTemplateForm from './forms/AddPresetTemplateForm';
 import EditPresetTemplateForm from './forms/EditPresetTemplateForm';
@@ -47,9 +47,12 @@ const PresetTemplate = () => {
   const [locationFilter, setLocationFilter] = useState('');
 
   useEffect(() => {
+    // Clear any previous errors when the component mounts
+    dispatch(clearError());
+  
     if (token && !user) {
-        console.log('Token available, fetching account details...');
-        dispatch(fetchAccountDetails());
+      console.log('Token available, fetching account details...');
+      dispatch(fetchAccountDetails());
     }
   }, [dispatch, token, user]);
 

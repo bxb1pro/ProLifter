@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchPresetWorkouts, fetchExercisesForPresetWorkout, unlinkExerciseFromPresetWorkout, deletePresetWorkout,
-  linkPresetWorkoutToUser, fetchUserPresetWorkouts, unlinkPresetWorkoutFromUser, } from '../features/presetWorkouts/presetWorkoutSlice';
+  linkPresetWorkoutToUser, fetchUserPresetWorkouts, unlinkPresetWorkoutFromUser, clearError } from '../features/presetWorkouts/presetWorkoutSlice';
 import { fetchPresetTemplates, linkPresetWorkoutToTemplate as linkWorkoutToPresetTemplate, } from '../features/presetTemplates/presetTemplateSlice';
 import { fetchUserCustomTemplates, linkPresetWorkoutToTemplate as linkWorkoutToCustomTemplate, } from '../features/customTemplates/customTemplateSlice';
 import { startWorkoutLog } from '../features/workoutLogs/workoutLogSlice';
